@@ -1,0 +1,85 @@
+2024-11-01 07:48:52,585 DEBUG cd frappe-bench && python3 -m venv env
+2024-11-01 07:49:36,299 DEBUG cd frappe-bench && /workspace/development/frappe-bench/env/bin/python -m pip install --quiet --upgrade pip
+2024-11-01 07:51:01,811 DEBUG cd frappe-bench && /workspace/development/frappe-bench/env/bin/python -m pip install --quiet wheel
+2024-11-01 07:51:13,064 LOG Getting frappe
+2024-11-01 07:51:13,065 DEBUG cd frappe-bench/apps && git clone https://github.com/frappe/frappe.git --branch version-15 --depth 1 --origin upstream
+2024-11-01 07:51:47,530 LOG Installing frappe
+2024-11-01 07:51:47,536 DEBUG cd /workspace/development/frappe-bench && /workspace/development/frappe-bench/env/bin/python -m pip install --quiet --upgrade -e /workspace/development/frappe-bench/apps/frappe 
+2024-11-01 07:59:53,476 DEBUG cd /workspace/development/frappe-bench/apps/frappe && yarn install --check-files
+2024-11-01 08:05:54,433 WARNING restart failed: Couldn't find supervisorctl in PATH
+2024-11-01 08:05:54,433 DEBUG cd frappe-bench && bench build
+2024-11-01 08:05:54,638 INFO /home/frappe/.local/bin/bench build
+2024-11-01 08:07:45,460 LOG setting up backups
+2024-11-01 08:07:45,491 LOG backups were set up
+2024-11-01 08:07:45,491 INFO Bench frappe-bench initialized
+2024-11-01 08:57:38,919 INFO /home/frappe/.local/bin/bench set-config -g db_host mariadb
+2024-11-01 08:57:52,952 INFO /home/frappe/.local/bin/bench set-config -g redis_cache redis:
+2024-11-01 08:58:22,969 INFO /home/frappe/.local/bin/bench set-config -g redis_queue redis:
+2024-11-01 08:59:39,941 INFO /home/frappe/.local/bin/bench set-config -g redis_queue redis://redis-queue:6379
+2024-11-01 09:00:46,843 INFO /home/frappe/.local/bin/bench set-config -g redis_queue redis://redis:6379
+2024-11-01 09:02:08,252 INFO /home/frappe/.local/bin/bench set-config -g redis_queue redis://redis:6379
+2024-11-01 09:05:28,515 INFO /home/frappe/.local/bin/bench new-site --mariadb-root-password 123 --admin-password admin --no-mariadb-socket mysite.localhost
+2024-11-01 09:08:12,731 INFO /home/frappe/.local/bin/bench use mysite.localhost
+2024-11-01 09:08:25,053 INFO /home/frappe/.local/bin/bench --site set-config developer_mode 1
+2024-11-01 09:10:49,984 INFO /home/frappe/.local/bin/bench --site mysite.localhost set-config developer_mode 1
+2024-11-01 09:11:24,970 INFO /home/frappe/.local/bin/bench --site clear-cache
+2024-11-01 09:12:41,419 INFO /home/frappe/.local/bin/bench --site mysite.localhost clear-cache
+2024-11-01 09:13:05,723 INFO /home/frappe/.local/bin/bench get-app --branch version-15 erpnext
+2024-11-01 09:13:06,529 LOG Getting erpnext
+2024-11-01 09:13:06,530 DEBUG cd ./apps && git clone https://github.com/frappe/erpnext.git --branch version-15 --depth 1 --origin upstream
+2024-11-01 09:13:57,677 LOG Installing erpnext
+2024-11-01 09:13:57,687 DEBUG cd /workspace/development/frappe-bench && /workspace/development/frappe-bench/env/bin/python -m pip install --quiet --upgrade -e /workspace/development/frappe-bench/apps/erpnext 
+2024-11-01 09:17:58,524 DEBUG cd /workspace/development/frappe-bench/apps/erpnext && yarn install --check-files
+2024-11-01 09:18:00,700 DEBUG bench build --app erpnext
+2024-11-01 09:18:00,967 INFO /home/frappe/.local/bin/bench build --app erpnext
+2024-11-01 09:18:59,843 WARNING restart failed: Couldn't find supervisorctl in PATH
+2024-11-01 09:41:28,432 INFO /home/frappe/.local/bin/bench --site install-app hrms
+2024-11-01 09:42:19,701 INFO /home/frappe/.local/bin/bench --site mysite.localhost install-app hrms
+2024-11-01 09:43:32,627 INFO /home/frappe/.local/bin/bench get-app --branch version-15 hrms
+2024-11-01 09:43:33,471 LOG Getting hrms
+2024-11-01 09:43:33,472 DEBUG cd ./apps && git clone https://github.com/frappe/hrms.git --branch version-15 --depth 1 --origin upstream
+2024-11-01 09:43:54,638 LOG Installing hrms
+2024-11-01 09:43:54,654 DEBUG cd /workspace/development/frappe-bench && /workspace/development/frappe-bench/env/bin/python -m pip install --quiet --upgrade -e /workspace/development/frappe-bench/apps/hrms 
+2024-11-01 09:44:36,170 DEBUG cd /workspace/development/frappe-bench/apps/hrms && yarn install --check-files
+2024-11-01 10:15:18,957 DEBUG bench build --app hrms
+2024-11-01 10:15:19,323 INFO /home/frappe/.local/bin/bench build --app hrms
+2024-11-01 10:17:52,317 WARNING restart failed: Couldn't find supervisorctl in PATH
+2024-11-01 11:06:02,379 INFO /home/frappe/.local/bin/bench --site mysite.localhost install-app hrms
+2024-11-01 11:11:40,332 INFO /home/frappe/.local/bin/bench get-app --branch version-15 https://github.com/frappe/payments.git
+2024-11-01 11:11:40,459 LOG Getting payments
+2024-11-01 11:11:40,459 DEBUG cd ./apps && git clone https://github.com/frappe/payments.git --branch version-15 --depth 1 --origin upstream
+2024-11-01 11:11:42,952 LOG Installing payments
+2024-11-01 11:11:42,959 DEBUG cd /workspace/development/frappe-bench && /workspace/development/frappe-bench/env/bin/python -m pip install --quiet --upgrade -e /workspace/development/frappe-bench/apps/payments 
+2024-11-01 11:13:50,164 DEBUG bench build --app payments
+2024-11-01 11:13:50,433 INFO /home/frappe/.local/bin/bench build --app payments
+2024-11-01 11:14:32,111 WARNING restart failed: Couldn't find supervisorctl in PATH
+2024-11-01 11:15:12,734 INFO /home/frappe/.local/bin/bench get-app --branch version-15 https://github.com/resilient-tech/india-compliance.git
+2024-11-01 11:15:12,850 LOG Getting india-compliance
+2024-11-01 11:15:12,850 DEBUG cd ./apps && git clone https://github.com/resilient-tech/india-compliance.git --branch version-15 --depth 1 --origin upstream
+2024-11-01 11:15:19,021 LOG Installing india_compliance
+2024-11-01 11:15:19,029 DEBUG cd /workspace/development/frappe-bench && /workspace/development/frappe-bench/env/bin/python -m pip install --quiet --upgrade -e /workspace/development/frappe-bench/apps/india_compliance 
+2024-11-01 11:16:32,306 DEBUG bench build --app india_compliance
+2024-11-01 11:16:32,573 INFO /home/frappe/.local/bin/bench build --app india_compliance
+2024-11-01 11:17:03,693 WARNING restart failed: Couldn't find supervisorctl in PATH
+2024-11-01 11:19:03,293 INFO /home/frappe/.local/bin/bench build
+2024-11-01 11:24:21,840 INFO /home/frappe/.local/bin/bench migrate
+2024-11-01 11:27:00,916 INFO /home/frappe/.local/bin/bench start
+2024-11-01 11:27:01,374 INFO /home/frappe/.local/bin/bench watch
+2024-11-01 11:27:01,380 INFO /home/frappe/.local/bin/bench serve --port 8000
+2024-11-01 11:27:01,400 INFO /home/frappe/.local/bin/bench worker
+2024-11-01 11:27:01,439 INFO /home/frappe/.local/bin/bench schedule
+2024-11-02 16:23:21,450 INFO /home/frappe/.local/bin/bench start
+2024-11-02 16:23:21,947 INFO /home/frappe/.local/bin/bench serve --port 8000
+2024-11-02 16:23:21,948 INFO /home/frappe/.local/bin/bench watch
+2024-11-02 16:23:21,963 INFO /home/frappe/.local/bin/bench schedule
+2024-11-02 16:23:21,984 INFO /home/frappe/.local/bin/bench worker
+2024-11-03 09:47:58,989 INFO /home/frappe/.local/bin/bench start
+2024-11-03 09:47:59,488 INFO /home/frappe/.local/bin/bench schedule
+2024-11-03 09:47:59,488 INFO /home/frappe/.local/bin/bench worker
+2024-11-03 09:47:59,500 INFO /home/frappe/.local/bin/bench watch
+2024-11-03 09:47:59,500 INFO /home/frappe/.local/bin/bench serve --port 8000
+2024-11-03 12:30:07,764 INFO /home/frappe/.local/bin/bench start
+2024-11-03 12:30:08,929 INFO /home/frappe/.local/bin/bench serve --port 8000
+2024-11-03 12:30:08,940 INFO /home/frappe/.local/bin/bench schedule
+2024-11-03 12:30:08,960 INFO /home/frappe/.local/bin/bench watch
+2024-11-03 12:30:09,059 INFO /home/frappe/.local/bin/bench worker
