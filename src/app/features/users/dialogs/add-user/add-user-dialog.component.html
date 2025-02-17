@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>Create User</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="userForm">
+    <mat-form-field>
+      <input matInput placeholder="Username" formControlName="username">
+      <mat-error *ngIf="userForm.get('username')?.invalid">
+        Username is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="Email" formControlName="email" type="email">
+      <mat-error *ngIf="userForm.get('email')?.invalid">
+        Please enter a valid email
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="First Name" formControlName="firstName">
+      <mat-error *ngIf="userForm.get('firstName')?.invalid">
+        First Name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="Last Name" formControlName="lastName">
+      <mat-error *ngIf="userForm.get('lastName')?.invalid">
+        Last Name is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="Password" type="password" formControlName="password">
+      <mat-error *ngIf="userForm.get('password')?.invalid">
+        Password is required (min 8 characters)
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Role</mat-label>
+      <mat-select formControlName="role">
+        <mat-option *ngFor="let role of roles" [value]="role">
+          {{getRoleDisplayName(role)}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="userForm.get('role')?.invalid">
+        Role is required
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" 
+          [disabled]="userForm.invalid"
+          (click)="addUser()">Create</button>
+</mat-dialog-actions>

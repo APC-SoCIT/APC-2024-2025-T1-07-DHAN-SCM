@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>Edit Product</h2>
+<mat-dialog-content>
+  <form [formGroup]="productForm">
+    <mat-form-field>
+      <input matInput placeholder="SKU" formControlName="sku" required>
+      <mat-error *ngIf="productForm.get('sku')?.invalid">SKU is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="Product Name" formControlName="name" required>
+      <mat-error *ngIf="productForm.get('name')?.invalid">Product Name is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="Model" formControlName="model" required>
+      <mat-error *ngIf="productForm.get('model')?.invalid">Model is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="Manufacturer" formControlName="manufacturer" required>
+      <mat-error *ngIf="productForm.get('manufacturer')?.invalid">Manufacturer is required</mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput placeholder="Category" formControlName="category" required>
+      <mat-error *ngIf="productForm.get('category')?.invalid">Category is required</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="dialogRef.close()">Cancel</button>
+  <button mat-raised-button color="primary" 
+          [disabled]="productForm.invalid" 
+          (click)="updateProduct()">Update Product</button>
+</mat-dialog-actions>

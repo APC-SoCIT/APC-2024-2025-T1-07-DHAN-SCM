@@ -1,0 +1,97 @@
+@use '@angular/material' as mat;
+
+// Include the common styles for Angular Material
+@include mat.core();
+
+// Define the palettes
+$primary: mat.define-palette(mat.$indigo-palette);
+$accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$warn: mat.define-palette(mat.$red-palette);
+
+// Create the theme object
+$theme: mat.define-light-theme((
+  color: (
+    primary: $primary,
+    accent: $accent,
+    warn: $warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+// Apply the theme
+@include mat.all-component-themes($theme);
+
+// Custom Theming for Angular Material
+
+// Modern color palette
+:root {
+  --primary-color: #3f51b5;
+  --secondary-color: #2196f3;
+  --background-light: #f8f9fa;
+  --text-primary: #1a1a2c;
+  --text-secondary: #6a6a6a;
+}
+
+// Global Reset and Typography
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--background-light);
+}
+
+// Scrollbar Styling
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+// Utility Classes
+.text-muted {
+  color: var(--text-secondary);
+}
+
+.shadow-sm {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+// Material Design Overrides
+.mat-mdc-card {
+  border-radius: 16px;
+}
+
+.mat-mdc-form-field {
+  --mdc-filled-text-field-container-shape: 12px;
+}
+
+// Subtle Transitions
+a, button, .transition {
+  transition: all 0.2s ease-in-out;
+}

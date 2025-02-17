@@ -1,0 +1,102 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  
+  mat-card {
+    max-width: 450px;
+    width: 95%;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 
+      0 12px 30px rgba(0, 0, 0, 0.08),
+      0 4px 10px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .logo-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .login-logo {
+    max-width: 180px;
+    max-height: 180px;
+    object-fit: contain;
+  }
+
+  .login-title-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+
+  .login-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2c;
+    text-align: center;
+    letter-spacing: -0.5px;
+  }
+
+  mat-card-header {
+    margin-bottom: 0;
+    width: 100%;
+  }
+
+  form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  mat-form-field {
+    width: 100%;
+
+    input {
+      font-size: 16px;
+      color: #333;
+      padding: 12px 16px;
+      border-radius: 8px;
+    }
+
+    .mat-mdc-form-field-focus-overlay {
+      background-color: rgba(63, 81, 181, 0.05);
+    }
+  }
+
+  button {
+    width: 100%;
+    height: 52px;
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 10px;
+    background-color: #3f51b5;
+    color: white;
+    border: none;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #354899;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: #a0a0a0;
+    }
+  }
+}

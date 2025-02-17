@@ -1,0 +1,51 @@
+:host {
+  display: block;
+  max-width: 800px;
+  width: 100%;
+}
+
+mat-dialog-content {
+  max-height: 70vh;
+  padding: 20px 0;
+}
+
+.tab-label {
+  margin-left: 8px;
+}
+
+.history-list {
+  padding: 16px 0;
+}
+
+.history-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #fff;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.date {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.details {
+  p {
+    margin: 8px 0;
+  }
+}
+
+.no-records {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+  font-style: italic;
+}

@@ -1,0 +1,56 @@
+.users-container {
+  padding: 24px;
+
+  .users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    h2 {
+      margin: 0;
+    }
+  }
+
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  .mat-column-actions {
+    width: 120px;
+    text-align: right;
+  }
+
+  @media (max-width: 600px) {
+    .users-header {
+      flex-direction: column;
+      align-items: flex-start;
+
+      button {
+        margin-top: 16px;
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Dialog form styles
+mat-dialog-content {
+  mat-form-field {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+}
+
+mat-dialog-actions {
+  justify-content: flex-end;
+
+  button {
+    margin-left: 8px;
+  }
+}

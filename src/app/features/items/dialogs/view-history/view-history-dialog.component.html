@@ -1,0 +1,89 @@
+<h2 mat-dialog-title>Item History</h2>
+<mat-dialog-content>
+  <mat-tab-group>
+    <!-- Maintenance History -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>build</mat-icon>
+        <span class="tab-label">Maintenance</span>
+      </ng-template>
+      
+      <div class="history-list">
+        <div *ngIf="!item.maintenanceHistory?.length" class="no-records">
+          No maintenance records found
+        </div>
+        <div *ngFor="let record of sortedMaintenanceHistory" class="history-item">
+          <div class="history-header">
+            <span class="date">{{record.date | date:'medium'}}</span>
+            <mat-chip>{{record.type}}</mat-chip>
+          </div>
+          <div class="details">
+            <p><strong>Description:</strong> {{record.description}}</p>
+            <p><strong>Performed by:</strong> {{record.performedBy}}</p>
+            <p *ngIf="record.cost"><strong>Cost:</strong> ${{record.cost}}</p>
+            <p *ngIf="record.nextDueDate">
+              <strong>Next Due:</strong> {{record.nextDueDate | date}}
+            </p>
+            <p *ngIf="record.attachments?.length"><strong>Attachments:</strong> {{record.attachments?.join(', ')}}</p>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Calibration History -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>settings</mat-icon>
+        <span class="tab-label">Calibration</span>
+      </ng-template>
+      
+      <div class="history-list">
+        <div *ngIf="!item.calibrationHistory?.length" class="no-records">
+          No calibration records found
+        </div>
+        <div *ngFor="let record of sortedCalibrationHistory" class="history-item">
+          <div class="history-header">
+            <span class="date">{{record.date | date:'medium'}}</span>
+            <mat-chip *ngIf="record.certificate" color="primary">Certified</mat-chip>
+          </div>
+          <div class="details">
+            <p><strong>Notes:</strong> {{record.notes}}</p>
+            <p><strong>Results:</strong> {{record.results}}</p>
+            <p><strong>Performed by:</strong> {{record.performedBy}}</p>
+            <p><strong>Next Due:</strong> {{record.nextDueDate | date}}</p>
+            <p *ngIf="record.certificate">
+              <strong>Certificate:</strong> {{record.certificate}}
+            </p>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Warranty Claims -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>gavel</mat-icon>
+        <span class="tab-label">Warranty Claims</span>
+      </ng-template>
+      
+      <div class="history-list">
+        <div *ngIf="!item.warranty?.claimHistory?.length" class="no-records">
+          No warranty claims found
+        </div>
+        <div *ngFor="let claim of sortedWarrantyClaims" class="history-item">
+          <div class="history-header">
+            <span class="date">{{claim.date | date:'medium'}}</span>
+            <mat-chip [color]="getClaimStatusColor(claim.status)">{{claim.status}}</mat-chip>
+          </div>
+          <div class="details">
+            <p><strong>Description:</strong> {{claim.description}}</p>
+            <p><strong>Resolution:</strong> {{claim.resolution}}</p>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>
