@@ -1,7 +1,7 @@
-# Medical Equipment Inventory Management System
+# Medical Supply Chain Management System
 
 ## Project Overview
-A comprehensive inventory management system designed for medical equipment distribution companies. This system helps track medical equipment from reception through demos and final delivery to healthcare facilities.
+A supply chain management system designed for medical equipment distribution companies. This system helps track medical equipment from reception through demos and final delivery to healthcare facilities.
 
 ## Recent UI Improvements
 ### Design System
