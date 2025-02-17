@@ -4,48 +4,36 @@ const { auth, authorize } = require('../middleware/auth');
 const router = express.Router();
 
 // Register new user (admin only)
-router.post('/users', auth, authorize('admin'), async (req, res) => {
+router.post('/register', auth, authorize('admin'), async (req, res) => {
     try {
         const user = new User(req.body);
         await user.save();
         const token = await user.generateAuthToken();
-        res.status(201).send({ user, token });
+        res.status(201).json({ user, token });
     } catch (error) {
-        res.status(400).send(error);
+        res.status(400).json({ error: error.message });
     }
 });
 
 // Login user
-router.post('/users/login', async (req, res) => {
+router.post('/login', async (req, res) => {
     try {
-        console.log('Login attempt for:', req.body.email);
-        const user = await User.findOne({ email: req.body.email });
-        if (!user) {
-            console.log('User not found');
-            return res.status(400).send({ error: 'User not found' });
-        }
-
-        const bcrypt = require('bcryptjs');
-        const isMatch = await bcrypt.compare(req.body.password, user.password);
-        if (!isMatch) {
-            console.log('Password mismatch');
-            return res.status(400).send({ error: 'Invalid password' });
-        }
-
+        const { email, password } = req.body;
+        const user = await User.findByCredentials(email, password);
         const token = await user.generateAuthToken();
+        
         user.lastLogin = new Date();
         await user.save();
         
-        console.log('Login successful for:', user.email);
-        res.send({ user, token });
+        res.json({ user, token });
     } catch (error) {
         console.error('Login error:', error);
-        res.status(400).send({ error: error.message || 'Invalid login credentials' });
+        res.status(401).json({ error: error.message || 'Invalid login credentials' });
     }
 });
 
 // Logout user
-router.post('/users/logout', auth, async (req, res) => {
+router.post('/logout', auth, async (req, res) => {
     try {
         req.user.tokens = req.user.tokens.filter(token => token.token !== req.token);
         await req.user.save();

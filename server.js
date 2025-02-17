@@ -7,37 +7,23 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// CORS Configuration
+app.use(cors({
+    origin: ['http://localhost:4200'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB connection
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(async () => {
+mongoose.connect(process.env.MONGODB_URI).then(async () => {
     console.log('Connected to MongoDB');
     
-    // Create admin user if it doesn't exist
-    try {
-        const adminExists = await User.findOne({ email: process.env.ADMIN_EMAIL });
-        if (!adminExists) {
-            const admin = new User({
-                username: process.env.ADMIN_USERNAME,
-                email: process.env.ADMIN_EMAIL,
-                password: process.env.ADMIN_PASSWORD,
-                role: 'admin',
-                firstName: 'Admin',
-                lastName: 'User',
-                isActive: true
-            });
-            await admin.save();
-            console.log('Admin user created successfully');
-        }
-    } catch (error) {
-        console.error('Error creating admin user:', error);
-    }
+    // Skip admin user creation since users already exist
+    console.log('Database connected and ready');
 }).catch((error) => {
     console.error('MongoDB connection error:', error);
 });

@@ -11,7 +11,7 @@ const auth = async (req, res, next) => {
         
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findOne({
-            _id: decoded._id,
+            _id: decoded.userId,
             'tokens.token': token,
             isActive: true
         });
@@ -29,9 +29,9 @@ const auth = async (req, res, next) => {
 };
 
 // Middleware for role-based access control
-const authorize = (...roles) => {
+const authorize = (...allowedRoles) => {
     return (req, res, next) => {
-        if (!roles.some(role => req.user.hasPermission(role))) {
+        if (!allowedRoles.includes(req.user.role)) {
             return res.status(403).send({
                 error: 'You do not have permission to perform this action'
             });

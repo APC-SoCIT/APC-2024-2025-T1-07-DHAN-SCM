@@ -16,12 +16,18 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
     const product = new Product({
         name: req.body.name,
+        model: req.body.model,
+        manufacturer: req.body.manufacturer,
         description: req.body.description,
         sku: req.body.sku,
         category: req.body.category,
-        quantity: req.body.quantity,
-        price: req.body.price,
-        reorderPoint: req.body.reorderPoint
+        specifications: req.body.specifications,
+        certifications: req.body.certifications,
+        technicalDetails: req.body.technicalDetails,
+        maintenanceSchedule: req.body.maintenanceSchedule,
+        warranty: req.body.warranty,
+        documentation: req.body.documentation,
+        support: req.body.support
     });
 
     try {

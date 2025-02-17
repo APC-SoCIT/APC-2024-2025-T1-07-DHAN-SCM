@@ -114,10 +114,13 @@ GET    /api/products/:id       # Get product
 PUT    /api/products/:id       # Update product
 
 # Items
-GET    /api/items              # List all items
-POST   /api/items              # Create item
-GET    /api/items/:id          # Get item
-PUT    /api/items/:id          # Update item
+GET    /api/items                  # List all items
+POST   /api/items                  # Create item
+GET    /api/items/:id              # Get item
+PUT    /api/items/:id              # Update item
+GET    /api/inventory/summary      # Get inventory summary
+GET    /api/maintenance/schedule   # Get maintenance schedule
+GET    /api/inventory/report       # Generate inventory report
 ```
 
 ### 3. Common Code Patterns

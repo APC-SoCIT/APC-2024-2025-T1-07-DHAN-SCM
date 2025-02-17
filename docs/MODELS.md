@@ -1,92 +1,24 @@
 # Data Models Documentation
 
-## User Model
-Represents a user in the system with role-based access control.
-
-### Schema
-```javascript
-{
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        minlength: 3
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true,
-        validate: [validateEmail, 'Please provide a valid email']
-    },
-    password: {
-        type: String,
-        required: true,
-        minlength: 8,
-        select: false  // Don't include in queries by default
-    },
-    role: {
-        type: String,
-        required: true,
-        enum: ['admin', 'customer', 'inventory_staff', 'logistics_manager'],
-        default: 'customer'
-    },
-    firstName: {
-        type: String,
-        trim: true
-    },
-    lastName: {
-        type: String,
-        trim: true
-    },
-    isActive: {
-        type: Boolean,
-        default: true
-    },
-    lastLogin: {
-        type: Date
-    },
-    tokens: [{
-        token: {
-            type: String,
-            required: true
-        }
-    }]
-}
-```
-
-### Methods
-```javascript
-// Generate JWT token
-userSchema.methods.generateAuthToken = async function() {
-    const token = jwt.sign(
-        { _id: this._id.toString(), role: this.role },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRATION }
-    );
-    return token;
-};
-
-// Hash password before saving
-userSchema.pre('save', async function(next) {
-    if (this.isModified('password')) {
-        this.password = await bcrypt.hash(this.password, 8);
-    }
-    next();
-});
-```
-
 ## Product Model
 Represents a type of medical equipment in the catalog.
 
 ### Schema
 ```javascript
-{
+const productSchema = new mongoose.Schema({
+    sku: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+    },
     name: {
         type: String,
         required: true,
+        trim: true
+    },
+    description: {
+        type: String,
         trim: true
     },
     model: {
@@ -99,6 +31,161 @@ Represents a type of medical equipment in the catalog.
         required: true,
         trim: true
     },
+    category: {
+        type: String,
+        required: true,
+        enum: ['Diagnostic System', 'Patient Monitoring', 'Laboratory Equipment', 
+               'Imaging Equipment', 'Surgical Equipment', 'Medical Supplies']
+    },
+    specifications: {
+        type: Map,
+        of: String
+    },
+    certifications: [{
+        type: {
+            type: String,
+            enum: ['CE', 'FDA', 'ISO', 'Other']
+        },
+        number: String,
+        validUntil: Date
+    }],
+    technicalDetails: {
+        powerRequirements: String,
+        dimensions: String,
+        weight: String,
+        operatingConditions: {
+            temperature: String,
+            humidity: String,
+            pressure: String
+        }
+    },
+    maintenanceRequirements: {
+        frequency: Number, // in days
+        procedures: [String],
+        requiredTools: [String],
+        estimatedDuration: Number // in minutes
+    },
+    documentation: {
+        manuals: [String], // URLs or file paths
+        datasheets: [String],
+        certificates: [String]
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+```
+
+## Item Model
+Represents an individual piece of equipment in the inventory.
+
+### Schema
+```javascript
+const itemSchema = new mongoose.Schema({
+    serialNumber: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: ['demo', 'inventory', 'delivery'],
+        default: 'inventory'
+    },
+    productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
+    },
+    // For items in 'demo' or 'delivery' status
+    destinationInfo: {
+        customerName: String,
+        address: String,
+        contactPerson: String,
+        contactNumber: String,
+        expectedReturnDate: Date  // for demo units
+    },
+    maintenanceHistory: [{
+        date: Date,
+        type: {
+            type: String,
+            enum: ['preventive', 'corrective', 'calibration', 'inspection']
+        },
+        description: String,
+        performedBy: String,
+        nextDueDate: Date,
+        attachments: [String],
+        cost: Number
+    }],
+    calibrationHistory: [{
+        date: Date,
+        performedBy: String,
+        certificate: String,
+        nextDueDate: Date,
+        results: String
+    }],
+    warranty: {
+        startDate: Date,
+        endDate: Date,
+        claimHistory: [{
+            date: Date,
+            description: String,
+            status: String,
+            resolution: String
+        }]
+    },
+    purchaseInfo: {
+        date: {
+            type: Date,
+            required: true
+        },
+        cost: Number,
+        supplier: String,
+        orderReference: String
+    },
+    notes: [{
+        date: Date,
+        text: String,
+        author: String
+    }],
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+```
+
+### Example Usage
+```javascript
+// Create a new item
+const item = new Item({
+    serialNumber: "LWP2000-2025-0042",
+    productId: productId,  // Reference to product
+    status: "inventory",
+    purchaseInfo: {
+        date: new Date(),  // Required field
+        cost: 5000,
+        supplier: "Medical Supplies Inc",
+        orderReference: "PO-2025-001"
+    },
+    warranty: {
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
+        claimHistory: []  // Required array, can be empty initially
+    }
+});
+```
     category: {
         type: String,
         required: true,

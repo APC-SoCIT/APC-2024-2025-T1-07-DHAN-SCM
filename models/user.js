@@ -64,69 +64,71 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-// Remove sensitive information when converting to JSON
-userSchema.methods.toJSON = function() {
-    const user = this.toObject();
-    delete user.password;
-    delete user.tokens;
-    return user;
-};
-
-// Generate authentication token
+// Generate JWT token
 userSchema.methods.generateAuthToken = async function() {
     const user = this;
     const token = jwt.sign(
-        { _id: user._id.toString(), role: user.role },
+        { userId: user._id.toString(), email: user.email },
         process.env.JWT_SECRET,
         { expiresIn: '24h' }
     );
-    
+
     user.tokens = user.tokens.concat({ token });
     await user.save();
-    
-    return token;
-};
 
-// Find user by credentials
-userSchema.statics.findByCredentials = async (email, password) => {
-    const user = await User.findOne({ email });
-    
-    if (!user) {
-        throw new Error('Invalid login credentials');
-    }
-    
-    const isMatch = await bcrypt.compare(password, user.password);
-    
-    if (!isMatch) {
-        throw new Error('Invalid login credentials');
-    }
-    
-    return user;
+    return token;
 };
 
 // Hash password before saving
 userSchema.pre('save', async function(next) {
     const user = this;
-    
     if (user.isModified('password')) {
         user.password = await bcrypt.hash(user.password, 8);
     }
-    
     next();
 });
 
-// Role-based permission checking
+// Remove sensitive data when converting to JSON
+userSchema.methods.toJSON = function() {
+    const user = this;
+    const userObject = user.toObject();
+
+    delete userObject.password;
+    delete userObject.tokens;
+
+    return userObject;
+};
+
+// Static method to find user by credentials
+userSchema.statics.findByCredentials = async function(email, password) {
+    const User = this;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        throw new Error('Invalid login credentials');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+        throw new Error('Invalid login credentials');
+    }
+
+    return user;
+};
+
+// Check if user has required role
 userSchema.methods.hasPermission = function(requiredRole) {
     const roleHierarchy = {
-        admin: ['admin', 'customer', 'inventory_staff', 'logistics_manager'],
-        inventory_staff: ['inventory_staff'],
-        logistics_manager: ['logistics_manager'],
-        customer: ['customer']
+        admin: 3,
+        logistics_manager: 2,
+        inventory_staff: 1,
+        customer: 0
     };
-    
-    return roleHierarchy[this.role]?.includes(requiredRole) || false;
+
+    return roleHierarchy[this.role] >= roleHierarchy[requiredRole];
 };
 
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
+

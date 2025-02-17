@@ -37,3 +37,20 @@ build/
 
 # Optional eslint cache
 .eslintcache
+
+# Angular specific
+.angular/
+out-tsc/
+bazel-out/
+.sass-cache/
+connect.lock
+coverage/
+libpeerconnection.log
+testem.log
+typings/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
