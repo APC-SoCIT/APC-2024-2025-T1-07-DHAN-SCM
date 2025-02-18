@@ -3,7 +3,7 @@
 ## Project Overview
 A supply chain management system designed for medical equipment distribution companies. This system helps track medical equipment from reception through demos and final delivery to healthcare facilities.
 
-## Features
+## Features (Currently)
 - Product catalog management for medical equipment
 - Individual unit tracking with status monitoring
 - Demo and delivery management
