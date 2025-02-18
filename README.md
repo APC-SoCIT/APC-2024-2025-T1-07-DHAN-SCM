@@ -48,24 +48,6 @@ NODE_ENV=development
 npm start
 ```
 
-## Project Structure
-```
-inventory-system/
-├── models/
-│   ├── product.js        # Product catalog schema
-│   └── item.js           # Individual item schema
-├── routes/
-│   ├── product.routes.js # Product API endpoints
-│   └── item.routes.js    # Item API endpoints
-├── server.js             # Main application file
-├── package.json          # Project dependencies
-└── .env                  # Environment variables
-```
 
-## Documentation
-For other documentation, please refer to:
-- [API Documentation](docs/API.md)
-- [Data Models](docs/MODELS.md)
-- [Usage Guide](docs/USAGE.md)
 
 
