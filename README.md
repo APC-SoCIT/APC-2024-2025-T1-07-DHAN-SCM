@@ -63,13 +63,9 @@ inventory-system/
 ```
 
 ## Documentation
-For detailed documentation, please refer to:
+For other documentation, please refer to:
 - [API Documentation](docs/API.md)
 - [Data Models](docs/MODELS.md)
 - [Usage Guide](docs/USAGE.md)
 
-## Contributing
-This is a capstone project. Please follow the project guidelines and coding standards.
 
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
