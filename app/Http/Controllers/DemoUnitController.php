@@ -75,7 +75,6 @@ class DemoUnitController extends Controller
                 'created_by' => optional($product->creator)->name,
                 'updated_by' => optional($product->updater)->name,
                 'tags' => optional($product->tags)->pluck('name')->toArray(),
-                'available_quantity' => optional($product->incomingStocks)->sum('quantity'),
             ],
         ], 201);
     }
@@ -114,7 +113,6 @@ class DemoUnitController extends Controller
                 'created_by' => optional($product->creator)->name,
                 'updated_by' => optional($product->updater)->name,
                 'tags' => optional($product->tags)->pluck('name')->toArray(),
-                'available_quantity' => optional($product->incomingStocks)->sum('quantity'),
             ],
         ]);
     }
