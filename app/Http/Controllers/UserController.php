@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\RoleUser;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -14,15 +15,37 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'username' => 'required',
-            'full_name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
+        $validatedData = $request->validate([
+            'username' => 'required|string|unique:users,username',
+            'full_name' => 'required|string',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'roles' => 'nullable|array', // Ensure roles is an array if provided
+            'roles.*' => 'exists:roles,id', // Validate each role ID exists
         ]);
 
-        return User::create($request->all());
+        // Create user
+        $user = User::create([
+            'username' => $validatedData['username'],
+            'full_name' => $validatedData['full_name'],
+            'email' => $validatedData['email'],
+            'password' => bcrypt($validatedData['password']), // Secure password
+        ]);
+
+        // Attach roles if provided
+        if (!empty($validatedData['roles'])) {
+            foreach ($validatedData['roles'] as $roleId) {
+                RoleUser::create([
+                    'user_id' => $user->id,
+                    'role_id' => $roleId
+                ]);
+            }
+        }
+
+        return response()->json($user, 201);
     }
+
+
    public function getUserData(Request $request)
     {
         $user = auth()->user();
@@ -54,16 +77,27 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $request->validate([
-            'username' => 'sometimes|required',
-            'full_name' => 'sometimes|required',
-            'email' => 'sometimes|required|email',
-            'password' => 'sometimes|required',
+        $validatedData = $request->validate([
+            'username' => 'sometimes|required|string|unique:users,username,' . $id,
+            'full_name' => 'sometimes|required|string',
+            'email' => 'sometimes|required|email|unique:users,email,' . $id,
+            'password' => 'sometimes|required|string|min:6',
+            'roles' => 'nullable|array', // Ensure roles is an array if provided
+            'roles.*' => 'exists:roles,id', // Validate each role ID exists
         ]);
 
-        $user->update($request->all());
+        // Update user details
+        if (!empty($validatedData['password'])) {
+            $validatedData['password'] = bcrypt($validatedData['password']); // Secure password update
+        }
+        $user->update($validatedData);
 
-        return $user;
+        // **Handling Roles**
+        if (array_key_exists('roles', $validatedData)) {
+            $user->roles()->sync($validatedData['roles'] ?? []); // Sync, removing all roles if empty array is provided
+        }
+
+        return response()->json($user);
     }
 
     public function destroy($id)
