@@ -44,43 +44,38 @@ class DemoUnitController extends Controller
             'status_id' => 'required|exists:statuses,id',
             'notes' => 'nullable|string',
         ]);
-    
+
         $validatedData['created_by'] = auth()->id();
-    
+
         // ✅ Create Demo Unit
         $demoUnit = DemoUnit::create($validatedData);
-    
+
         // ✅ Automatically create an outgoing stock entry
         OutgoingStock::create([
             'demo_unit_id' => $demoUnit->id,
             'incoming_stock_id' => $validatedData['incoming_stock_id'],
-            'order_item_id' => null, // Set if applicable
+            'order_item_id' => null,
             'type' => 'Demo',
             'remarks' => "",
         ]);
-    
-        // ✅ Retrieve product details through incoming stock
-        $product = IncomingStock::find($validatedData['incoming_stock_id'])->product;
-    
+
+        // ✅ Retrieve product details
+        $product = $demoUnit->incomingStock->product;
+
         return response()->json([
             'demo_unit' => $demoUnit,
-            'product' => [
-                'product_id' => $product->id,
-                'name' => $product->name,
-                'sku' => $product->sku,
-                'model' => $product->model,
-                'description' => $product->description,
-                'image_url' => $product->image_url,
-                'minimum_quantity' => $product->minimum_quantity,
-                'supplier' => $product->supplier->name ?? null,
-                'supplier_price' => $product->supplier_price,
-                'location' => $product->location->name ?? null,
-                'warehouse' => $product->warehouse->name ?? null,
-                'status' => $product->status->name ?? null,
-                'created_by' => $product->creator->name ?? null,
-                'updated_by' => $product->updater->name ?? null,
-                'tags' => $product->tags->pluck('name')->toArray(),
-                'available_quantity' => $product->incomingStocks->sum('quantity'),
+            'product' => optional($product)->only([
+                'id', 'name', 'sku', 'model', 'description', 'image_url', 'minimum_quantity',
+                'supplier_price', 'created_at', 'updated_at'
+            ]) + [
+                'supplier' => optional($product->supplier)->name,
+                'location' => optional($product->location)->name,
+                'warehouse' => optional($product->warehouse)->name,
+                'status' => optional($product->status)->name,
+                'created_by' => optional($product->creator)->name,
+                'updated_by' => optional($product->updater)->name,
+                'tags' => optional($product->tags)->pluck('name')->toArray(),
+                'available_quantity' => optional($product->incomingStocks)->sum('quantity'),
             ],
         ], 201);
     }
@@ -101,31 +96,25 @@ class DemoUnitController extends Controller
         ]);
     
         $validatedData['updated_by'] = auth()->id();
-    
         $demoUnit->update($validatedData);
     
-        // ✅ Retrieve product details through the incoming stock
-        $product = $demoUnit->incomingStock->product;
+        // ✅ Retrieve product details safely
+        $product = optional($demoUnit->incomingStock->product);
     
         return response()->json([
             'demo_unit' => $demoUnit,
-            'product' => [
-                'product_id' => $product->id,
-                'name' => $product->name,
-                'sku' => $product->sku,
-                'model' => $product->model,
-                'description' => $product->description,
-                'image_url' => $product->image_url,
-                'minimum_quantity' => $product->minimum_quantity,
-                'supplier' => $product->supplier->name ?? null,
-                'supplier_price' => $product->supplier_price,
-                'location' => $product->location->name ?? null,
-                'warehouse' => $product->warehouse->name ?? null,
-                'status' => $product->status->name ?? null,
-                'created_by' => $product->creator->name ?? null,
-                'updated_by' => $product->updater->name ?? null,
-                'tags' => $product->tags->pluck('name')->toArray(),
-                'available_quantity' => $product->incomingStocks->sum('quantity'),
+            'product' => $product->only([
+                'id', 'name', 'sku', 'model', 'description', 'image_url', 'minimum_quantity',
+                'supplier_price', 'created_at', 'updated_at'
+            ]) + [
+                'supplier' => optional($product->supplier)->name,
+                'location' => optional($product->location)->name,
+                'warehouse' => optional($product->warehouse)->name,
+                'status' => optional($product->status)->name,
+                'created_by' => optional($product->creator)->name,
+                'updated_by' => optional($product->updater)->name,
+                'tags' => optional($product->tags)->pluck('name')->toArray(),
+                'available_quantity' => optional($product->incomingStocks)->sum('quantity'),
             ],
         ]);
     }
