@@ -12,6 +12,7 @@ class CompanyController extends Controller
     {
         return Company::with('companyUsers.user')->get()->map(function ($company) {
             return [
+                "id"=> $company->id,
                 "name" => $company->name,
                 "contact_info" => $company->contact_info,
                 "website_url" => $company->website_url,
@@ -77,6 +78,7 @@ class CompanyController extends Controller
         $company = Company::with('companyUsers.user')->findOrFail($id);
     
         return [
+            "id"=> $company->id,
             "name" => $company->name,
             "contact_info" => $company->contact_info,
             "website_url" => $company->website_url,

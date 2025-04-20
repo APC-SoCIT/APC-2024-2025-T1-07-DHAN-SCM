@@ -16,7 +16,7 @@ class RoleController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'description' => 'required',
+            'description' => 'nullable|string',
         ]);
 
         return Role::create($request->all());
@@ -33,7 +33,7 @@ class RoleController extends Controller
 
         $request->validate([
             'name' => 'sometimes|required',
-            'description' => 'sometimes|required',
+            'description' => 'nullable|string',
         ]);
 
         $role->update($request->all());
