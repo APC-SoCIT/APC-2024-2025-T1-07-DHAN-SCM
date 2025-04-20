@@ -78,7 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 });
-Route::get('report/outOfStocks', [ReportController::class, 'outOfStocks']);
+
 
 
 Route::get('availableIncomingStocks/{productId?}', [IncomingStocksController::class, 'getAvailableIncomingStocks']);
@@ -86,5 +86,14 @@ Route::get('availableIncomingStocks/{productId?}', [IncomingStocksController::cl
 Route::get('/purchaseOrders/{purchaseOrderId?}', [PurchaseOrderController::class, 'getPurchaseOrderDetails']);
 
 Route::get('getAllProducts/{productId?}', [ProductController::class, 'getAllProducts']);
+
+
+
+//reporst from here:
+Route::get('report/outOfStocks', [ReportController::class, 'outOfStocks']);
+Route::get('report/belowMinimumStocks', [ReportController::class, 'belowMinimumStocks']);
+Route::get('report/getAllDemoUnits', [ReportController::class, 'getAllDemoUnits']);
+
+
 
 
