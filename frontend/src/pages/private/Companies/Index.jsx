@@ -112,14 +112,6 @@ function Companies() {
       ...getColumnSearchProps("name"),
     },
     {
-      title: "Email",
-      dataIndex: "email_address",
-    },
-    {
-      title: "Phone Number",
-      dataIndex: "phone_number",
-    },
-    {
       title: "Action",
       width: 50,
       render: (_, record) => {

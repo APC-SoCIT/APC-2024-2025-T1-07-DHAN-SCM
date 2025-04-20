@@ -20,6 +20,7 @@ import PurchaseOrdersCreate from "./pages/private/PurchaseOrdersCreate/Index.jsx
 import PurchaseOrdersView from "./pages/private/PurchaseOrdersView/Index.jsx";
 import PurchaseOrdersReceive from "./pages/private/PurchaseOrdersReceive/Index.jsx";
 import Orders from "./pages/private/Orders/Index.jsx";
+import DemoUnits from "./pages/private/DemoUnits/Index.jsx";
 
 import ProductGroups from "./pages/private/ProductGroups/Index.jsx";
 import Suppliers from "./pages/private/Suppliers/Index.jsx";
@@ -84,6 +85,13 @@ function App() {
       subTitle: "receive your purchase order here",
       path: "/purchaseOrders/receive/:purchaseOrderId",
       element: <PurchaseOrdersReceive />,
+      isWithBackButton: true,
+    },
+    {
+      title: "Demo Units",
+      subTitle: "demo units management",
+      path: "/demoUnits",
+      element: <DemoUnits />,
       isWithBackButton: true,
     },
     // {

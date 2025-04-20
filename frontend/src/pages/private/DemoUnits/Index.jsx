@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
-import { Spin, Row, Col, Button, Drawer, Table, Modal, Dropdown } from "antd";
+import {
+  Spin,
+  Row,
+  Col,
+  Button,
+  Drawer,
+  Table,
+  Modal,
+  Dropdown,
+  Typography,
+} from "antd";
 import { MoreOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 import ErrorContent from "../../../components/common/ErrorContent";
 import FormDemoUnit from "./components/FormDemoUnit";
@@ -9,12 +20,16 @@ import http from "../../../services/httpService";
 
 import { getColumnSearchProps } from "../../../helpers/TableFilterProps";
 
+const { Text } = Typography;
+
 function DemoUnits() {
   const [demoUnits, setDemoUnits] = useState([]);
   const [selectedDemoUnit, setSelectedDemoUnit] = useState(null);
 
   const [companies, setCompanies] = useState([]);
   const [users, setUsers] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [products, setProducts] = useState([]);
 
   const [isFormCreateDemoUnitOpen, setIsFormCreateDemoUnitOpen] =
     useState(false);
@@ -35,10 +50,14 @@ function DemoUnits() {
         setIsContentLoading(true);
         const { data: companies } = await http.get("/api/companies");
         const { data: users } = await http.get("/api/users");
+        const { data: suppliers } = await http.get("/api/suppliers");
+        const { data: products } = await http.get("/api/getAllProducts");
         await getDemoUnits();
 
         setCompanies(companies);
         setUsers(users);
+        setProducts(products);
+        setSuppliers(suppliers);
       } catch (error) {
         setErrorMsg(error.message || "Something went wrong!");
       } finally {
@@ -65,7 +84,7 @@ function DemoUnits() {
     try {
       toggleFormCreateDemoUnitOpen();
       setIsContentLoading(true);
-      await http.post("/api/demoUnits", { ...formData, status_id: 1 });
+      await http.post("/api/demoUnits", { ...formData, status_id: 26 });
       await getDemoUnits();
     } catch (error) {
       setErrorMsg(error.message || "Something went wrong!");
@@ -101,13 +120,56 @@ function DemoUnits() {
 
   const tableColumns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      ...getColumnSearchProps("name"),
+      title: "Product",
+      render: (_, record) => {
+        return (
+          <>
+            <div>
+              {record.incoming_stock.product.name} &ndash;{" "}
+              {record.incoming_stock.product.model}
+            </div>
+            <div>
+              <Text type="secondary">
+                Serial: {record.incoming_stock.serial_number}
+              </Text>
+            </div>
+          </>
+        );
+      },
     },
     {
-      title: "Description",
-      dataIndex: "description",
+      title: "Company",
+      render: (_, record) => {
+        return record.company.name;
+      },
+    },
+    {
+      title: "Date Start",
+      render: (_, record) => {
+        return dayjs(record.demo_start).format("MMMM DD, YYYY");
+      },
+    },
+    {
+      title: "Date End",
+      render: (_, record) => {
+        return dayjs(record.demo_end).format("MMMM DD, YYYY");
+      },
+    },
+    {
+      title: "Assigned Person",
+      render: (_, record) => {
+        return record.assigned_person.full_name;
+      },
+    },
+    {
+      title: "Notes",
+      dataIndex: "notes",
+    },
+    {
+      title: "Status",
+      render: (_, record) => {
+        return record.status.name;
+      },
     },
     {
       title: "Action",
@@ -158,7 +220,7 @@ function DemoUnits() {
           <Col></Col>
           <Col>
             <Button type="primary" onClick={toggleFormCreateDemoUnitOpen}>
-              Create DemoUnit
+              Create Demo Unit
             </Button>
           </Col>
         </Row>
@@ -174,7 +236,7 @@ function DemoUnits() {
       >
         <FormDemoUnit
           onSubmit={handleFormCreateDemoUnitSubmit}
-          supportingData={{ companies, users }}
+          supportingData={{ companies, users, suppliers, products }}
         />
       </Drawer>
 
@@ -188,6 +250,7 @@ function DemoUnits() {
         <FormDemoUnit
           formData={selectedDemoUnit}
           onSubmit={handleFormUpdateDemoUnitSubmit}
+          supportingData={{ companies, users, suppliers, products }}
         />
       </Drawer>
     </>

@@ -109,10 +109,10 @@ function PurchaseOrdersReceive() {
       }
 
       await getPurchaseOrder();
-      setTimeout(() => {
-        setSelectedPOItem(purchaseOrder.items[0]);
-        toggleViewReceiveOpen();
-      }, 10);
+      // setTimeout(() => {
+      //   setSelectedPOItem(purchaseOrder.items[0]);
+      //   toggleViewReceiveOpen();
+      // }, 10);
     } catch (error) {
       setErrorMsg(error.message);
     } finally {

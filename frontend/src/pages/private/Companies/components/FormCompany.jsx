@@ -6,10 +6,7 @@ const FormCompany = ({ formData, supportingDetails, onSubmit }) => {
 
   useEffect(() => {
     if (formData) {
-      formCompanyInstance.setFieldsValue({
-        ...formData,
-        users: formData.company_members.map((item) => item.user_id),
-      });
+      formCompanyInstance.setFieldsValue(formData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData]);
@@ -44,7 +41,7 @@ const FormCompany = ({ formData, supportingDetails, onSubmit }) => {
       <Form.Item label="Name" name="name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
-      <Form.Item label="Users" name="users" rules={[{ required: true }]}>
+      <Form.Item label="Users" name="user_id" rules={[{ required: true }]}>
         <Select
           mode="multiple"
           allowClear
@@ -80,7 +77,7 @@ const FormCompany = ({ formData, supportingDetails, onSubmit }) => {
       </Form.Item>
       <Form.Item
         label="Email"
-        name="email"
+        name="email_address"
         rules={[
           {
             pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
