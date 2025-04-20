@@ -6,6 +6,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\ProductController;
@@ -77,6 +78,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 });
+Route::get('report/outOfStocks', [ReportController::class, 'outOfStocks']);
+
 
 Route::get('availableIncomingStocks/{productId?}', [IncomingStocksController::class, 'getAvailableIncomingStocks']);
 

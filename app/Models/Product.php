@@ -119,9 +119,9 @@ class Product extends Model
         return $this->hasMany(IncomingStock::class, 'product_id');
     }
 
-    public function availableQuantity()
+    public function getAvailableQuantityAttribute()
     {
-        return $this->incomingStocks()->sum('quantity'); // Get total stock quantity
+        return $this->incomingStocks()->sum('quantity');
     }
 
 

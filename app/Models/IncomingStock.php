@@ -69,4 +69,9 @@ class IncomingStock extends Model
     {
         return self::whereIn('barcode', $barcodes)->update($data);
     }
+    public function outgoingStocks()
+    {
+        return $this->hasMany(OutgoingStock::class, 'incoming_stock_id');
+    }
+    
 }
