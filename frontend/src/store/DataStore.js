@@ -1,0 +1,47 @@
+import { create } from "zustand";
+
+const useDataStore = create((set) => ({
+  statuses: {
+    1: "Pending",
+    2: "Approved",
+    3: "Rejected",
+    4: "Active",
+    5: "Inactive",
+    6: "Pending Approval",
+    7: "Ordered",
+    8: "Received",
+    9: "Processing",
+    10: "Shipped",
+    11: "Delivered",
+    12: "Cancelled",
+    13: "Returned",
+    14: "Paid",
+    15: "Partially Paid",
+    16: "Overdue",
+    17: "Refunded",
+    18: "Written Off",
+    19: "In Stock",
+    20: "Out of Stock",
+    21: "Under Maintenance",
+    22: "Decommissioned",
+    23: "Scheduled",
+    24: "In Progress",
+    25: "Overdue",
+    26: "Demo",
+    27: "Purchased",
+    28: "Demo Returned",
+    29: "Return Demo (working)",
+    30: "Return Demo (not working)",
+    31: "Partially Received",
+    32: "Completed",
+    33: "For Receiving",
+  },
+  productUnits: {
+    1: "Piece",
+    2: "Box",
+    3: "Liter",
+  },
+  setData: (data) => set((state) => ({ ...state, ...data })),
+}));
+
+export default useDataStore;

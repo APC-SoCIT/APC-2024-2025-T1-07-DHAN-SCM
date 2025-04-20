@@ -1,0 +1,298 @@
+Table users {
+  id BIGINT [pk]
+  username VARCHAR
+  password_hash VARCHAR
+  email VARCHAR
+  full_name VARCHAR
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+  last_login DATE
+}
+
+Table roles {
+  id BIGINT [pk]
+  name VARCHAR      //-- Role name (e.g., 'Admin', 'User')
+  description VARCHAR // -- Description of the role (optional)
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table role_user {
+  user_id BIGINT [ref: > users.id]
+  role_id BIGINT [ref: > roles.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+
+
+Table statuses {
+  id BIGINT [pk]
+  name VARCHAR
+  description TEXT
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table locations {
+  id BIGINT [pk]
+  name VARCHAR
+  description TEXT [null]  // null description
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table warehouses {
+  id BIGINT [pk]
+  name VARCHAR
+  address TEXT [null]  // null address
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table products {
+  id BIGINT [pk]
+  name VARCHAR
+  type VARCHAR
+  description TEXT
+  unit_of_measure VARCHAR
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table suppliers {
+  id BIGINT [pk]
+  name VARCHAR
+  contact_info TEXT
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table companies {
+  id BIGINT [pk]
+  name VARCHAR
+  contact_info TEXT [null]  // null contact_info
+  website_url VARCHAR [null]  // null website_url
+  industry VARCHAR [null]  // null industry
+  address TEXT [null]  // null address
+  city VARCHAR [null]  // null city
+  country VARCHAR [null]  // null country
+  zip_code VARCHAR [null]  // null zip_code
+  phone_number VARCHAR [null]  // null phone_number
+  email_address VARCHAR [null]  // null email_address
+  primary_contact_name VARCHAR [null]  // null primary_contact_name
+  primary_contact_phone VARCHAR [null]  // null primary_contact_phone
+  primary_contact_email VARCHAR [null]  // null primary_contact_email
+  additional_info JSONB [null]  //-- null additional_info
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table purchase_orders {
+  id BIGINT [pk]
+  supplier_id BIGINT [ref: > suppliers.id]
+  order_date DATE
+  total_amount DECIMAL
+  status_id BIGINT [ref: > statuses.id]   // Centralized status reference
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table purchase_order_statuses {
+  id BIGINT [pk]
+  purchase_order_id BIGINT [ref: > purchase_orders.id]
+  status_id BIGINT [ref: > statuses.id]   // Centralized status reference
+  status_date TIMESTAMP
+  comments TEXT [null]  // Make comments null
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table purchase_order_items {
+  id BIGINT [pk]
+  purchase_order_id BIGINT [ref: > purchase_orders.id]
+  product_id BIGINT [ref: > products.id]
+  quantity INT
+  unit_price DECIMAL
+  total_price DECIMAL
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table inventory_consumables {
+  id BIGINT [pk]
+  product_id BIGINT [ref: > products.id]
+  purchase_order_item_id BIGINT [ref: > purchase_order_items.id]
+  batch_number VARCHAR [null]  // null batch number
+  expiry_date DATE [null]  // null expiry date
+  quantity INT
+  location_id BIGINT [ref: > locations.id]  // References the locations table
+  warehouse_id BIGINT [ref: > warehouses.id]  // null warehouse_id
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table inventory_equipment {
+  id BIGINT [pk]
+  product_id BIGINT [ref: > products.id]
+  purchase_order_item_id BIGINT [ref: > purchase_order_items.id]
+  serial_number VARCHAR [null]  // null serial number
+  model_number VARCHAR [null]  // null model number
+  purchase_date DATE [null]  // null purchase date
+  status_id BIGINT [ref: > statuses.id]   // Centralized status reference
+  location_id BIGINT [ref: > locations.id] // References the locations table
+  warehouse_id BIGINT [ref: > warehouses.id] // null warehouse_id
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table orders {
+  id BIGINT [pk]
+  company_id BIGINT [ref: > companies.id]
+  order_date DATE
+  total_amount DECIMAL
+  status_id BIGINT [ref: > statuses.id]   // Centralized status reference
+  payment_status_id BIGINT [ref: > statuses.id]
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table order_items {
+  id BIGINT [pk]
+  order_id BIGINT [ref: > orders.id]
+  product_id BIGINT [ref: > products.id]
+  quantity INT
+  unit_price DECIMAL
+  total_price DECIMAL
+  amount_paid DECIMAL [default: 0]
+  remaining_balance DECIMAL
+  inventory_equipment_id BIGINT [ref: > inventory_equipment.id, null]
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table maintenance_records {
+  id BIGINT [pk]
+  inventory_equipment_id BIGINT [ref: > inventory_equipment.id]
+  maintenance_date DATE
+  description TEXT [null]  // null description
+  performed_by VARCHAR [null]  // null performed_by
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table calibration_records {
+  id BIGINT [pk]
+  inventory_equipment_id BIGINT [ref: > inventory_equipment.id]
+  calibration_date DATE
+  next_calibration_due DATE [null]  // null next_calibration_due
+  calibrated_by VARCHAR [null]  // null calibrated_by
+  calibration_status_id BIGINT [ref: > statuses.id]   // Centralized status reference
+  calibration_notes TEXT [null]  // null calibration_notes
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table insurance_claims {
+  id BIGINT [pk]
+  inventory_equipment_id BIGINT [ref: > inventory_equipment.id]
+  claim_date DATE
+  incident_description TEXT [null]  // null incident_description
+  claim_amount DECIMAL
+  approved_amount DECIMAL
+  claim_status_id BIGINT [ref: > statuses.id]   // Centralized status reference
+  insurer_name VARCHAR [null]  // null insurer_name
+  policy_number VARCHAR [null]  // null policy_number
+  settlement_date DATE [null]  // null settlement_date
+  remarks TEXT [null]  // null remarks
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table billings {
+  id BIGINT [pk]
+  order_id BIGINT [ref: > orders.id]
+  billing_date DATE
+  due_date DATE
+  total_amount DECIMAL
+  amount_paid DECIMAL [default: 0]
+  remaining_balance DECIMAL
+  status_id BIGINT [ref: > statuses.id]   // Centralized status reference
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table payment_transactions {
+  id BIGINT [pk]
+  billing_id BIGINT [ref: > billings.id]
+  payment_date DATE
+  amount_paid DECIMAL
+  payment_method VARCHAR
+  is_pdc BOOLEAN [default: FALSE]
+  cheque_clearance_date DATE [null]  // null cheque_clearance_date
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table order_item_payments {
+  id BIGINT [pk]
+  payment_transaction_id BIGINT [ref: > payment_transactions.id]
+  order_item_id BIGINT [ref: > order_items.id]
+  payment_date DATE
+  amount_paid DECIMAL
+  remarks TEXT [null]  // null remarks
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}
+
+Table invoices {
+  id BIGINT [pk]
+  order_id BIGINT [ref: > orders.id]
+  billing_id BIGINT [ref: > billings.id]
+  invoice_date DATE
+  due_date DATE
+  total_amount DECIMAL
+  status_id BIGINT [ref: > statuses.id]   // Centralized status reference
+  created_by BIGINT [ref: > users.id]
+  updated_by BIGINT [ref: > users.id]
+  created_at TIMESTAMP
+  updated_at TIMESTAMP
+}

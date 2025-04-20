@@ -1,0 +1,760 @@
+[
+    {
+        "type_id": 1,
+        "type_name": "consumable",
+        "product_groups": [
+            {
+                "group_id": 1,
+                "group_name": "medicine",
+                "products": [
+                    {
+                        "id": 1,
+                        "name": "Biogesic",
+                        "sku": "BIOGKYJH",
+                        "barcode": "BIOGKYJH-1-1",
+                        "description": "Description of product 1",
+                        "unit_of_measure": "box",
+                        "minimum_quantity": 5,
+                        "available_quantity": 10,
+                        "quantity_level": "Above Minimum",
+                        "default_selling_price": "100.00",
+                        "supplier_price": "90.00",
+                        "margin_percentage": "10%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_consumables": [
+                            {
+                                "id": 1,
+                                "product_id": 1,
+                                "purchase_order_item_id": 1,
+                                "barcode": "BIOGKYJH-Batch001-122025",
+                                "batch_number": "Batch001",
+                                "expiry_date": "2025-12-31T00:00:00.000000Z",
+                                "quantity": 10,
+                                "notes": null,
+                                "created_by": 1,
+                                "updated_by": 1,
+                                "created_at": "2025-03-20T02:47:31.000000Z",
+                                "updated_at": "2025-03-20T02:47:31.000000Z"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 7,
+                        "name": "Alaxan",
+                        "sku": "ALAXP7QK",
+                        "barcode": "ALAXP7QK-1-1",
+                        "description": "Description of product 7",
+                        "unit_of_measure": "box",
+                        "minimum_quantity": 5,
+                        "available_quantity": 5,
+                        "quantity_level": "Above Minimum",
+                        "default_selling_price": "100.00",
+                        "supplier_price": "95.00",
+                        "margin_percentage": "5%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_consumables": [
+                            {
+                                "id": 2,
+                                "product_id": 7,
+                                "purchase_order_item_id": 2,
+                                "barcode": "ALAXP7QK-Batch002-012026",
+                                "batch_number": "Batch002",
+                                "expiry_date": "2026-01-31T00:00:00.000000Z",
+                                "quantity": 5,
+                                "notes": null,
+                                "created_by": 1,
+                                "updated_by": 1,
+                                "created_at": "2025-03-20T02:47:31.000000Z",
+                                "updated_at": "2025-03-20T02:47:31.000000Z"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 8,
+                        "name": "Diatabs",
+                        "sku": "DIATTDI8",
+                        "barcode": "DIATTDI8-1-1",
+                        "description": "Description of product 8",
+                        "unit_of_measure": "box",
+                        "minimum_quantity": 5,
+                        "available_quantity": 0,
+                        "quantity_level": "Below Minimum",
+                        "default_selling_price": "100.00",
+                        "supplier_price": "95.00",
+                        "margin_percentage": "5%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_consumables": []
+                    },
+                    {
+                        "id": 9,
+                        "name": "Mefenamic Acid",
+                        "sku": "MEFE4PCG",
+                        "barcode": "MEFE4PCG-1-1",
+                        "description": "Description of product 9",
+                        "unit_of_measure": "box",
+                        "minimum_quantity": 5,
+                        "available_quantity": 0,
+                        "quantity_level": "Below Minimum",
+                        "default_selling_price": "100.00",
+                        "supplier_price": "45.00",
+                        "margin_percentage": "55%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_consumables": []
+                    },
+                    {
+                        "id": 10,
+                        "name": "Solmux",
+                        "sku": "SOLMQLJ1",
+                        "barcode": "SOLMQLJ1-1-1",
+                        "description": "Description of product 10",
+                        "unit_of_measure": "box",
+                        "minimum_quantity": 5,
+                        "available_quantity": 0,
+                        "quantity_level": "Below Minimum",
+                        "default_selling_price": "100.00",
+                        "supplier_price": "95.00",
+                        "margin_percentage": "5%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_consumables": []
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "type_id": 2,
+        "type_name": "equipment",
+        "product_groups": [
+            {
+                "group_id": 2,
+                "group_name": "radiology",
+                "products": [
+                    {
+                        "id": 2,
+                        "name": "Danus 30",
+                        "sku": "DANUNNS5",
+                        "barcode": "DANUNNS5-2-2",
+                        "description": "Description of product 2",
+                        "unit_of_measure": "pcs",
+                        "minimum_quantity": 2,
+                        "available_quantity": 2,
+                        "quantity_level": "Above Minimum",
+                        "default_selling_price": "1111120.00",
+                        "supplier_price": "0.00",
+                        "margin_percentage": "100%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_equipment": [
+                            {
+                                "id": 1,
+                                "product_id": 2,
+                                "purchase_order_item_id": 1,
+                                "barcode": "DANUNNS5-SN001",
+                                "serial_number": "SN001",
+                                "model_number": "MN001",
+                                "purchase_date": "2025-03-10",
+                                "notes": null,
+                                "status_id": 19,
+                                "created_by": 1,
+                                "updated_by": 1,
+                                "created_at": "2025-03-20T02:47:31.000000Z",
+                                "updated_at": "2025-03-20T02:47:31.000000Z",
+                                "status": {
+                                    "id": 19,
+                                    "name": "In Stock",
+                                    "description": "Item is in stock",
+                                    "created_by": 1,
+                                    "updated_by": 1,
+                                    "created_at": "2025-03-20T02:47:31.000000Z",
+                                    "updated_at": "2025-03-20T02:47:31.000000Z"
+                                }
+                            },
+                            {
+                                "id": 2,
+                                "product_id": 2,
+                                "purchase_order_item_id": 2,
+                                "barcode": "DANUNNS5-SN002",
+                                "serial_number": "SN002",
+                                "model_number": "MN002",
+                                "purchase_date": "2025-03-11",
+                                "notes": null,
+                                "status_id": 19,
+                                "created_by": 1,
+                                "updated_by": 1,
+                                "created_at": "2025-03-20T02:47:31.000000Z",
+                                "updated_at": "2025-03-20T02:47:31.000000Z",
+                                "status": {
+                                    "id": 19,
+                                    "name": "In Stock",
+                                    "description": "Item is in stock",
+                                    "created_by": 1,
+                                    "updated_by": 1,
+                                    "created_at": "2025-03-20T02:47:31.000000Z",
+                                    "updated_at": "2025-03-20T02:47:31.000000Z"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": 3,
+                        "name": "Finus 45",
+                        "sku": "FINUMYOC",
+                        "barcode": "FINUMYOC-2-2",
+                        "description": "Description of product 3",
+                        "unit_of_measure": "pcs",
+                        "minimum_quantity": 5,
+                        "available_quantity": 0,
+                        "quantity_level": "Below Minimum",
+                        "default_selling_price": "2222222.00",
+                        "supplier_price": "2220000.00",
+                        "margin_percentage": "0.1%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_equipment": []
+                    },
+                    {
+                        "id": 4,
+                        "name": "Finus 50",
+                        "sku": "FINULLKH",
+                        "barcode": "FINULLKH-2-2",
+                        "description": "Description of product 4",
+                        "unit_of_measure": "pcs",
+                        "minimum_quantity": 2,
+                        "available_quantity": 0,
+                        "quantity_level": "Below Minimum",
+                        "default_selling_price": "333333.00",
+                        "supplier_price": "333000.00",
+                        "margin_percentage": "0.1%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_equipment": []
+                    },
+                    {
+                        "id": 5,
+                        "name": "Finus 70",
+                        "sku": "FINUEBMK",
+                        "barcode": "FINUEBMK-2-2",
+                        "description": "Description of product 5",
+                        "unit_of_measure": "pcs",
+                        "minimum_quantity": 1,
+                        "available_quantity": 0,
+                        "quantity_level": "Below Minimum",
+                        "default_selling_price": "444444.00",
+                        "supplier_price": "444000.00",
+                        "margin_percentage": "0.1%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_equipment": []
+                    },
+                    {
+                        "id": 6,
+                        "name": "Flat Panel Detector",
+                        "sku": "FLAT1X8B",
+                        "barcode": "FLAT1X8B-2-2",
+                        "description": "Description of product 6",
+                        "unit_of_measure": "pcs",
+                        "minimum_quantity": 1,
+                        "available_quantity": 0,
+                        "quantity_level": "Below Minimum",
+                        "default_selling_price": "55555.00",
+                        "supplier_price": "55000.00",
+                        "margin_percentage": "1%",
+                        "image_url": null,
+                        "created_at": "2025-03-20T02:47:31.000000Z",
+                        "updated_at": "2025-03-20T02:47:31.000000Z",
+                        "status_id": {
+                            "id": 4,
+                            "name": "Active",
+                            "description": "Currently active and in use",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "created_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "updated_by": {
+                            "id": 1,
+                            "username": "admin",
+                            "full_name": "Admin User",
+                            "email": "admin@example.com",
+                            "email_verified_at": null,
+                            "created_at": "2025-03-20T02:47:30.000000Z",
+                            "updated_at": "2025-03-20T02:47:30.000000Z"
+                        },
+                        "location": {
+                            "id": 1,
+                            "name": "Main Warehouse",
+                            "description": "Primary storage location",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "warehouse": {
+                            "id": 1,
+                            "name": "Warehouse A",
+                            "address": "123 Warehouse St.",
+                            "created_by": 1,
+                            "updated_by": 1,
+                            "created_at": "2025-03-20T02:47:31.000000Z",
+                            "updated_at": "2025-03-20T02:47:31.000000Z"
+                        },
+                        "inventory_equipment": []
+                    }
+                ]
+            },
+            {
+                "group_id": 3,
+                "group_name": "cardiology",
+                "products": []
+            },
+            {
+                "group_id": 4,
+                "group_name": "laboratory",
+                "products": []
+            },
+            {
+                "group_id": 5,
+                "group_name": "orericu",
+                "products": []
+            },
+            {
+                "group_id": 6,
+                "group_name": "ob-gyne",
+                "products": []
+            },
+            {
+                "group_id": 7,
+                "group_name": "hospital furniture",
+                "products": []
+            }
+        ]
+    }
+]

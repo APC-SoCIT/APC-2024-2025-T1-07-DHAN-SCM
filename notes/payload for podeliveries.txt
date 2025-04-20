@@ -1,0 +1,15 @@
+{
+    "purchase_order_item_id": 2,
+    "delivered_quantity": 1,
+    "delivery_date": "2025-03-28",
+    "serial": "123456789"
+}
+
+
+{
+    "purchase_order_item_id": 1,
+    "delivered_quantity": 1,
+    "delivery_date": "2025-03-28",
+    "expiry_date": "12-12-2026",
+    "batch": "Batch001"
+}

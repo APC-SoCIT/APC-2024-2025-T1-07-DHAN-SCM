@@ -1,0 +1,39 @@
+
+
+
+
+barcodes table
+id++ barcode / status
+
+
+product_type_id-product_id-po_item_id-batch-expirydate(monthyear)-incremental
+
+product_type_id-product_id-po_item_id-serial-incremental
+
+barcode = 1-1-1-batch1-22025-1
+1 1-1-1-batch1-22025-1 /0
+
+
+221BBLD244053294
+CT221BHW-BLL
+
+
+
+-----------------
+
+0. barcode printer - hardware
+1. barcode - item-level -- MBIOL1B-1-batch-12122025-1 ok
+2. location and warehouse - product level ok	
+3 po_item_deliveries for partial received
+4.supplier_products (change name)
+
+----
+1. may invalid saaan ui sya mag rereprint -- should be new unique barcode
+2. saving multiple barcode in one or scaned and save
+3. order saving FIFO
+--
+PE09281029
+MC81818-1
+
+
+

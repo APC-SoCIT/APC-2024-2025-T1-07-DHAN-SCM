@@ -1,0 +1,27 @@
+.sidebar .ant-menu {
+  border-inline-end: 0 !important;
+}
+
+.custom-dropdown-menu .ant-dropdown-menu {
+  height: 200px !important; /* Set your desired minimum height */
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printArea,
+  #printArea * {
+    visibility: visible;
+  }
+  #printArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
