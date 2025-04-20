@@ -83,17 +83,39 @@ class DemoUnitController extends Controller
             'demo_start' => 'date',
             'demo_end' => 'nullable|date',
             'assigned_person_id' => 'exists:users,id',
-            'status_id' => 'exists:statuses,id', // ✅ Changed to reference statuses table
+            'status_id' => 'exists:statuses,id',
             'notes' => 'nullable|string',
         ]);
-
+    
         $validatedData['updated_by'] = auth()->id();
-
+    
         $demoUnit->update($validatedData);
-
-        return response()->json($demoUnit);
+    
+        // ✅ Retrieve product details through the incoming stock
+        $product = $demoUnit->incomingStock->product;
+    
+        return response()->json([
+            'demo_unit' => $demoUnit,
+            'product' => [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'sku' => $product->sku,
+                'model' => $product->model,
+                'description' => $product->description,
+                'image_url' => $product->image_url,
+                'minimum_quantity' => $product->minimum_quantity,
+                'supplier' => $product->supplier->name ?? null,
+                'supplier_price' => $product->supplier_price,
+                'location' => $product->location->name ?? null,
+                'warehouse' => $product->warehouse->name ?? null,
+                'status' => $product->status->name ?? null,
+                'created_by' => $product->creator->name ?? null,
+                'updated_by' => $product->updater->name ?? null,
+                'tags' => $product->tags->pluck('name')->toArray(),
+                'available_quantity' => $product->incomingStocks->sum('quantity'),
+            ],
+        ]);
     }
-
     /**
      * Remove the specified resource from storage.
      */
