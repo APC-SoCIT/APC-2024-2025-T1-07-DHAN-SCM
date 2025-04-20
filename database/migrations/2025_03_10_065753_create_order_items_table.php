@@ -20,7 +20,6 @@ return new class extends Migration
             $table->decimal('total_price', 15, 2);
             $table->decimal('amount_paid', 15, 2)->default(0);
             $table->decimal('remaining_balance', 15, 2);
-            $table->foreignId('inventory_equipment_id')->nullable()->constrained('inventory_equipment');
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->constrained('users');
             $table->timestamps();

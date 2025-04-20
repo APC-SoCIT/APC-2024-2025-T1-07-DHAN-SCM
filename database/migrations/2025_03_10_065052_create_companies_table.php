@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('primary_contact_name')->nullable();
             $table->string('primary_contact_phone')->nullable();
             $table->string('primary_contact_email')->nullable();
-            $table->json('additional_info')->nullable();
+            $table->string('additional_info')->nullable();
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->constrained('users');
             $table->timestamps();
