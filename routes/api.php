@@ -30,8 +30,8 @@ Route::post('logout', [LoginController::class, 'logout'])->middleware('auth:sanc
 // Required Authentication
 Route::middleware('auth:sanctum')->group(function () {
     
-
-
+    //validate user if login
+    Route::get('user', [UserController::class, 'getUserData']);
 
 
     Route::post('createPurchaseOrder', [PurchaseOrderController::class, 'createPurchaseOrder']);
@@ -58,11 +58,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('incomingStocks/update', [IncomingStocksController::class, 'updateIncomingStock']);
 
-    Route::apiResource('outgoingStocks', OutgoingStockController::class);
+    //Route::apiResource('outgoingStocks', OutgoingStockController::class);
     Route::apiResource('demoUnits', DemoUnitController::class);
 
     Route::resource('companies', CompanyController::class);
-    Route::resource('user', UserController::class);
+
+    Route::resource('users', UserController::class);
+    
 
 
 
