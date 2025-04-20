@@ -50,7 +50,7 @@ class CompanyController extends Controller
             'primary_contact_name' => 'nullable|string',
             'primary_contact_phone' => 'nullable|string',
             'primary_contact_email' => 'nullable|email',
-            'additional_info' => 'nullable|json',
+            'additional_info' => 'nullable|string',
             'user_id' => 'nullable|array', // Optional user IDs
             'user_id.*' => 'exists:users,id' // Validate each user ID
         ]);
