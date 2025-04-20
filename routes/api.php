@@ -71,9 +71,14 @@ Route::middleware('auth:sanctum')->group(function () {
     
 
 
+    
+
+
 
 
 });
+
+Route::get('availableIncomingStocks/{productId?}', [IncomingStocksController::class, 'getAvailableIncomingStocks']);
 
 Route::get('/purchaseOrders/{purchaseOrderId?}', [PurchaseOrderController::class, 'getPurchaseOrderDetails']);
 
