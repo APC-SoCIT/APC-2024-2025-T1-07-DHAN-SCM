@@ -39,7 +39,7 @@ class CompanyController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string',
             'contact_info' => 'nullable|string',
-            'website_url' => 'nullable|url',
+            'website_url' => 'nullable|string',
             'industry' => 'nullable|string',
             'address' => 'nullable|string',
             'city' => 'nullable|string',
@@ -50,7 +50,7 @@ class CompanyController extends Controller
             'primary_contact_name' => 'nullable|string',
             'primary_contact_phone' => 'nullable|string',
             'primary_contact_email' => 'nullable|email',
-            'additional_info' => 'nullable|json',
+            'additional_info' => 'nullable|string',
             'created_by' => 'nullable|exists:users,id',
             'updated_by' => 'nullable|exists:users,id',
             'user_id' => 'nullable|array', // Now optional
