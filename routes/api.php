@@ -58,7 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::put('incomingStocks/update', [IncomingStocksController::class, 'updateIncomingStock']);
 
-    //Route::apiResource('outgoingStocks', OutgoingStockController::class);
+    Route::apiResource('outgoingStocks', OutgoingStockController::class);
     Route::apiResource('demoUnits', DemoUnitController::class);
 
     Route::resource('companies', CompanyController::class);

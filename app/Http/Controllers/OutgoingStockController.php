@@ -2,19 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OutgoingStock;
 use Illuminate\Http\Request;
+use App\Models\IncomingStock;
+use App\Models\OutgoingStock;
 
 class OutgoingStockController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(OutgoingStock::all());
+        $validatedData = $request->validate([
+            'product_id' => 'required|exists:products,id' // Ensures valid product ID
+        ]);
+    
+        // Find all incoming stock IDs related to the product
+        $incomingIds = IncomingStock::where('product_id', $validatedData['product_id'])->pluck('id');
+    
+        // Fetch outgoing stock data based on found incoming stock IDs
+        $outgoingStocks = OutgoingStock::whereIn('incoming_stock_id', $incomingIds)->get();
+    
+        return response()->json($outgoingStocks);
     }
-
     /**
      * Store a newly created resource in storage.
      */
