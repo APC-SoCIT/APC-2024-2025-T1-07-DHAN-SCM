@@ -14,7 +14,39 @@ class DemoUnitController extends Controller
      */
     public function index()
     {
-        return response()->json(DemoUnit::with(['incomingStock', 'company', 'assignedPerson', 'status', 'createdBy', 'updatedBy'])->get());
+        $demoUnits = DemoUnit::with(['incomingStock.product', 'company', 'assignedPerson', 'status', 'createdBy', 'updatedBy'])->get()->map(function ($demoUnit) {
+            return [
+                'demo_unit_id' => $demoUnit->id,
+                'incoming_stock_id' => $demoUnit->incoming_stock_id,
+                'company' => $demoUnit->company->name ?? null,
+                'assigned_person' => $demoUnit->assignedPerson->name ?? null,
+                'status' => $demoUnit->status->name ?? null,
+                'created_by' => $demoUnit->createdBy->name ?? null,
+                'updated_by' => $demoUnit->updatedBy->name ?? null,
+                'demo_start' => $demoUnit->demo_start,
+                'demo_end' => $demoUnit->demo_end,
+                'notes' => $demoUnit->notes,
+                'product' => $demoUnit->incomingStock->product ? [
+                    'product_id' => $demoUnit->incomingStock->product->id,
+                    'name' => $demoUnit->incomingStock->product->name,
+                    'sku' => $demoUnit->incomingStock->product->sku,
+                    'model' => $demoUnit->incomingStock->product->model,
+                    'description' => $demoUnit->incomingStock->product->description,
+                    'image_url' => $demoUnit->incomingStock->product->image_url,
+                    'minimum_quantity' => $demoUnit->incomingStock->product->minimum_quantity,
+                    'supplier' => $demoUnit->incomingStock->product->supplier->name ?? null,
+                    'supplier_price' => $demoUnit->incomingStock->product->supplier_price,
+                    'location' => $demoUnit->incomingStock->product->location->name ?? null,
+                    'warehouse' => $demoUnit->incomingStock->product->warehouse->name ?? null,
+                    'status' => $demoUnit->incomingStock->product->status->name ?? null,
+                    'created_by' => $demoUnit->incomingStock->product->creator->name ?? null,
+                    'updated_by' => $demoUnit->incomingStock->product->updater->name ?? null,
+                    'tags' => $demoUnit->incomingStock->product->tags->pluck('name')->toArray(),
+                ] : null,
+            ];
+        });
+    
+        return response()->json(['demo_units' => $demoUnits]);
     }
 
     /**
