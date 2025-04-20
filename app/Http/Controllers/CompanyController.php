@@ -51,15 +51,20 @@ class CompanyController extends Controller
             'primary_contact_phone' => 'nullable|string',
             'primary_contact_email' => 'nullable|email',
             'additional_info' => 'nullable|json',
-            'created_by' => 'nullable|exists:users,id',
-            'updated_by' => 'nullable|exists:users,id',
-            'user_id' => 'nullable|array', // Now optional
-            'user_id.*' => 'exists:users,id' // Ensures valid user IDs if provided
+            'user_id' => 'nullable|array', // Optional user IDs
+            'user_id.*' => 'exists:users,id' // Validate each user ID
         ]);
     
-        $company = Company::create($validatedData);
+        // Get authenticated user
+        $authenticatedUser = auth()->user();
     
-        // Attach users only if user_id is provided and not empty
+        // Create company with `created_by` and `updated_by`
+        $company = Company::create(array_merge($validatedData, [
+            'created_by' => $authenticatedUser->id,
+            'updated_by' => $authenticatedUser->id
+        ]));
+    
+        // Attach users if provided
         if (!empty($validatedData['user_id'])) {
             foreach ($validatedData['user_id'] as $userId) {
                 CompanyUser::create([
@@ -69,7 +74,7 @@ class CompanyController extends Controller
             }
         }
     
-        return $company;
+        return response()->json($company, 201);
     }
 
     
@@ -119,18 +124,21 @@ class CompanyController extends Controller
             'primary_contact_phone' => 'nullable|string',
             'primary_contact_email' => 'nullable|email',
             'additional_info' => 'nullable|json',
-            'created_by' => 'nullable|exists:users,id',
-            'updated_by' => 'nullable|exists:users,id',
-            'user_id' => 'nullable|array', // Now optional
-            'user_id.*' => 'exists:users,id' // Ensures valid user IDs if provided
+            'user_id' => 'nullable|array', // Optional user IDs
+            'user_id.*' => 'exists:users,id' // Validate each user ID
         ]);
     
-        $company->update($validatedData);
+        // Get authenticated user
+        $authenticatedUser = auth()->user();
     
-        // Only update `company_users` if `user_id` is provided
+        // Merge validated data with updated_by field
+        $company->update(array_merge($validatedData, [
+            'updated_by' => $authenticatedUser->id
+        ]));
+    
+        // Update `company_users` if `user_id` is provided
         if (isset($validatedData['user_id'])) {
-            CompanyUser::where('company_id', $company->id)->delete();
-    
+            $company->companyUsers()->delete(); // Remove old records
             foreach ($validatedData['user_id'] as $userId) {
                 CompanyUser::create([
                     'company_id' => $company->id,
@@ -139,7 +147,7 @@ class CompanyController extends Controller
             }
         }
     
-        return $company;
+        return response()->json($company);
     }
 
 
