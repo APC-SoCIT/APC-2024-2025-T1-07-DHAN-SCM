@@ -124,6 +124,42 @@ class ReportController extends Controller
 
         return response()->json(['demo_unit_count' => $demoUnits->count()]);
     }
+
+    public function demoUnitOverDueNearExpire(Request $request)
+    {
+        // Get the 'showDetails' parameter (default to false)
+        $showDetails = filter_var($request->query('showDetails', false), FILTER_VALIDATE_BOOLEAN);
+    
+        // Get the current date and calculate the date one week from now
+        $oneWeekFromNow = now()->addWeek();
+    
+        // Fetch demo units where demo_end is either within the next week OR has already passed
+        $demoUnits = DemoUnit::where('demo_end', '<=', $oneWeekFromNow)
+            ->with('incomingStock')
+            ->get();
+    
+        // If 'showDetails' is true, return full details, otherwise return only the count
+        if ($showDetails) {
+            $demoUnits = $demoUnits->map(function ($demoUnit) {
+                return [
+                    'demo_unit_id' => $demoUnit->id,
+                    'incoming_stock_id' => $demoUnit->incoming_stock_id,
+                    'company_id' => $demoUnit->company_id,
+                    'assigned_person_id' => $demoUnit->assigned_person_id,
+                    'status_id' => $demoUnit->status_id,
+                    'demo_start' => $demoUnit->demo_start,
+                    'demo_end' => $demoUnit->demo_end,
+                    'notes' => $demoUnit->notes,
+                ];
+            });
+    
+            return response()->json(['demo_units' => $demoUnits]);
+        }
+    
+        return response()->json(['demo_unit_count' => $demoUnits->count()]);
+    }
+
+
                 
 
 }
