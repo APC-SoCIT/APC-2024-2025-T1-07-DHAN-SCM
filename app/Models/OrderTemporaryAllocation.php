@@ -4,22 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OrderItem extends Model
+class OrderTemporaryAllocation extends Model
 {
     protected $fillable = [
-        'order_id', 
-        'product_id', 
-        'quantity', 
-        'unit_price', 
-        'discount', // ✅ New field
-        'total_price', 
-        'created_by', 
-        'updated_by'
+        'order_item_id',
+        'incoming_stock_id',
+        'product_id',
+        'created_by',
+        'updated_by',
     ];
 
-    public function order()
+    public function orderItem()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(OrderItem::class);
+    }
+
+    public function incomingStock()
+    {
+        return $this->belongsTo(IncomingStock::class);
     }
 
     public function product()

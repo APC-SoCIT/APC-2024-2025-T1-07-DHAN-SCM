@@ -16,10 +16,9 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained('orders');
             $table->foreignId('product_id')->constrained('products');
             $table->integer('quantity');
-            $table->decimal('unit_price', 15, 2);
-            $table->decimal('total_price', 15, 2);
-            $table->decimal('amount_paid', 15, 2)->default(0);
-            $table->decimal('remaining_balance', 15, 2);
+            $table->decimal('unit_price', 15, 2)->default(0);
+            $table->decimal('discount', 15, 2)->default(0); 
+            $table->decimal('total_price', 15, 2)->default(0);
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->constrained('users');
             $table->timestamps();

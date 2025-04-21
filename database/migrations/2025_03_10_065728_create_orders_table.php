@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('company_id')->constrained('companies');
+            $table->string('megaion_order_number')->nullable()->unique(); // ✅ Added field
+            $table->string('company_order_number')->nullable()->unique(); // ✅ Added field
             $table->date('order_date');
             $table->decimal('total_amount', 15, 2);
             $table->foreignId('status_id')->constrained('statuses');
-            $table->foreignId('payment_status_id')->constrained('statuses');
             $table->foreignId('created_by')->constrained('users');
             $table->foreignId('updated_by')->constrained('users');
             $table->timestamps();

@@ -16,6 +16,8 @@ class OrderController extends Controller
     {
         $request->validate([
             'company_id' => 'required|exists:companies,id',
+            'megaion_order_number' => 'required|string|unique:orders,megaion_order_number', // ✅ New validation rule
+            'company_order_number' => 'required|string|unique:orders,company_order_number', // ✅ New validation rule
             'order_date' => 'required|date',
             'total_amount' => 'required|numeric',
             'status_id' => 'required|exists:statuses,id',
@@ -38,6 +40,8 @@ class OrderController extends Controller
 
         $request->validate([
             'company_id' => 'sometimes|required|exists:companies,id',
+            'megaion_order_number' => 'sometimes|required|string|unique:orders,megaion_order_number,' . $id, // ✅ New validation rule
+            'company_order_number' => 'sometimes|required|string|unique:orders,company_order_number,' . $id, // ✅ New validation rule
             'order_date' => 'sometimes|required|date',
             'total_amount' => 'sometimes|required|numeric',
             'status_id' => 'sometimes|required|exists:statuses,id',

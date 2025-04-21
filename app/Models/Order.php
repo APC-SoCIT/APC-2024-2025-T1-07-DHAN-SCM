@@ -6,7 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['company_id', 'order_date', 'total_amount', 'status_id', 'payment_status_id', 'created_by', 'updated_by'];
+    protected $fillable = [
+        'company_id', 
+        'megaion_order_number', // ✅ New field
+        'company_order_number', // ✅ New field
+        'order_date', 
+        'total_amount', 
+        'status_id', 
+        'payment_status_id', 
+        'created_by', 
+        'updated_by'
+    ];
 
     public function company()
     {
