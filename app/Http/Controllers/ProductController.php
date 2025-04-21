@@ -183,84 +183,71 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-{
-    // ✅ Remove `image` from validation if explicitly set to null
-    if ($request->input('image') === null) {
-        $request->request->remove('image'); // Prevent Laravel from treating it as a file
+    {
+        if ($request->input('image') === null) {
+            $request->request->remove('image');
+        }
+    
+        $request->merge([
+            'is_machine' => filter_var($request->is_machine, FILTER_VALIDATE_BOOLEAN),
+        ]);
+    
+        $imageRules = $request->hasFile('image') ? 'file|image|mimes:jpeg,png,jpg,gif|max:2048' : 'nullable';
+    
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'model' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'product_unit_id' => 'required|exists:product_units,id',
+            'minimum_quantity' => 'required|integer|min:0',
+            'profit_margin' => 'required|numeric|min:0|max:100',
+            'image' => $imageRules,
+            'supplier_id' => 'nullable|exists:suppliers,id',
+            'supplier_price' => 'required|numeric|min:0',
+            'location_id' => 'nullable',
+            'warehouse_id' => 'nullable',
+            'is_machine' => 'required|boolean',
+            'tag_id' => 'nullable|string',
+        ]);
+    
+        if ($request->location_id === 'null' || $request->location_id === '') {
+            unset($validatedData['location_id']);
+        }
+        if ($request->warehouse_id === 'null' || $request->warehouse_id === '') {
+            unset($validatedData['warehouse_id']);
+        }
+        if ($request->tag_id === 'null' || $request->tag_id === '') {
+            $request->tag_id = "";
+        }
+    
+        // ✅ **Make Image Accessible in Public Folder**
+        if ($request->hasFile('image')) {
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $imagePath = public_path('products/' . $imageName);
+            $request->file('image')->move(public_path('products'), $imageName);
+            $validatedData['image_url'] = url("products/{$imageName}");
+        } elseif ($request->input('image') === null) {
+            $validatedData['image_url'] = null;
+        }
+    
+        $validatedData['created_by'] = auth()->id();
+        $validatedData['updated_by'] = auth()->id();
+        $validatedData['status_id'] = 1;
+    
+        $product = Product::create($validatedData);
+    
+        if (!empty($request->tag_id)) {
+            $tagIds = explode(',', $request->tag_id);
+            $product->tags()->sync($tagIds);
+        } else {
+            $product->tags()->detach();
+        }
+    
+        return response()->json([
+            'message' => 'Product successfully created',
+            'product' => $product
+        ], 201);
     }
-
-    // ✅ Convert 'is_machine' to a proper boolean before validation
-    $request->merge([
-        'is_machine' => filter_var($request->is_machine, FILTER_VALIDATE_BOOLEAN),
-    ]);
-
-    // ✅ Apply conditional validation: Only validate image if it exists
-    $imageRules = $request->hasFile('image') ? 'file|image|mimes:jpeg,png,jpg,gif|max:2048' : 'nullable';
-
-    // ✅ Validate the incoming request
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'model' => 'nullable|string|max:255',
-        'description' => 'nullable|string',
-        'product_unit_id' => 'required|exists:product_units,id',
-        'minimum_quantity' => 'required|integer|min:0',
-        'profit_margin' => 'required|numeric|min:0|max:100',
-        'image' => $imageRules, // Corrected validation rule for image
-        'supplier_id' => 'nullable|exists:suppliers,id',
-        'supplier_price' => 'required|numeric|min:0',
-        'location_id' => 'nullable',
-        'warehouse_id' => 'nullable',
-        'is_machine' => 'required|boolean',
-        'tag_id' => 'nullable|string', // Validate tag_id as a comma-separated string
-    ]);
-
-    // ✅ Remove `location_id` and `warehouse_id` from array if they are null
-    if ($request->location_id === 'null' || $request->location_id === '') {
-        unset($validatedData['location_id']);
-    }
-    if ($request->warehouse_id === 'null' || $request->warehouse_id === '') {
-        unset($validatedData['warehouse_id']);
-    }
-    if ($request->tag_id === 'null' || $request->tag_id === '') {
-        $request->tag_id = "";
-    }
-
-
-    // ✅ Handle image upload or removal
-    if ($request->hasFile('image')) {
-        // Save new image
-        $imagePath = $request->file('image')->store('products', 'public');
-        $validatedData['image_url'] = asset("storage/{$imagePath}");
-    } elseif ($request->input('image') === null) {
-        // Remove image reference if explicitly set to null
-        $validatedData['image_url'] = null;
-    }
-
-    // ✅ Assign logged-in user
-    $validatedData['created_by'] = auth()->id();
-    $validatedData['updated_by'] = auth()->id();
-
-    // ✅ Set default status_id
-    $validatedData['status_id'] = 1;
-
-    // ✅ Create product
-    $product = Product::create($validatedData);
-
-    // ✅ Modify Tag Handling: If `tag_id` is empty/null, delete all tags
-    if (!empty($request->tag_id)) {
-        $tagIds = explode(',', $request->tag_id);
-        $product->tags()->sync($tagIds);
-    } else {
-        // If `tag_id` is empty or null, remove all tags
-        $product->tags()->detach();
-    }
-
-
-    return response()->json([
-        'message' => 'Product successfully created',
-        'product' => $product
-    ], 201);
-}
     /**
      * Display the specified product.
      *
@@ -281,17 +268,14 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        // Handle `_method=PUT` workaround
         if ($request->has('_method') && $request->_method === 'PUT') {
             $request->setMethod('PUT');
         }
 
-        // Convert 'is_machine' to boolean before validation
         $request->merge([
             'is_machine' => filter_var($request->input('is_machine'), FILTER_VALIDATE_BOOLEAN),
         ]);
 
-        // Manually extract request fields
         $validatedData = [
             'name' => $request->input('name', $product->name),
             'model' => $request->input('model', $product->model),
@@ -318,37 +302,38 @@ class ProductController extends Controller
             $request->tag_id = "";
         }
 
-        // ✅ Handle Image Upload (Remove Image If `null`)
+        // ✅ **Handle Image Upload (Save Image in Public)**
         if ($request->hasFile('image')) {
-            // Save new image
-            $newImagePath = $request->file('image')->store('products', 'public');
-            $validatedData['image_url'] = asset("storage/{$newImagePath}");
+            // Generate unique image name
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $imagePath = public_path('products/' . $imageName);
+
+            // Move image to public/products/
+            $request->file('image')->move(public_path('products'), $imageName);
+            $validatedData['image_url'] = url("products/{$imageName}");
 
             // Delete old image if a new image is uploaded
             if ($product->image_url) {
-                $oldImagePath = str_replace(asset('storage'), 'storage', $product->image_url);
-                if (file_exists(public_path($oldImagePath))) {
-                    unlink(public_path($oldImagePath));
+                $oldImagePath = public_path('products/' . basename($product->image_url));
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
                 }
             }
         } elseif ($request->input('image') == "null" && $product->image_url) {
             // Remove image if explicitly set to `null`
-            $oldImagePath = str_replace(asset('storage'), 'storage', $product->image_url);
-            if (file_exists(public_path($oldImagePath))) {
-                unlink(public_path($oldImagePath)); // Remove existing file
+            $oldImagePath = public_path('products/' . basename($product->image_url));
+            if (file_exists($oldImagePath)) {
+                unlink($oldImagePath);
             }
             $validatedData['image_url'] = null; // Remove image reference from DB
         }
 
-        // Force update to apply changes
         $product->forceFill($validatedData)->save();
 
-        // ✅ Modify Tag Handling: If `tag_id` is empty/null, delete all tags
         if (!empty($request->tag_id)) {
             $tagIds = explode(',', $request->tag_id);
             $product->tags()->sync($tagIds);
         } else {
-            // If `tag_id` is empty or null, remove all tags
             $product->tags()->detach();
         }
 
