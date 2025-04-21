@@ -9,7 +9,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return Order::with(['company', 'status', 'paymentStatus', 'creator', 'updater'])->get();
+        return Order::with(['company', 'status', 'creator', 'updater'])->get(); // Removed 'paymentStatus'
     }
 
     public function store(Request $request)
@@ -17,12 +17,11 @@ class OrderController extends Controller
         $request->validate([
             'company_id' => 'required|exists:companies,id',
             'megaion_order_number' => 'required|string|unique:orders,megaion_order_number',
-            'company_order_number' => 'required|string|unique:orders,company_order_number',
+            'company_order_number' => 'nullable|string|unique:orders,company_order_number',
             'order_date' => 'required|date',
-            'total_amount' => 'required|numeric',
+            'total_amount' => 'nullable|numeric',
             'status_id' => 'required|exists:statuses,id',
-            'payment_status_id' => 'required|exists:statuses,id',
-        ]);
+        ]); 
 
         return Order::create(array_merge($request->all(), [
             'created_by' => auth()->id(),
@@ -32,7 +31,7 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        return Order::with(['company', 'status', 'paymentStatus', 'creator', 'updater'])->findOrFail($id);
+        return Order::with(['company', 'status', 'creator', 'updater'])->findOrFail($id); // Removed 'paymentStatus'
     }
 
     public function update(Request $request, $id)
@@ -46,8 +45,7 @@ class OrderController extends Controller
             'order_date' => 'sometimes|required|date',
             'total_amount' => 'sometimes|required|numeric',
             'status_id' => 'sometimes|required|exists:statuses,id',
-            'payment_status_id' => 'sometimes|required|exists:statuses,id',
-        ]);
+        ]); 
 
         $order->update(array_merge($request->all(), [
             'updated_by' => auth()->id(),

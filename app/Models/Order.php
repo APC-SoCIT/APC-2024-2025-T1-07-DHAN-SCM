@@ -13,7 +13,6 @@ class Order extends Model
         'order_date', 
         'total_amount', 
         'status_id', 
-        'payment_status_id', 
         'created_by', 
         'updated_by'
     ];
@@ -26,11 +25,6 @@ class Order extends Model
     public function status()
     {
         return $this->belongsTo(Status::class, 'status_id');
-    }
-
-    public function paymentStatus()
-    {
-        return $this->belongsTo(Status::class, 'payment_status_id');
     }
 
     public function creator()
