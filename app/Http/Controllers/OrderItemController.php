@@ -19,13 +19,14 @@ class OrderItemController extends Controller
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|numeric',
             'unit_price' => 'required|numeric',
-            'discount' => 'nullable|numeric|min:0', // ✅ Added discount validation
+            'discount' => 'nullable|numeric|min:0',
             'total_price' => 'required|numeric',
-            'created_by' => 'required|exists:users,id',
-            'updated_by' => 'required|exists:users,id',
         ]);
 
-        return OrderItem::create($request->all());
+        return OrderItem::create(array_merge($request->all(), [
+            'created_by' => auth()->id(),
+            'updated_by' => auth()->id(),
+        ]));
     }
 
     public function show($id)
@@ -42,13 +43,13 @@ class OrderItemController extends Controller
             'product_id' => 'sometimes|required|exists:products,id',
             'quantity' => 'sometimes|required|numeric',
             'unit_price' => 'sometimes|required|numeric',
-            'discount' => 'sometimes|nullable|numeric|min:0', // ✅ Added discount validation
+            'discount' => 'sometimes|nullable|numeric|min:0',
             'total_price' => 'sometimes|required|numeric',
-            'created_by' => 'sometimes|required|exists:users,id',
-            'updated_by' => 'sometimes|required|exists:users,id',
         ]);
 
-        $orderItem->update($request->all());
+        $orderItem->update(array_merge($request->all(), [
+            'updated_by' => auth()->id(),
+        ]));
 
         return $orderItem;
     }
