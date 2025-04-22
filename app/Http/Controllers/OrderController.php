@@ -7,13 +7,25 @@ use App\Models\Status;
 use App\Models\OrderItem;
 use App\Models\OrderStatus;
 use Illuminate\Http\Request;
+use App\Models\IncomingStock;
+use App\Models\OutgoingStock;
 use Illuminate\Support\Facades\DB;
+use App\Models\OrderTemporaryAllocation;
 
 class OrderController extends Controller
 {
     public function index()
     {
-        return Order::with(['company', 'status', 'creator', 'updater', 'orderItems.product'])->get();
+        return Order::with([
+            'company',
+            'status',
+            'creator',
+            'updater',
+            'orderItems.product',
+            'orderItems.orderTemporaryAllocations.incomingStock', // Include temporary stock allocations
+            'orderItems.outgoingStocks.incomingStock', // Include outgoing stock details
+            'orderStatuses.status' // Include order statuses with status details
+        ])->get();
     }
 
     public function show($id)
@@ -117,25 +129,9 @@ class OrderController extends Controller
             // If status is "Approved", allocate stock using FIFO (excluding expired & used items)
             if (strtolower($statusName) === 'approved') {
                 foreach ($order->orderItems as $item) {
-                    $quantityNeeded = $item->quantity;
+                    $availableStocks = $this->getAvailableIncomingStocks($item->product_id, $item->quantity);
     
-                    // Retrieve available stock in FIFO order (one row = one quantity)
-                    $incomingStocks = IncomingStock::where('product_id', $item->product_id)
-                        ->where(function ($query) {
-                            $query->whereNull('expiration_date')
-                                  ->orWhere('expiration_date', '>=', now()); // Exclude expired stock
-                        })
-                        ->whereNotIn('id', function ($query) {
-                            $query->select('incoming_stock_id')->from('outgoing'); // Exclude stock used in outgoing
-                        })
-                        ->whereNotIn('id', function ($query) {
-                            $query->select('incoming_stock_id')->from('demo'); // Exclude stock used in demo
-                        })
-                        ->orderByRaw('COALESCE(expiration_date, created_at) ASC') // FIFO sorting
-                        ->limit($quantityNeeded) // Get exact number of stocks needed
-                        ->get();
-    
-                    foreach ($incomingStocks as $incomingStock) {
+                    foreach ($availableStocks as $incomingStock) {
                         OrderTemporaryAllocation::create([
                             'order_item_id' => $item->id,
                             'incoming_stock_id' => $incomingStock->id,
@@ -144,6 +140,25 @@ class OrderController extends Controller
                             'updated_by' => auth()->id(),
                         ]);
                     }
+                }
+            }
+    
+            // If status is "Ready to Deliver", move stock from temporary allocation to outgoing_stocks
+            if (strtolower($statusName) === 'ready to deliver') {
+                foreach ($order->orderItems as $item) {
+                    $temporaryAllocations = OrderTemporaryAllocation::where('order_item_id', $item->id)->get();
+    
+                    foreach ($temporaryAllocations as $allocation) {
+                        OutgoingStock::create([
+                            'order_item_id' => $allocation->order_item_id,
+                            'incoming_stock_id' => $allocation->incoming_stock_id,
+                            'type' => 'delivery',
+                            'remarks' => 'Stock moved for delivery',
+                        ]);
+                    }
+                    
+                    // Remove allocated stock from temporary allocations once moved
+                    OrderTemporaryAllocation::where('order_item_id', $item->id)->delete();
                 }
             }
     
@@ -158,7 +173,25 @@ class OrderController extends Controller
         }
     }
     
-   
+
+    public function getAvailableIncomingStocks($productId, $quantityNeeded)
+    {
+        return IncomingStock::where('product_id', $productId)
+            ->where(function ($query) {
+                $query->whereNull('expiration_date')
+                    ->orWhere('expiration_date', '>=', now()); // Exclude expired stock
+            })
+            ->whereNotIn('id', function ($query) {
+                $query->select('incoming_stock_id')->from('outgoing_stocks'); // Exclude stock used in outgoing
+            })
+            ->whereNotIn('id', function ($query) {
+                $query->select('incoming_stock_id')->from('order_temporary_allocations'); // Exclude allocated stock
+            })
+            ->orderByRaw('COALESCE(expiration_date, created_at) ASC') // FIFO sorting
+            ->limit($quantityNeeded) // Get exact number of stocks needed
+            ->get();
+    }
+    
 
     public function destroy($id)
     {

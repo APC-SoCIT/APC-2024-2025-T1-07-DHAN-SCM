@@ -35,4 +35,5 @@ class OutgoingStock extends Model
     {
         return $this->belongsTo(IncomingStock::class, 'incoming_stock_id');
     }
+
 }

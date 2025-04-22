@@ -36,4 +36,12 @@ class OrderItem extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+    public function orderTemporaryAllocations()
+    {
+        return $this->hasMany(OrderTemporaryAllocation::class);
+    }
+    public function outgoingStocks()
+    {
+        return $this->hasMany(OutgoingStock::class);
+    }
 }

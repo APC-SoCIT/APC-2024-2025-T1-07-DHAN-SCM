@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\DemoUnit;
 use App\Models\ProductType;
 use Illuminate\Http\Request;
+use App\Models\OutgoingStock;
 use App\Models\PurchaseOrder;
 use App\Models\SupplierProduct;
 use App\Models\PurchaseOrderItem;
@@ -41,12 +42,13 @@ class ProductController extends Controller
         $products = $query->get()
             ->map(function ($product) {  
                 $availableQuantity = $product->incomingStocks
-                ->reject(fn($stock) => DemoUnit::where('incoming_stock_id', $stock->id)->exists()) // Exclude stocks in DemoUnit
+                ->reject(fn($stock) => OutgoingStock::where('incoming_stock_id', $stock->id)->exists()) // Exclude stocks already in OutgoingStock
                 ->filter(fn($stock) => is_null($stock->expiration_date) || !Carbon::parse($stock->expiration_date)->isPast()) 
                 ->sum('quantity'); 
 
-                    $filteredIncomingStocks = $product->incomingStocks->reject(fn($stock) => 
-                    DemoUnit::where('incoming_stock_id', $stock->id)->exists()
+                $filteredIncomingStocks = $product->incomingStocks->reject(fn($stock) =>
+                OutgoingStock::where('incoming_stock_id', $stock->id)->exists()
+
                 );
                 
                 $groupedStocks = $filteredIncomingStocks->isNotEmpty()
