@@ -36,4 +36,12 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+    public function orderStatuses()
+    {
+        return $this->hasMany(OrderStatus::class);
+    }
 }

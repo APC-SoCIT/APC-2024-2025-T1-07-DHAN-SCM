@@ -6,6 +6,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\CompanyController;
@@ -72,7 +73,10 @@ Route::middleware('auth:sanctum')->group(function () {
     
 
 
-    
+    Route::apiResource('orders', OrderController::class)->except(['update']);
+
+    Route::patch('orders/{id}/status', [OrderController::class, 'updateStatus']);
+
 
 
 
