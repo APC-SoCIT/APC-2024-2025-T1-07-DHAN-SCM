@@ -114,6 +114,39 @@ class OrderController extends Controller
                 'updated_by' => auth()->id(),
             ]);
     
+            // If status is "Approved", allocate stock using FIFO (excluding expired & used items)
+            if (strtolower($statusName) === 'approved') {
+                foreach ($order->orderItems as $item) {
+                    $quantityNeeded = $item->quantity;
+    
+                    // Retrieve available stock in FIFO order (one row = one quantity)
+                    $incomingStocks = IncomingStock::where('product_id', $item->product_id)
+                        ->where(function ($query) {
+                            $query->whereNull('expiration_date')
+                                  ->orWhere('expiration_date', '>=', now()); // Exclude expired stock
+                        })
+                        ->whereNotIn('id', function ($query) {
+                            $query->select('incoming_stock_id')->from('outgoing'); // Exclude stock used in outgoing
+                        })
+                        ->whereNotIn('id', function ($query) {
+                            $query->select('incoming_stock_id')->from('demo'); // Exclude stock used in demo
+                        })
+                        ->orderByRaw('COALESCE(expiration_date, created_at) ASC') // FIFO sorting
+                        ->limit($quantityNeeded) // Get exact number of stocks needed
+                        ->get();
+    
+                    foreach ($incomingStocks as $incomingStock) {
+                        OrderTemporaryAllocation::create([
+                            'order_item_id' => $item->id,
+                            'incoming_stock_id' => $incomingStock->id,
+                            'product_id' => $item->product_id,
+                            'created_by' => auth()->id(),
+                            'updated_by' => auth()->id(),
+                        ]);
+                    }
+                }
+            }
+    
             DB::commit();
     
             // Return order with order items and statuses
@@ -124,7 +157,6 @@ class OrderController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-
     
    
 
