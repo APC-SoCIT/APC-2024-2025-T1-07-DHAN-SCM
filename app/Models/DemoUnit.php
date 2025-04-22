@@ -13,12 +13,13 @@ class DemoUnit extends Model
     protected $table = 'demo_units';
 
     protected $fillable = [
+        'demo_number', // ✅ Added demo_number
         'incoming_stock_id',
         'company_id',
         'demo_start',
         'demo_end',
         'assigned_person_id',
-        'status_id', // ✅ Updated to reference statuses table
+        'status_id',
         'notes',
         'created_by',
         'updated_by',
@@ -42,7 +43,7 @@ class DemoUnit extends Model
 
     public function status(): BelongsTo
     {
-        return $this->belongsTo(Status::class, 'status_id'); // ✅ Added relationship for statuses
+        return $this->belongsTo(Status::class, 'status_id');
     }
 
     public function createdBy(): BelongsTo

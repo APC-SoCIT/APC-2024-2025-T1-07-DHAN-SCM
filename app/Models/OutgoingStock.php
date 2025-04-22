@@ -16,6 +16,7 @@ class OutgoingStock extends Model
         'demo_unit_id',
         'order_item_id',
         'incoming_stock_id',
+        'product_id', // ✅ Added product_id
         'type',
         'remarks',
     ];
@@ -36,4 +37,8 @@ class OutgoingStock extends Model
         return $this->belongsTo(IncomingStock::class, 'incoming_stock_id');
     }
 
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'product_id'); // ✅ Added relationship to Product
+    }
 }

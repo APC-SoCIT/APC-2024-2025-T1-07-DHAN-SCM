@@ -91,7 +91,7 @@ Route::get('/purchaseOrders/{purchaseOrderId?}', [PurchaseOrderController::class
 
 Route::get('getAllProducts/{productId?}', [ProductController::class, 'getAllProducts']);
 
-
+Route::get('/products/{id}/logs', [ProductController::class, 'productLogs']);
 
 //reporst from here:
 Route::get('report/outOfStocks', [ReportController::class, 'outOfStocks']);

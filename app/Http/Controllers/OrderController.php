@@ -152,11 +152,12 @@ class OrderController extends Controller
                         OutgoingStock::create([
                             'order_item_id' => $allocation->order_item_id,
                             'incoming_stock_id' => $allocation->incoming_stock_id,
-                            'type' => 'delivery',
-                            'remarks' => 'Stock moved for delivery',
+                            'product_id' => $allocation->product_id, // ✅ Ensure product_id is included
+                            'type' => 'Ordered',
+                            'remarks' => 'Stock has been Ordered',
                         ]);
                     }
-                    
+    
                     // Remove allocated stock from temporary allocations once moved
                     OrderTemporaryAllocation::where('order_item_id', $item->id)->delete();
                 }

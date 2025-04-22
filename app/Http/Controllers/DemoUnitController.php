@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DemoUnit;
 use Illuminate\Http\Request;
+use App\Models\IncomingStock;
 use App\Models\OutgoingStock;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,24 +45,33 @@ class DemoUnitController extends Controller
             'status_id' => 'required|exists:statuses,id',
             'notes' => 'nullable|string',
         ]);
-
+    
         $validatedData['created_by'] = auth()->id();
-
+    
+        // ✅ Generate Next Demo Number
+        $lastDemoUnit = DemoUnit::latest('id')->first(); // Get last entry
+        $nextNumber = $lastDemoUnit ? ((int) substr($lastDemoUnit->demo_number, 5)) + 1 : 1; 
+        $validatedData['demo_number'] = 'DEMO-' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT); // Format DEMO-000001
+    
         // ✅ Create Demo Unit
         $demoUnit = DemoUnit::create($validatedData);
-
+    
+        // ✅ Retrieve product ID from incoming stock
+        $productId = IncomingStock::where('id', $validatedData['incoming_stock_id'])->value('product_id');
+    
         // ✅ Automatically create an outgoing stock entry
         OutgoingStock::create([
             'demo_unit_id' => $demoUnit->id,
             'incoming_stock_id' => $validatedData['incoming_stock_id'],
             'order_item_id' => null,
+            'product_id' => $productId,
             'type' => 'Demo',
             'remarks' => "",
         ]);
-
+    
         // ✅ Retrieve product details
         $product = $demoUnit->incomingStock->product;
-
+    
         return response()->json([
             'demo_unit' => $demoUnit,
             'product' => optional($product)->only([
@@ -85,24 +95,23 @@ class DemoUnitController extends Controller
     public function update(Request $request, DemoUnit $demoUnit)
     {
         $validatedData = $request->validate([
-            'incoming_stock_id' => 'exists:incoming_stocks,id',
-            'company_id' => 'exists:companies,id',
             'demo_start' => 'date',
             'demo_end' => 'nullable|date',
             'assigned_person_id' => 'exists:users,id',
-            'status_id' => 'exists:statuses,id',
             'notes' => 'nullable|string',
         ]);
-    
+
         $validatedData['updated_by'] = auth()->id();
+
+        // ✅ Update only selected fields without modifying `demo_number`
         $demoUnit->update($validatedData);
-    
+
         // ✅ Retrieve product details safely
         $product = optional($demoUnit->incomingStock->product);
-    
+
         return response()->json([
             'demo_unit' => $demoUnit,
-            'product' => $product->only([
+            'product' => optional($product)->only([
                 'id', 'name', 'sku', 'model', 'description', 'image_url', 'minimum_quantity',
                 'supplier_price', 'created_at', 'updated_at'
             ]) + [

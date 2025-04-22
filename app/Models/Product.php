@@ -118,6 +118,10 @@ class Product extends Model
     {
         return $this->hasMany(IncomingStock::class, 'product_id');
     }
+    public function outgoingStocks()
+    {
+        return $this->hasMany(OutgoingStock::class);
+    }
 
     public function getAvailableQuantityAttribute()
     {

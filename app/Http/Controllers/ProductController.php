@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use Log;
 use Storage;
 use Carbon\Carbon;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\DemoUnit;
 use App\Models\ProductType;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\OutgoingStock;
 use App\Models\PurchaseOrder;
@@ -18,6 +20,56 @@ use Illuminate\Http\UploadedFile;
 class ProductController extends Controller
 {
 
+    public function productLogs($productId)
+    {
+        // Fetch product with incoming and outgoing stocks
+        $product = Product::with(['incomingStocks', 'outgoingStocks'])->findOrFail($productId);
+
+        $logs = collect();
+
+        // ✅ Group Incoming Stock Entries by `purchase_order_item_id`
+        $incomingGrouped = $product->incomingStocks->groupBy('purchase_order_item_id');
+        foreach ($incomingGrouped as $poItemId => $stocks) {
+            // ✅ Fetch `purchase_order_id` from `purchase_order_items`
+            $purchaseOrderId = PurchaseOrderItem::where('id', $poItemId)->value('purchase_order_id');
+
+            // ✅ Now, fetch PO Number using `purchase_order_id`
+            $poNumber = $purchaseOrderId ? PurchaseOrder::where('id', $purchaseOrderId)->value('ponumber') : 'No PO Found';
+
+            // ✅ Determine type based on PO Number format
+            $type = Str::startsWith($poNumber, 'I-P') ? 'Internal P.O' : (Str::startsWith($poNumber, 'N-P') ? 'Normal P.O' : 'Received Stock');
+
+            $logs->push([
+                'name' => $product->name,
+                'type' => $type,
+                'quantity' => $stocks->count(),
+                'source' => 'IncomingStock',
+                'timestamp' => $stocks->max('created_at')->toDateTimeString(),
+                'reference_number' => $poNumber,
+            ]);
+        }
+
+        // ✅ Group Outgoing Stock Entries by `demo_unit_id` or `order_item_id`
+        $outgoingGrouped = $product->outgoingStocks->groupBy(fn($stock) => $stock->demo_unit_id ?? $stock->order_item_id);
+        foreach ($outgoingGrouped as $groupKey => $stocks) {
+            // ✅ Fetch Demo Number if available
+            $demoNumber = DemoUnit::where('id', $stocks->first()->demo_unit_id)->value('demo_number');
+
+            // ✅ Fetch Order Number if available
+            $orderNumber = Order::where('id', $stocks->first()->order_item_id)->value('megaion_order_number');
+
+            $logs->push([
+                'name' => $product->name,
+                'type' => $stocks->first()->type ?? 'Ordered',
+                'quantity' => $stocks->count(),
+                'source' => 'OutgoingStock',
+                'timestamp' => $stocks->max('created_at')->toDateTimeString(),
+                'reference_number' => $demoNumber ?? $orderNumber ?? 'N/A',
+            ]);
+        }
+
+        return response()->json($logs->sortByDesc('timestamp')->values()->toArray()); // ✅ Returns only logs
+    }
 
     public function getAllProducts($productId = null)  
     {  

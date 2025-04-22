@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('demo_units', function (Blueprint $table) {
             $table->id();
+            $table->string('demo_number')->unique(); // ✅ Added demo_number as a unique string
             $table->foreignId('incoming_stock_id')->constrained('incoming_stocks')->cascadeOnDelete();
             $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
             $table->dateTime('demo_start');
@@ -24,7 +25,6 @@ return new class extends Migration
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
-
     }
 
     /**
