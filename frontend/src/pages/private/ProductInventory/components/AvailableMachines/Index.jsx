@@ -64,7 +64,7 @@ function AvailableMachines({ product, onChange }) {
     };
 
     fetchGroupedItems();
-  }, []);
+  }, [product]);
 
   if (errorMsg) {
     return <ErrorContent errorMessage={errorMsg} />;
@@ -203,14 +203,20 @@ function AvailableMachines({ product, onChange }) {
                   key: "2",
                   label: "Calibration Records",
                   children: (
-                    <Calibrations serialNumber={record.serial_number} />
+                    <Calibrations
+                      serialNumber={record.serial_number}
+                      onChange={onChange}
+                    />
                   ),
                 },
                 {
                   key: "3",
                   label: "Maintenance Records",
                   children: (
-                    <Maintenances serialNumber={record.serial_number} />
+                    <Maintenances
+                      serialNumber={record.serial_number}
+                      onChange={onChange}
+                    />
                   ),
                 },
               ];

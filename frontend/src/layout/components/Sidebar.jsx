@@ -121,6 +121,11 @@ function Sidebar() {
       label: <Link to="/purchaseOrders">Purchase Orders</Link>,
     },
     {
+      key: "/orders",
+      icon: <ShoppingOutlined />,
+      label: <Link to="/orders">Orders</Link>,
+    },
+    {
       key: "/suppliers",
       icon: <InboxOutlined />,
       label: <Link to="/suppliers">Suppliers</Link>,
@@ -166,6 +171,11 @@ function Sidebar() {
       label: <Link to="/tags">Tags</Link>,
       group: "Others",
     },
+    {
+      key: "/ecommerce",
+      icon: <UnorderedListOutlined />,
+      label: <Link to="/ecommerce">Ecommerce</Link>,
+    },
   ];
 
   const userRoleMenu = {
@@ -185,6 +195,7 @@ function Sidebar() {
       "/warehouses",
       "/productUnits",
       "/tags",
+      "/ecommerce",
     ],
     Customer: ["/ecommerce", "/customerOrders"],
     Sales: ["/dashboard", "/orders"],

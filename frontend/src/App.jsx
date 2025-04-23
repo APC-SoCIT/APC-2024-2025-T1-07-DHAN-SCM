@@ -54,12 +54,6 @@ function App() {
       path: "/products/:productId",
       element: <ProductInventory />,
     },
-    // {
-    //   title: "My Orders",
-    //   subTitle: "view your orders here",
-    //   path: "/customerOrders",
-    //   element: <CustomerOrder />,
-    // },
     {
       title: "Purchase Orders",
       subTitle: "purchase order management",
@@ -88,11 +82,10 @@ function App() {
       isWithBackButton: true,
     },
     {
-      title: "Demo Units",
-      subTitle: "demo units management",
-      path: "/demoUnits",
-      element: <DemoUnits />,
-      isWithBackButton: true,
+      title: "Orders",
+      subTitle: "create purchamanage order here",
+      path: "/orders",
+      element: <Orders />,
     },
     // {
     //   title: "View Order",
@@ -100,6 +93,12 @@ function App() {
     //   path: "/orders/:orderId",
     //   element: <ViewOrder />,
     //   isWithBackButton: true,
+    // },
+    // {
+    //   title: "My Orders",
+    //   subTitle: "view your orders here",
+    //   path: "/customerOrders",
+    //   element: <CustomerOrder />,
     // },
     // {
     //   title: "View Order",
@@ -115,26 +114,13 @@ function App() {
     //   element: <ViewProductItem />,
     //   isWithBackButton: true,
     // },
-
-    // {
-    //   title: "Orders",
-    //   subTitle: "create purchamanage order here",
-    //   path: "/orders",
-    //   element: <Orders />,
-    // },
-
-    // {
-    //   title: "Products",
-    //   subTitle: "product management",
-    //   path: "/products",
-    //   element: <Products />,
-    // },
-    // {
-    //   title: "Inventory",
-    //   subTitle: "inventory management",
-    //   path: "/inventory",
-    //   element: <Inventory />,
-    // },
+    {
+      title: "Demo Units",
+      subTitle: "demo units management",
+      path: "/demoUnits",
+      element: <DemoUnits />,
+      isWithBackButton: true,
+    },
     {
       title: "Users",
       subTitle: "user management",
@@ -146,12 +132,6 @@ function App() {
     //   subTitle: "view reports here",
     //   path: "/reports",
     //   element: <Reports />,
-    // },
-    // {
-    //   title: "Product Groups",
-    //   subTitle: "use to categorize products",
-    //   path: "/productGroups",
-    //   element: <ProductGroups />,
     // },
     {
       title: "Suppliers",
@@ -189,24 +169,12 @@ function App() {
       path: "/tags",
       element: <Tags />,
     },
-    // {
-    //   title: "Ecommerce",
-    //   subTitle: "place your order here",
-    //   path: "/ecommerce",
-    //   element: <Ecommerce />,
-    // },
-    // {
-    //   title: "Ecommerce",
-    //   subTitle: "place your order here",
-    //   path: "/ecommerce",
-    //   element: <Ecommerce />,
-    // },
-    // {
-    //   title: "My Orders",
-    //   subTitle: "view your orders here",
-    //   path: "/customerOrders",
-    //   element: <CustomerOrder />,
-    // },
+    {
+      title: "Ecommerce",
+      subTitle: "place your order here",
+      path: "/ecommerce",
+      element: <Ecommerce />,
+    },
   ];
 
   const customerRoutes = [];

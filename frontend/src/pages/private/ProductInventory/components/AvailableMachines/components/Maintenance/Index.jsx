@@ -10,7 +10,7 @@ import http from "../../../../../../../services/httpService";
 
 import { getColumnSearchProps } from "../../../../../../../helpers/TableFilterProps";
 
-function Maintenances({ serialNumber }) {
+function Maintenances({ serialNumber, onChange }) {
   const [maintenances, setMaintenances] = useState([]);
   const [selectedMaintenance, setSelectedMaintenance] = useState(null);
 
@@ -64,6 +64,7 @@ function Maintenances({ serialNumber }) {
         serial_number: serialNumber,
       });
       await getMaintenances();
+      onChange();
     } catch (error) {
       setErrorMsg(error.message || "Something went wrong!");
     } finally {
@@ -80,6 +81,7 @@ function Maintenances({ serialNumber }) {
         serial_number: serialNumber,
       });
       await getMaintenances();
+      onChange();
     } catch (error) {
       setErrorMsg(error.message || "Something went wrong!");
     } finally {
@@ -92,6 +94,7 @@ function Maintenances({ serialNumber }) {
       setIsContentLoading(true);
       await http.delete(`/api/maintenanceRecords/${maintenance.id}`);
       await getMaintenances();
+      onChange();
     } catch (error) {
       setErrorMsg(error.message || "Something went wrong!");
     } finally {

@@ -69,4 +69,68 @@ const getColumnSearchProps = (dataIndex, placeholder) => {
   };
 };
 
-export { getColumnSearchProps };
+const getColumnSearchPropsProduct = (dataIndex, placeholder) => {
+  return {
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={(node) => {
+            inputRef = node;
+          }}
+          placeholder={placeholder || "Search here"}
+          value={selectedKeys[0]}
+          style={{
+            width: 188,
+            marginBottom: 8,
+            display: "block",
+          }}
+          onPressEnter={() => confirm()}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => confirm()}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters()}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value, record) => {
+      const recordValue = `${record[dataIndex]} ${record.sku || ""}`;
+      return recordValue
+        ? recordValue.toString().toLowerCase().includes(value.toLowerCase())
+        : "";
+    },
+    filterDropdownProps: {
+      onOpenChange(open) {
+        if (open) {
+          setTimeout(() => inputRef.focus(), 100);
+        }
+      },
+    },
+  };
+};
+
+export { getColumnSearchProps, getColumnSearchPropsProduct };

@@ -12,6 +12,7 @@ import {
   Tag,
   Divider,
   Typography,
+  Result,
 } from "antd";
 import {
   ShoppingCartOutlined,
@@ -24,6 +25,8 @@ import ErrorContent from "../../../components/common/ErrorContent";
 import http from "../../../services/httpService";
 
 import { formatWithComma } from "../../../helpers/numbers";
+
+import useUserStore from "../../../store/UserStore";
 
 const { Paragraph } = Typography;
 
@@ -66,7 +69,7 @@ function ProductCard({ product, addToCart }) {
           <div style={{ height: "200px", overflow: "hidden" }}>
             <img
               alt={product.name}
-              src={product.image_url}
+              src={product.image_url || "https://placehold.co/230x270"}
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           </div>
@@ -78,7 +81,7 @@ function ProductCard({ product, addToCart }) {
           title={product.name}
           description={
             <>
-              <Paragraph
+              {/* <Paragraph
                 ellipsis={{
                   rows: 3,
                   expandable: true,
@@ -87,13 +90,10 @@ function ProductCard({ product, addToCart }) {
                 style={{ minHeight: 80 }}
               >
                 {product.description}
-              </Paragraph>
+              </Paragraph> */}
 
               <div>
-                PHP{" "}
-                {formatWithComma(
-                  product.default_default_selling_price.toFixed(2)
-                )}
+                PHP {formatWithComma(product.default_selling_price.toFixed(2))}
               </div>
               <div>Available: {product.available_quantity}</div>
             </>
@@ -111,18 +111,28 @@ function ProductListing() {
   const [products, setProducts] = useState([]);
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [placeOrderLoading, setPlaceOrderLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [errorMsg, setErrorMsg] = useState(false);
 
-  const [orderNumber, setOrderNumber] = useState("");
+  const [companyOrderNumber, setCompanyOrderNumber] = useState("");
+
+  const [isOrderSuccess, setIsOrderSuccess] = useState(false);
+  const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
+
+  const { id: companyId } = useUserStore();
 
   useEffect(() => {
     const fetchLocations = async () => {
       try {
         setIsContentLoading(true);
-        const { data } = await http.get("/api/products");
-        setProducts(data);
+        const { data } = await http.get("/api/getAllProducts");
+        setProducts(
+          data.map((product) => ({
+            ...product,
+            default_selling_price: parseFloat(product.default_selling_price),
+          }))
+        );
       } catch (error) {
-        setError(error);
+        setError(error.message);
       } finally {
         setIsContentLoading(false);
       }
@@ -131,8 +141,8 @@ function ProductListing() {
     fetchLocations();
   }, []);
 
-  if (error) {
-    return <ErrorContent />;
+  if (errorMsg) {
+    return <ErrorContent errorMessage={errorMsg} />;
   }
 
   if (isContentLoading) {
@@ -184,40 +194,62 @@ function ProductListing() {
 
   const handlePlaceOrder = async () => {
     try {
-      if (orderNumber.trim() === "") {
+      if (companyOrderNumber.trim() === "") {
         alert("Please enter order number");
         return;
       }
-
       setPlaceOrderLoading(true);
-
       const orderItems = cart.map((cartItem) => {
         const { quantity, id, default_selling_price } = cartItem;
         return {
           product_id: id,
-          qty: quantity,
-          price: default_selling_price,
-          total_amount: Number(
+          quantity,
+          unit_price: default_selling_price,
+          total_price: Number(
             (cartItem.default_selling_price * cartItem.quantity).toFixed(2)
           ),
         };
       });
-
       const order = {
-        total_items: cart.length,
-        order_number: orderNumber,
+        company_id: companyId,
+        company_order_number: companyOrderNumber,
+        order_date: "2025-04-05",
         total_amount: totalPrice,
         order_items: orderItems,
+        status_id: 1,
       };
-
-      await http.post("/api/orders", order);
-      window.location.reload();
+      const { data } = await http.post("/api/orders", order);
+      setPurchaseOrderNumber(data.megaion_order_number);
+      setIsOrderSuccess(true);
     } catch (error) {
-      setError(error);
+      setError(error.message);
     } finally {
       setPlaceOrderLoading(false);
     }
   };
+
+  if (isOrderSuccess) {
+    return (
+      <Result
+        status="success"
+        title="Order Successfully Purchased!"
+        subTitle={`Order #${purchaseOrderNumber} Confirmed: Thank You for Trusting Megaion! We’ll Reach Out if Any Further Action is Required.`}
+        extra={[
+          <Button
+            type="primary"
+            key="console"
+            onClick={() =>
+              alert(
+                "for customer user only .. redirect to /customerOrders route"
+              )
+            }
+          >
+            Go to My Orders
+          </Button>,
+        ]}
+      />
+    );
+  }
 
   return (
     <div>
@@ -235,7 +267,7 @@ function ProductListing() {
           ) : (
             <Row gutter={[16, 16]}>
               {filteredProducts.map((product) => (
-                <Col key={product.id} xs={24} sm={12} md={8} lg={6}>
+                <Col key={product.id} xs={24} sm={12} md={8} lg={8}>
                   <ProductCard product={product} addToCart={addToCart} />
                 </Col>
               ))}
@@ -283,7 +315,7 @@ function ProductListing() {
             <Input
               style={{ width: "100%", marginBottom: 16 }}
               placeholder="Enter your Order Number Here"
-              onChange={(e) => setOrderNumber(e.target.value)}
+              onChange={(e) => setCompanyOrderNumber(e.target.value)}
             />
             <Button
               size="large"

@@ -9,7 +9,7 @@ import http from "../../../../../../../services/httpService";
 
 import { getColumnSearchProps } from "../../../../../../../helpers/TableFilterProps";
 
-function Calibrations({ serialNumber }) {
+function Calibrations({ serialNumber, onChange }) {
   const [calibrations, setCalibrations] = useState([]);
   const [selectedCalibration, setSelectedCalibration] = useState(null);
 
@@ -62,6 +62,7 @@ function Calibrations({ serialNumber }) {
         serial_number: serialNumber,
       });
       await getCalibrations();
+      onChange();
     } catch (error) {
       setErrorMsg(error.message || "Something went wrong!");
     } finally {
@@ -78,6 +79,7 @@ function Calibrations({ serialNumber }) {
         serial_number: serialNumber,
       });
       await getCalibrations();
+      onChange();
     } catch (error) {
       setErrorMsg(error.message || "Something went wrong!");
     } finally {
@@ -90,6 +92,7 @@ function Calibrations({ serialNumber }) {
       setIsContentLoading(true);
       await http.delete(`/api/calibrationRecords/${calibration.id}`);
       await getCalibrations();
+      onChange();
     } catch (error) {
       setErrorMsg(error.message || "Something went wrong!");
     } finally {

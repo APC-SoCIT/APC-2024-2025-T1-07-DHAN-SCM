@@ -131,6 +131,24 @@ const FormReceive = ({ supportingData, onSubmit }) => {
               name={`serial_number_${index + 1}`}
               rules={[
                 { required: true, message: `Serial ${index + 1} is required.` },
+                {
+                  validator: (_, value) => {
+                    const allValues = formPOItemInstance.getFieldsValue();
+                    const serialNumbers = Object.keys(allValues)
+                      .filter((key) => key.startsWith("serial_number_"))
+                      .map((key) => allValues[key]);
+
+                    if (
+                      serialNumbers.filter((serial) => serial === value)
+                        .length > 1
+                    ) {
+                      return Promise.reject(
+                        new Error("Serial numbers must be unique.")
+                      );
+                    }
+                    return Promise.resolve();
+                  },
+                },
               ]}
             >
               <Input />

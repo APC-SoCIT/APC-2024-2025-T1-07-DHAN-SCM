@@ -30,7 +30,7 @@ import ErrorContent from "../../../components/common/ErrorContent";
 import FormProduct from "./components/FormProduct";
 
 import http from "../../../services/httpService";
-import { getColumnSearchProps } from "../../../helpers/TableFilterProps";
+import { getColumnSearchPropsProduct } from "../../../helpers/TableFilterProps";
 import { formatWithComma } from "../../../helpers/numbers";
 
 const { Text } = Typography;
@@ -155,7 +155,7 @@ function Products() {
     {
       title: "Name",
       dataIndex: "name",
-      ...getColumnSearchProps("name"),
+      ...getColumnSearchPropsProduct("name", "Product Name or SKU"),
       render: (_, record) => {
         return (
           <Link
@@ -281,10 +281,10 @@ function Products() {
         const menuItems = [
           { key: "View", label: "View" },
           { key: "Update", label: "Update" },
-          {
-            type: "divider",
-          },
-          { key: "Delete", label: "Delete", danger: true },
+          // {
+          //   type: "divider",
+          // },
+          // { key: "Delete", label: "Delete", danger: true },
         ];
 
         const handleMenuClick = ({ key, domEvent }) => {

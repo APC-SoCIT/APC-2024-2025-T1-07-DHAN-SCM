@@ -37,6 +37,7 @@ function ProductInventory() {
   const [product, setProduct] = useState(null);
 
   const [isContentLoading, setIsContentLoading] = useState(false);
+  const [isContentLoading2, setIsContentLoading2] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
   const { productId } = useParams();
@@ -75,12 +76,12 @@ function ProductInventory() {
 
   const handleAvailableMachineChange = async () => {
     try {
-      setIsContentLoading(true);
+      setIsContentLoading2(true);
       await getProductInventory();
     } catch (error) {
       setErrorMsg(error.message || "Something went wrong!");
     } finally {
-      setIsContentLoading(false);
+      setIsContentLoading2(false);
     }
   };
 
@@ -159,7 +160,7 @@ function ProductInventory() {
   }
 
   return (
-    <>
+    <Spin spinning={isContentLoading2} tip="loading...">
       <Card style={{ marginBottom: 16 }}>
         <Row gutter={16}>
           <Col>
@@ -204,7 +205,7 @@ function ProductInventory() {
           items={tabItems}
         />
       </Card>
-    </>
+    </Spin>
   );
 }
 

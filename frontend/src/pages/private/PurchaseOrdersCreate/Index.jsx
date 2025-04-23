@@ -19,7 +19,7 @@ import ErrorContent from "../../../components/common/ErrorContent";
 
 import http from "../../../services/httpService";
 import { formatWithComma } from "../../../helpers/numbers";
-import { getColumnSearchProps } from "../../../helpers/TableFilterProps";
+import { getColumnSearchPropsProduct } from "../../../helpers/TableFilterProps";
 
 // import useDataStore from "../../../../store/DataStore";
 
@@ -153,7 +153,7 @@ function PurchaseOrdersCreate() {
   const table1Columns = [
     {
       title: "Supplier Products",
-      ...getColumnSearchProps("name"),
+      ...getColumnSearchPropsProduct("name", "Product Name or SKU"),
       render: (_, record) => {
         return (
           <>
