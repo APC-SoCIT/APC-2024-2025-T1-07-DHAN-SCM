@@ -98,10 +98,9 @@ class ProductController extends Controller
                 ->filter(fn($stock) => is_null($stock->expiration_date) || !Carbon::parse($stock->expiration_date)->isPast()) 
                 ->sum('quantity'); 
 
-                $filteredIncomingStocks = $product->incomingStocks->reject(fn($stock) =>
-                OutgoingStock::where('incoming_stock_id', $stock->id)->exists()
-
-                );
+                $filteredIncomingStocks = $product->incomingStocks
+                ->reject(fn($stock) => OutgoingStock::where('incoming_stock_id', $stock->id)->exists())
+                ->sortBy(fn($stock) => $stock->expiration_date ?? $stock->created_at);
                 
                 $groupedStocks = $filteredIncomingStocks->isNotEmpty()
                     ?  $filteredIncomingStocks
