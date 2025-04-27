@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Status;
 use App\Models\OrderItem;
+use App\Models\CompanyUser;
 use App\Models\OrderStatus;
 use Illuminate\Http\Request;
 use App\Models\IncomingStock;
@@ -59,7 +60,6 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'company_id' => 'required|exists:companies,id',
             'company_order_number' => 'nullable|string|unique:orders,company_order_number',
             'order_date' => 'required|date',
             'total_amount' => 'nullable|numeric',
@@ -74,28 +74,45 @@ class OrderController extends Controller
         DB::beginTransaction();
     
         try {
+            // Get company_id from logged-in user
+            $companyUser = CompanyUser::where('user_id', auth()->id())->first();
+    
+            if (!$companyUser) {
+                return response()->json(['error' => 'Company not found for the logged-in user'], 400);
+            }
+    
             // Create the Order
-            $order = Order::create(array_merge($request->except('order_items'), [
+            $order = Order::create([
+                'company_id' => $companyUser->company_id,
+                'company_order_number' => $request->company_order_number,
+                'order_date' => $request->order_date,
+                'total_amount' => $request->total_amount,
+                'status_id' => $request->status_id,
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
-            ]));
+            ]);
     
-            // Generate the MEGA order number based on the inserted ID
+            // Generate MEGA order number based on inserted ID
             $order->update([
                 'megaion_order_number' => 'MEGA' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
             ]);
     
             // Insert order items
             foreach ($request->order_items as $item) {
-                OrderItem::create(array_merge($item, [
+                OrderItem::create([
                     'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'total_price' => $item['total_price'],
                     'created_by' => auth()->id(),
                     'updated_by' => auth()->id(),
-                ]));
+                ]);
             }
     
             // Get status description
-            $statusDescription = Status::find($order->status_id)->description ?? 'Status not found';
+            $status = Status::find($order->status_id);
+            $statusDescription = $status ? $status->description : 'Status not found';
     
             // Save initial order status in order_statuses table with status description
             OrderStatus::create([
@@ -109,15 +126,12 @@ class OrderController extends Controller
     
             DB::commit();
     
-            // Load related data: order items and order statuses
             return response()->json($order->load(['orderItems.product', 'orderStatuses.status']), 201);
         } catch (Exception $e) {
             DB::rollBack();
-    
             return response()->json(['error' => $e->getMessage()], 500);
         }
-    }   
-
+    }
     public function updateStatus(Request $request, $id)
     {
         $order = Order::findOrFail($id);
