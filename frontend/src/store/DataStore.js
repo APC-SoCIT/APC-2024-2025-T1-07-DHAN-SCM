@@ -35,6 +35,8 @@ const useDataStore = create((set) => ({
     31: "Partially Received",
     32: "Completed",
     33: "For Receiving",
+    34: "Ready to Deliver",
+    35: "In-Transit",
   },
   productUnits: {
     1: "Piece",
