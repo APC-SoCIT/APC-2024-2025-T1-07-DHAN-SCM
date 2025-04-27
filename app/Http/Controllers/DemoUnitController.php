@@ -24,8 +24,12 @@ class DemoUnitController extends Controller
                 'createdBy',
                 'updatedBy'
             ])->get()->map(function ($demoUnit) {
+                $today = now();
+                $demoEndDate = $demoUnit->demo_end ? \Carbon\Carbon::parse($demoUnit->demo_end) : null;
+
                 return array_merge($demoUnit->toArray(), [
-                    'product' => optional($demoUnit->incomingStock->product)->toArray()
+                    'product' => optional($demoUnit->incomingStock->product)->toArray(),
+                    'is_overdue' => $demoEndDate !== null && $demoEndDate->isPast()
                 ]);
             })
         );
