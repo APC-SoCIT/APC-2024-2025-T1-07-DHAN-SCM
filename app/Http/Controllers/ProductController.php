@@ -20,25 +20,21 @@ use Illuminate\Http\UploadedFile;
 class ProductController extends Controller
 {
 
+   
     public function productLogs($productId)
     {
         // Fetch product with incoming and outgoing stocks
         $product = Product::with(['incomingStocks', 'outgoingStocks'])->findOrFail($productId);
-
+    
         $logs = collect();
-
+    
         // ✅ Group Incoming Stock Entries by `purchase_order_item_id`
         $incomingGrouped = $product->incomingStocks->groupBy('purchase_order_item_id');
         foreach ($incomingGrouped as $poItemId => $stocks) {
-            // ✅ Fetch `purchase_order_id` from `purchase_order_items`
             $purchaseOrderId = PurchaseOrderItem::where('id', $poItemId)->value('purchase_order_id');
-
-            // ✅ Now, fetch PO Number using `purchase_order_id`
             $poNumber = $purchaseOrderId ? PurchaseOrder::where('id', $purchaseOrderId)->value('ponumber') : 'No PO Found';
-
-            // ✅ Determine type based on PO Number format
             $type = Str::startsWith($poNumber, 'I-P') ? 'Internal P.O' : (Str::startsWith($poNumber, 'N-P') ? 'Normal P.O' : 'Received Stock');
-
+    
             $logs->push([
                 'name' => $product->name,
                 'quantity' => $stocks->count(),
@@ -48,29 +44,41 @@ class ProductController extends Controller
                 'type' => $type,
             ]);
         }
-
-        // ✅ Group Outgoing Stock Entries by `demo_unit_id` or `order_item_id`
-        $outgoingGrouped = $product->outgoingStocks->groupBy(fn($stock) => $stock->demo_unit_id ?? $stock->order_item_id);
-        foreach ($outgoingGrouped as $groupKey => $stocks) {
-            // ✅ Fetch Demo Number if available
-            $demoNumber = DemoUnit::where('id', $stocks->first()->demo_unit_id)->value('demo_number');
-
-            // ✅ Fetch Order Number if available
-            $orderNumber = Order::where('id', $stocks->first()->order_item_id)->value('megaion_order_number');
-
+    
+        // ✅ Separate Outgoing Stock Entries by `demo_unit_id`
+        $demoOutgoingGrouped = $product->outgoingStocks->whereNotNull('demo_unit_id')->groupBy('demo_unit_id');
+        foreach ($demoOutgoingGrouped as $demoId => $stocks) {
+            $demoNumber = DemoUnit::where('id', $demoId)->value('demo_number');
+    
             $logs->push([
                 'name' => $product->name,
                 'quantity' => $stocks->count(),
                 'Adjustment' => 'Decrease (-)',
                 'timestamp' => $stocks->max('created_at')->toDateTimeString(),
-                'reference_number' => $demoNumber ?? $orderNumber ?? 'N/A',
-                'type' => $stocks->first()->type ?? 'Ordered',
+                'reference_number' => $demoNumber ?? 'N/A',
+                'type' => 'Demo',
             ]);
         }
-
-        return response()->json($logs->sortByDesc('timestamp')->values()->toArray()); // ✅ Returns only logs
+    
+        // ✅ Separate Outgoing Stock Entries by `order_item_id`
+        $orderOutgoingGrouped = $product->outgoingStocks->whereNotNull('order_item_id')->groupBy('order_item_id');
+        foreach ($orderOutgoingGrouped as $orderItemId => $stocks) {
+            $orderNumber = Order::whereHas('orderItems', function ($query) use ($orderItemId) {
+                $query->where('id', $orderItemId);
+            })->value('megaion_order_number');
+    
+            $logs->push([
+                'name' => $product->name,
+                'quantity' => $stocks->count(),
+                'Adjustment' => 'Decrease (-)',
+                'timestamp' => $stocks->max('created_at')->toDateTimeString(),
+                'reference_number' => $orderNumber ?? 'N/A',
+                'type' => 'Ordered',
+            ]);
+        }
+    
+        return response()->json($logs->sortByDesc('timestamp')->values()->toArray());
     }
-
     public function getAllProducts($productId = null)  
     {  
         $query = Product::with([  
