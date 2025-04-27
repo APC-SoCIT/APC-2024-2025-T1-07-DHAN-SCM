@@ -9,6 +9,7 @@ import {
   Modal,
   Dropdown,
   Typography,
+  Card,
 } from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -120,6 +121,11 @@ function DemoUnits() {
 
   const tableColumns = [
     {
+      title: "Demo #",
+      dataIndex: "demo_number",
+      width: 200,
+    },
+    {
       title: "Product",
       render: (_, record) => {
         return (
@@ -159,6 +165,12 @@ function DemoUnits() {
       title: "Assigned Person",
       render: (_, record) => {
         return record.assigned_person.full_name;
+      },
+    },
+    {
+      title: "Overdue",
+      render: (_, record) => {
+        return record.is_overdue ? "Yes" : "No";
       },
     },
     {
@@ -213,6 +225,10 @@ function DemoUnits() {
     },
   ];
 
+  const totalOverdue = demoUnits.filter(
+    (demoUnit) => demoUnit.is_overdue
+  ).length;
+
   return (
     <>
       <Spin spinning={isContentLoading} tip="loading ...">
@@ -224,6 +240,11 @@ function DemoUnits() {
             </Button>
           </Col>
         </Row>
+        <Card style={{ marginBottom: 16 }}>
+          <span>
+            <strong>Total Overdue</strong>: {totalOverdue}
+          </span>
+        </Card>
         <Table columns={tableColumns} dataSource={demoUnits} rowKey="id" />
       </Spin>
 

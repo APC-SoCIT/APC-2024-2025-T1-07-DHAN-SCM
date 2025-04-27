@@ -197,7 +197,16 @@ function Servicing() {
 
   return (
     <Spin spinning={isContentLoading2} tip="loading...">
-      <Row style={{ marginBottom: 16 }} justify="space-between">
+      <Card style={{ marginBottom: 16 }}>
+        <span>
+          <strong>For Calibration</strong>: {0}
+        </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <span>
+          <strong>For Maintenance</strong>: {0}
+        </span>
+      </Card>
+      {/* <Row style={{ marginBottom: 16 }} justify="space-between">
         <Col></Col>
         <Col>
           <Row gutter={[16, 16]}>
@@ -219,7 +228,7 @@ function Servicing() {
             </Col>
           </Row>
         </Col>
-      </Row>
+      </Row> */}
       <Table
         columns={tableColumns}
         dataSource={machines}

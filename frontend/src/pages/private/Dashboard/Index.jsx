@@ -59,11 +59,10 @@ function Dashboard() {
         );
 
         setData({
-          outOfStocks: outOfStocks.below_minimum_count,
-          belowMinimumStocks: belowMinimumStocks.demo_unit_count,
+          outOfStocks: outOfStocks.out_of_stock_count,
+          belowMinimumStocks: belowMinimumStocks.below_minimum_count,
           demoUnit: getAllDemoUnits.demo_unit_count,
-          demoUnitOverDueNearExpire:
-            demoUnitOverDueNearExpire.out_of_stock_count,
+          demoUnitOverDueNearExpire: demoUnitOverDueNearExpire.demo_unit_count,
         });
 
         // const { data: amountPerUser } = await http.get(
@@ -211,7 +210,7 @@ function Dashboard() {
               <Col span={24}>
                 <Card style={cardStyle}>
                   <Statistic
-                    title="Processing"
+                    title="Below Minimum Stocks"
                     value={data.belowMinimumStocks}
                     prefix={<SyncOutlined />}
                   />
@@ -220,7 +219,7 @@ function Dashboard() {
               <Col span={24}>
                 <Card style={cardStyle}>
                   <Statistic
-                    title="In-Transit"
+                    title="Demo Unit"
                     value={data.demoUnit}
                     prefix={<ShoppingCartOutlined />}
                   />
@@ -229,7 +228,7 @@ function Dashboard() {
               <Col span={24}>
                 <Card style={cardStyle}>
                   <Statistic
-                    title="Delivered"
+                    title="Demo Unit Overdue / Near Expire"
                     value={data.demoUnitOverDueNearExpire}
                     prefix={<CheckCircleOutlined />}
                   />

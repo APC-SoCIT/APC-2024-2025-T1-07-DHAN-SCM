@@ -90,6 +90,13 @@ function Orders() {
       width: 200,
     },
     {
+      title: "Customer Order #",
+      dataIndex: "company_order_number",
+      ...getColumnSearchProps("company_order_number"),
+      width: 200,
+      render: (text) => formatWithComma(text),
+    },
+    {
       title: "Company",
       render: (_, record) => record.company.name,
     },
