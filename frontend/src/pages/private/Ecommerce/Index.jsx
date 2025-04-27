@@ -245,7 +245,7 @@ function ProductListing() {
       setPurchaseOrderNumber(data.megaion_order_number);
       setIsOrderSuccess(true);
     } catch (error) {
-      setError(error.message);
+      setErrorMsg(error.message);
     } finally {
       setPlaceOrderLoading(false);
     }

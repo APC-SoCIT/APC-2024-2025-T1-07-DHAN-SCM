@@ -24,7 +24,7 @@ function CustomerOrdersView() {
   const [order, setOrder] = useState(null);
 
   const [isContentLoading, setIsContentLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   const [isViewAllocationOpen, setIsViewAllocationOpen] = useState(false);
 
@@ -41,7 +41,7 @@ function CustomerOrdersView() {
         setIsContentLoading(true);
         await getOrder();
       } catch (error) {
-        setError(error);
+        setErrorMsg(error.message);
       } finally {
         setIsContentLoading(false);
       }
@@ -50,8 +50,8 @@ function CustomerOrdersView() {
     fetchData();
   }, []);
 
-  if (error) {
-    return <ErrorContent />;
+  if (errorMsg) {
+    return <ErrorContent errorMessage={errorMsg} />;
   }
 
   if (isContentLoading) {

@@ -38,7 +38,7 @@ function Dashboard() {
   });
 
   const [isContentLoading, setIsContentLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   const { name, roles } = useUserStore();
 
@@ -77,7 +77,7 @@ function Dashboard() {
         // setAmountPerUser(amountPerUser);
         // setCategoryReport(categoryReport);
       } catch (error) {
-        setError(error);
+        setErrorMsg(error.message);
       } finally {
         setIsContentLoading(false);
       }
@@ -86,8 +86,8 @@ function Dashboard() {
     fetchData();
   }, []);
 
-  if (error) {
-    return <ErrorContent />;
+  if (errorMsg) {
+    return <ErrorContent errorMessage={errorMsg} />;
   }
 
   if (isContentLoading) {

@@ -32,7 +32,7 @@ function Orders() {
   const [orders, setOrders] = useState([]);
 
   const [isContentLoading, setIsContentLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   const navigate = useNavigate();
   const { statuses } = useDataStore();
@@ -50,7 +50,7 @@ function Orders() {
         setIsContentLoading(true);
         await getOrders();
       } catch (error) {
-        setError(error);
+        setErrorMsg(error.message);
       } finally {
         setIsContentLoading(false);
       }
@@ -59,8 +59,8 @@ function Orders() {
     fetchOrders();
   }, []);
 
-  if (error) {
-    return <ErrorContent />;
+  if (errorMsg) {
+    return <ErrorContent errorMessage={errorMsg} />;
   }
 
   const handleUpdateOrder = async (order, newStatusId) => {
@@ -71,7 +71,7 @@ function Orders() {
       });
       await getOrders();
     } catch (error) {
-      setError(error);
+      setErrorMsg(error.message);
     } finally {
       setIsContentLoading(false);
     }
