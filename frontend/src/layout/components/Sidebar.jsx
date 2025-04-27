@@ -18,6 +18,7 @@ import {
   CalculatorOutlined,
   TagsOutlined,
   UsbOutlined,
+  ToolOutlined,
 } from "@ant-design/icons";
 
 import useAppStore from "../../store/AppStore";
@@ -67,7 +68,12 @@ function Sidebar() {
     {
       key: "/demoUnits",
       icon: <UsbOutlined />,
-      label: <Link to="/demoUnits">Demo Unit</Link>,
+      label: <Link to="/demoUnits">Demo Units</Link>,
+    },
+    {
+      key: "/servicing",
+      icon: <ToolOutlined />,
+      label: <Link to="/servicing">Servicing</Link>,
     },
     {
       key: "/users",
@@ -117,6 +123,7 @@ function Sidebar() {
       "/inventory",
       "/purchaseOrders",
       "/demoUnits",
+      "/servicing",
       "/orders",
       "/reports",
       "/productGroups",

@@ -20,7 +20,7 @@ import OrderTracking from "../../../components/common/OrderTracking";
 
 const { Title, Text } = Typography;
 
-function CustomerOrders() {
+function CustomerOrdersView() {
   const [order, setOrder] = useState(null);
 
   const [isContentLoading, setIsContentLoading] = useState(false);
@@ -190,4 +190,4 @@ function CustomerOrders() {
   );
 }
 
-export default CustomerOrders;
+export default CustomerOrdersView;

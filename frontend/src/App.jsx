@@ -21,6 +21,7 @@ import PurchaseOrdersReceive from "./pages/private/PurchaseOrdersReceive/Index.j
 import Orders from "./pages/private/Orders/Index.jsx";
 import OrdersView from "./pages/private/OrdersView/Index.jsx";
 import DemoUnits from "./pages/private/DemoUnits/Index.jsx";
+import Servicing from "./pages/private/Servicing/Index.jsx";
 
 import Suppliers from "./pages/private/Suppliers/Index.jsx";
 import Companies from "./pages/private/Companies/Index.jsx";
@@ -97,7 +98,12 @@ function App() {
       subTitle: "demo units management",
       path: "/demoUnits",
       element: <DemoUnits />,
-      isWithBackButton: true,
+    },
+    {
+      title: "Servicing",
+      subTitle: "machine servicing monitoring",
+      path: "/servicing",
+      element: <Servicing />,
     },
     {
       title: "Users",

@@ -24,6 +24,7 @@ import { getColumnSearchProps } from "../../../helpers/TableFilterProps";
 import { formatWithComma } from "../../../helpers/numbers";
 
 import useDataStore from "../../../store/DataStore";
+import useUserStore from "../../../store/UserStore";
 
 const { Text } = Typography;
 
@@ -35,6 +36,7 @@ function PurchaseOrders() {
 
   const navigate = useNavigate();
   const { statuses } = useDataStore();
+  const { roles } = useUserStore();
   const { modal } = App.useApp();
 
   const getPurchaseOrders = async () => {
@@ -144,26 +146,34 @@ function PurchaseOrders() {
         const statusName = record.status.name;
 
         if (statusName === "Pending") {
-          menuItems.push({ type: "divider" });
-          menuItems.push({ key: 12, label: "Cancelled", danger: true });
-          menuItems.unshift({ key: 2, label: "Approved" });
+          if (roles.includes("Admin")) {
+            menuItems.push({ type: "divider" });
+            menuItems.push({ key: 12, label: "Cancelled", danger: true });
+            menuItems.unshift({ key: 2, label: "Approved" });
+          }
         }
 
         if (statusName === "Approved") {
-          menuItems.push({ type: "divider" });
-          menuItems.push({ key: 12, label: "Cancelled", danger: true });
-          menuItems.unshift({ key: 33, label: "For Receiving" });
+          if (roles.includes("Admin")) {
+            menuItems.push({ type: "divider" });
+            menuItems.push({ key: 12, label: "Cancelled", danger: true });
+            menuItems.unshift({ key: 33, label: "For Receiving" });
+          }
         }
 
         if (
           statusName === "For Receiving" ||
           statusName === "Partially Received"
         ) {
-          menuItems.unshift({ key: "Receive", label: "Receive" });
+          if (roles.includes("Admin") || roles.includes("Warehouse Staff")) {
+            menuItems.unshift({ key: "Receive", label: "Receive" });
+          }
         }
 
         if (statusName === "Delivered") {
-          menuItems.unshift({ key: 14, label: "Paid" });
+          if (roles.includes("Admin")) {
+            menuItems.unshift({ key: 14, label: "Paid" });
+          }
         }
 
         const handleMenuClick = ({ key, label }) => {
