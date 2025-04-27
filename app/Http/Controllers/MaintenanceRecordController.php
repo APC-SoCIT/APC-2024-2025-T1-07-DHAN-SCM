@@ -62,7 +62,7 @@ class MaintenanceRecordController extends Controller
                 
                 return array_merge((array) $item, [
                     'for_maintenance' => $nextMaintenanceDate === null || $nextMaintenanceDate->diffInDays($today) <= 30,
-                    'for_calibration' => $calibrationDate === null ? false : true
+                    'for_calibration' => $calibrationDate != null ? false : true
                 ]);
             })
         );
