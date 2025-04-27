@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_id')->constrained('companies');
             $table->string('megaion_order_number')->nullable()->unique(); // ✅ Added field
-            $table->string('company_order_number')->nullable()->unique(); // ✅ Added field
+            $table->string('company_order_number')->nullable(); // ✅ Added field
             $table->date('order_date');
             $table->decimal('total_amount', 15, 2);
             $table->foreignId('status_id')->constrained('statuses');

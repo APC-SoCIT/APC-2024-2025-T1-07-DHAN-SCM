@@ -60,7 +60,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'company_order_number' => 'nullable|string|unique:orders,company_order_number',
+            'company_order_number' => 'nullable|string',
             'order_date' => 'required|date',
             'total_amount' => 'nullable|numeric',
             'status_id' => 'required|exists:statuses,id',
@@ -94,7 +94,7 @@ class OrderController extends Controller
     
             // Generate MEGA order number based on inserted ID
             $order->update([
-                'megaion_order_number' => 'MEGA' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
+                'megaion_order_number' => 'MEGA-' . str_pad($order->id, 6, '0', STR_PAD_LEFT),
             ]);
     
             // Insert order items
