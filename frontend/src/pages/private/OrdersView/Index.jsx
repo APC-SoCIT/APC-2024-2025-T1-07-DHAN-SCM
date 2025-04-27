@@ -1,27 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
-  Spin,
   Row,
   Col,
   Button,
-  Drawer,
   Table,
   Modal,
-  Dropdown,
-  Select,
   Typography,
-  Space,
   Descriptions,
-  Input,
   Empty,
   Skeleton,
   Tag,
-  List,
-  Card,
   App,
 } from "antd";
-import { MoreOutlined, TruckOutlined } from "@ant-design/icons";
 import Barcode from "react-barcode";
 
 import ErrorContent from "../../../components/common/ErrorContent";
@@ -29,10 +20,9 @@ import ErrorContent from "../../../components/common/ErrorContent";
 import http from "../../../services/httpService";
 import { formatWithComma } from "../../../helpers/numbers";
 
-import useDataStore from "../../../store/DataStore";
 import useUserStore from "../../../store/UserStore";
 
-import FormAllocation from "./components/FormAllocation";
+import ViewAllocation from "./components/ViewAllocation";
 
 import OrderTracking from "../../../components/common/OrderTracking";
 
@@ -45,24 +35,14 @@ function OrdersView() {
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [isFormAllocationOpen, setIsFormAllocationOpen] = useState(false);
+  const [isViewAllocationOpen, setIsViewAllocationOpen] = useState(false);
 
   const { orderId } = useParams();
-  const { statuses } = useDataStore();
   const { roles } = useUserStore();
   const { modal } = App.useApp();
 
   const getOrder = async () => {
     const { data: order } = await http.get(`/api/orders/${orderId}`);
-
-    console.log({ order });
-
-    // const newOrderItems = order.order_items.map((orderItem) => ({
-    //   ...orderItem,
-    //   orderItemAllocations: orderItem.order_items_allocation,
-    // }));
-
-    // order.order_items = newOrderItems;
     setOrder(order);
   };
 
@@ -93,35 +73,9 @@ function OrdersView() {
     return <Empty />;
   }
 
-  const toggleFormAllocationOpen = () => {
-    setIsFormAllocationOpen(!isFormAllocationOpen);
+  const toggleViewAllocationOpen = () => {
+    setIsViewAllocationOpen(!isViewAllocationOpen);
   };
-
-  // const handleFormAllocationSubmit = (formData) => {
-  //   toggleFormAllocationOpen();
-  //   const { forInsertOrderAllocation, forInsertInventory } = formData;
-
-  //   const newOrderItems = order.order_items.map((orderItem) => {
-  //     if (orderItem.id === selectedOrderItem.id) {
-  //       return {
-  //         ...orderItem,
-  //         orderItemAllocations: forInsertOrderAllocation,
-  //         forInsertInventory,
-  //       };
-  //     }
-  //     return orderItem;
-  //   });
-
-  //   order.order_items = newOrderItems;
-
-  //   setOrder(order);
-  // };
-
-  // function hasEmptyAllocation(order) {
-  //   return order
-  //     ? order.order_items.some((item) => item.orderItemAllocations.length === 0)
-  //     : true;
-  // }
 
   const handleUpdateOrder = async (order, newStatusId) => {
     try {
@@ -145,44 +99,6 @@ function OrdersView() {
         handleUpdateOrder(order, key);
       },
     });
-
-    //   // await http.post("/api/saveOrderAllocation", {
-    //   //   order_id: order.id,
-    //   //   forInventoryInsert: forInsertInventory,
-    //   //   forOrderItemsAllocationInsert,
-    //   // });
-    // } catch (error) {
-    //   setError(true);
-    // } finally {
-    //   setIsContentLoading(false);
-    // }
-    // try {
-    //   setIsContentLoading(true);
-    //   let forInsertInventory = [];
-    //   let forOrderItemsAllocationInsert = [];
-
-    //   order.order_items.forEach((orderItem) => {
-    //     forInsertInventory = [
-    //       ...forInsertInventory,
-    //       ...orderItem.forInsertInventory,
-    //     ];
-    //     forOrderItemsAllocationInsert = [
-    //       ...forOrderItemsAllocationInsert,
-    //       ...orderItem.orderItemAllocations,
-    //     ];
-    //   });
-
-    //   await http.post("/api/saveOrderAllocation", {
-    //     order_id: order.id,
-    //     forInventoryInsert: forInsertInventory,
-    //     forOrderItemsAllocationInsert,
-    //   });
-    //   await getOrder();
-    // } catch (error) {
-    //   setError(true);
-    // } finally {
-    //   setIsContentLoading(false);
-    // }
   };
 
   const handlePrint = () => {
@@ -223,29 +139,6 @@ function OrdersView() {
     },
   ];
 
-  // if (roles.includes("Sales") || roles.includes("Admin")) {
-  //   tableColumns.push({
-  //     title: "Action",
-  //     width: 50,
-  //     render: (_, record) => {
-  //       return (
-  //         <Button
-  //           onClick={() => {
-  //             setSelectedOrderItem({ order, ...record });
-  //             toggleFormAllocationOpen();
-  //           }}
-  //         >
-  //           Allocate
-  //         </Button>
-  //       );
-  //     },
-  //   });
-  // }
-
-  // if (order.latest_status.status.id !== 9) {
-  //   tableColumns.pop();
-  // }
-
   const { megaion_order_number, order_items, total_amount, status, company } =
     order;
 
@@ -279,14 +172,14 @@ function OrdersView() {
 
   if (statusName === "Approved") {
     if (roles.includes("Warehouse Staff") || roles.includes("Admin")) {
-      actionKey = 16;
+      actionKey = 34;
       actionText = "Ready to Deliver";
     }
   }
 
   if (statusName === "Ready to Deliver") {
     if (roles.includes("Logistics") || roles.includes("Admin")) {
-      actionKey = 18;
+      actionKey = 35;
       actionText = "In Transit";
     }
   }
@@ -314,15 +207,32 @@ function OrdersView() {
               <Title level={5} style={{ margin: 0 }}>
                 Order Number: {megaion_order_number}
               </Title>
+              <div id="barcode" style={{ display: "none" }}>
+                <Barcode
+                  value={order.megaion_order_number}
+                  height={30}
+                  displayValue={true}
+                />
+              </div>
+              <Button
+                color="primary"
+                size="large"
+                variant="dashed"
+                onClick={handlePrint}
+                style={{ marginTop: 8 }}
+              >
+                Print Barcode
+              </Button>
             </Col>
             <Col>
-              <Tag color={color}>{statusName}</Tag>
+              <Tag style={{ fontSize: 16 }} color={color}>
+                {statusName}
+              </Tag>
             </Col>
           </Row>
 
           <div style={{ marginBottom: 16 }}>
             <Title level={5} style={{ marginBottom: 0 }}>
-              {/* {order?.user?.company_members[0]?.company.name || "-"} */}
               {company.name}
             </Title>
             <div>
@@ -338,29 +248,13 @@ function OrdersView() {
             dataSource={order_items}
             rowKey="id"
             pagination={false}
-            // defaultExpandAllRows
-            // expandable={{
-            //   expandedRowRender: (record) => (
-            //     <>
-            //       <List
-            //         size="small"
-            //         bordered
-            //         dataSource={record.orderItemAllocations}
-            //         renderItem={(item) => (
-            //           <List.Item>
-            //             <div style={{ fontSize: 11 }}>
-            //               <Space>
-            //                 <span>
-            //                   <strong>Quantity Allocated</strong>: {item.qty}
-            //                 </span>
-            //               </Space>
-            //             </div>
-            //           </List.Item>
-            //         )}
-            //       />
-            //     </>
-            //   ),
-            // }}
+            rowClassName="cursor-pointer"
+            onRow={(record) => ({
+              onClick: () => {
+                setSelectedOrderItem(record);
+                toggleViewAllocationOpen();
+              },
+            })}
           />
 
           <Row
@@ -368,16 +262,7 @@ function OrdersView() {
             justify="space-between"
             style={{ marginTop: 16, marginBottom: 16 }}
           >
-            <Col>
-              <div id="barcode">
-                <Barcode
-                  value={"123" || order.barcode}
-                  height={50}
-                  displayValue={true}
-                />
-              </div>
-              <Button onClick={handlePrint}>Print Barcode</Button>
-            </Col>
+            <Col></Col>
             <Col>
               <Descriptions
                 bordered
@@ -398,6 +283,14 @@ function OrdersView() {
           </Row>
 
           <div style={{ textAlign: "right" }}>
+            <Button
+              size="large"
+              danger
+              onClick={() => handleAction(12, "Cancel")}
+              style={{ marginRight: 8 }}
+            >
+              Cancel
+            </Button>
             {actionKey !== "" && (
               <Button
                 size="large"
@@ -407,38 +300,26 @@ function OrdersView() {
                 {actionText}
               </Button>
             )}
-            <Button
-              type="primary"
-              size="large"
-              danger
-              onClick={() => handleAction(12, "Cancel")}
-              style={{ marginLeft: 8 }}
-            >
-              Cancel
-            </Button>
           </div>
-
-          {/* {order.latest_status.status.id === 9 && ()} */}
         </Col>
         <Col span={8}>
-          {/* <div style={{ width: "100%", paddingLeft: 50, color: "#eb2f96" }}>
-            <OrderTracking orderId={order.id} />
-          </div> */}
+          <div style={{ width: "100%", paddingLeft: 50, color: "#eb2f96" }}>
+            <OrderTracking order={order} />
+          </div>
         </Col>
       </Row>
 
-      {/* <Drawer
-        title="Select Product"
-        open={isFormAllocationOpen}
+      <Modal
+        title="View Allocated Items"
+        style={{ top: 20 }}
+        open={isViewAllocationOpen}
+        onCancel={toggleViewAllocationOpen}
+        onOk={toggleViewAllocationOpen}
         destroyOnClose
-        width={600}
-        onClose={toggleFormAllocationOpen}
+        width={1000}
       >
-        <FormAllocation
-          supportingData={{ selectedOrderItem }}
-          onSubmit={handleFormAllocationSubmit}
-        />
-      </Drawer> */}
+        <ViewAllocation order={order} orderItem={selectedOrderItem} />
+      </Modal>
     </>
   );
 }

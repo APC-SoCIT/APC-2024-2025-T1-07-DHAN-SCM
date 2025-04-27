@@ -14,7 +14,6 @@ import Dashboard from "./pages/private/Dashboard/Index";
 import Products from "./pages/private/Products/Index";
 import ProductInventory from "./pages/private/ProductInventory/Index";
 
-import ViewProductItem from "./pages/private/Products/components/ViewProductItem/Index.jsx";
 import PurchaseOrders from "./pages/private/PurchaseOrders/Index.jsx";
 import PurchaseOrdersCreate from "./pages/private/PurchaseOrdersCreate/Index.jsx";
 import PurchaseOrdersView from "./pages/private/PurchaseOrdersView/Index.jsx";
@@ -23,7 +22,6 @@ import Orders from "./pages/private/Orders/Index.jsx";
 import OrdersView from "./pages/private/OrdersView/Index.jsx";
 import DemoUnits from "./pages/private/DemoUnits/Index.jsx";
 
-import ProductGroups from "./pages/private/ProductGroups/Index.jsx";
 import Suppliers from "./pages/private/Suppliers/Index.jsx";
 import Companies from "./pages/private/Companies/Index.jsx";
 import Locations from "./pages/private/Locations/Index.jsx";
@@ -33,7 +31,6 @@ import Tags from "./pages/private/Tags/Index.jsx";
 
 import Reports from "./pages/private/Reports/Index.jsx";
 import Users from "./pages/private/Users/Index.jsx";
-import Inventory from "./pages/private/Inventory/Index.jsx";
 
 import Ecommerce from "./pages/private/Ecommerce/Index";
 
@@ -53,6 +50,7 @@ function App() {
       subTitle: "view your selected product inventory details",
       path: "/products/:productId",
       element: <ProductInventory />,
+      isWithBackButton: true,
     },
     {
       title: "Purchase Orders",

@@ -21,7 +21,6 @@ const Login = () => {
       window.location.reload();
     } catch (error) {
       alert(error.message || "Login failed");
-      console.log(error);
     } finally {
       setIsLoading(false);
     }

@@ -75,8 +75,6 @@ const FormProduct = ({ formData, supportingData, onSubmit }) => {
       });
     }
 
-    console.log(formData);
-
     onSubmit(formData);
   };
 
