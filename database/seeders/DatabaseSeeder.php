@@ -65,7 +65,7 @@ class DatabaseSeeder extends Seeder
             'id' => 1,
             'username' => 'admin',
             'password' => Hash::make('123'),
-            'email' => 'admin@admin.com',
+            'email' => 'admin@gmail.com',
             'full_name' => 'Admin User',
             'created_at' => now(),
             'updated_at' => now(),
@@ -73,20 +73,60 @@ class DatabaseSeeder extends Seeder
 
         User::create([
             'id' => 2,
-            'username' => 'jdoe',
-            'password' => Hash::make('hashedpassword2'),
-            'email' => 'jdoe@example.com',
-            'full_name' => 'John Doe',
+            'username' => 'inventory.user',
+            'password' => Hash::make('123'),
+            'email' => 'inventory.user@gmail.com',
+            'full_name' => 'inventory.user',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
         User::create([
             'id' => 3,
-            'username' => 'asmith',
-            'password' => Hash::make('hashedpassword3'),
-            'email' => 'asmith@example.com',
-            'full_name' => 'Alice Smith',
+            'username' => 'sales.user',
+            'password' => Hash::make('123'),
+            'email' => 'sales.user@gmail.com',
+            'full_name' => 'sales.user',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        User::create([
+            'id' => 4,
+            'username' => 'warehouseman.user',
+            'password' => Hash::make('123'),
+            'email' => 'warehouseman.user@gmail.com',
+            'full_name' => 'warehouseman.user',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        User::create([
+            'id' => 5,
+            'username' => 'logistic.user',
+            'password' => Hash::make('123'),
+            'email' => 'logistic.user@gmail.com',
+            'full_name' => 'logistic.user',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        User::create([
+            'id' => 6,
+            'username' => 'customer.user',
+            'password' => Hash::make('123'),
+            'email' => 'customer.user@gmail.com',
+            'full_name' => 'customer.user',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        User::create([
+            'id' => 7,
+            'username' => 'finance.user',
+            'password' => Hash::make('123'),
+            'email' => 'finance.user@gmail.com',
+            'full_name' => 'finance.user',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -146,7 +186,7 @@ class DatabaseSeeder extends Seeder
             ['id' => 30, 'name' => 'Return Demo (not working)', 'description' => 'Equipment demo tested and ready to sell', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 31, 'name' => 'Partially Received', 'description' => 'Order has been partially received', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 32, 'name' => 'Completed', 'description' => 'Completed', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 33, 'name' => 'For Recieving', 'description' => 'For Recieving', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 33, 'name' => 'For Receiving', 'description' => 'For Receiving', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 34, 'name' => 'Ready to Deliver', 'description' => 'Ready to Deliver', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 35, 'name' => 'In-Transit', 'description' => 'In-transit', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 36, 'name' => 'Draft', 'description' => 'Draft', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()]
