@@ -6,7 +6,7 @@ const PublicRoutes = () => {
   const { id: userId } = useUserStore((state) => state);
   console.log("userId", userId);
 
-  return !userId ? <Outlet /> : <Navigate replace to="/products" />;
+  return !userId ? <Outlet /> : <Navigate replace to="/dashboard" />;
 };
 
 export default PublicRoutes;

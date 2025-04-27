@@ -34,8 +34,8 @@ import Users from "./pages/private/Users/Index.jsx";
 
 import Ecommerce from "./pages/private/Ecommerce/Index";
 
-// import CustomerOrder from "./pages/private/CustomerOrder/Index.jsx";
-// import ViewCustomerOrder from "./pages/private/CustomerOrder/OrdersView/Index.jsx";
+import CustomerOrders from "./pages/private/CustomerOrders/Index.jsx";
+import CustomerOrdersView from "./pages/private/CustomerOrdersView/Index.jsx";
 
 function App() {
   const routes = [
@@ -92,26 +92,6 @@ function App() {
       element: <OrdersView />,
       isWithBackButton: true,
     },
-    // {
-    //   title: "My Orders",
-    //   subTitle: "view your orders here",
-    //   path: "/customerOrders",
-    //   element: <CustomerOrder />,
-    // },
-    // {
-    //   title: "View Order",
-    //   subTitle: "view order full details",
-    //   path: "/customerOrders/:orderId",
-    //   element: <ViewCustomerOrder />,
-    //   isWithBackButton: true,
-    // },
-    // {
-    //   title: "View Product Item",
-    //   subTitle: "view product item full details",
-    //   path: "/productItems/:productCategoryId/:productItemId",
-    //   element: <ViewProductItem />,
-    //   isWithBackButton: true,
-    // },
     {
       title: "Demo Units",
       subTitle: "demo units management",
@@ -125,12 +105,6 @@ function App() {
       path: "/users",
       element: <Users />,
     },
-    // {
-    //   title: "Reports",
-    //   subTitle: "view reports here",
-    //   path: "/reports",
-    //   element: <Reports />,
-    // },
     {
       title: "Suppliers",
       subTitle: "supplier management",
@@ -138,9 +112,9 @@ function App() {
       element: <Suppliers />,
     },
     {
-      title: "Companies",
+      title: "Customers",
       subTitle: "customer/company management",
-      path: "/companies",
+      path: "/customers",
       element: <Companies />,
     },
     {
@@ -173,12 +147,32 @@ function App() {
       path: "/ecommerce",
       element: <Ecommerce />,
     },
+    {
+      title: "My Orders",
+      subTitle: "view your orders here",
+      path: "/customerOrders",
+      element: <CustomerOrders />,
+    },
+    {
+      title: "View Order",
+      subTitle: "view order full details",
+      path: "/customerOrders/:orderId",
+      element: <CustomerOrdersView />,
+      isWithBackButton: true,
+    },
+    // {
+    //   title: "Reports",
+    //   subTitle: "view reports here",
+    //   path: "/reports",
+    //   element: <Reports />,
+    // },
   ];
 
   const customerRoutes = [];
 
   return (
     <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/" element={<AuthWrapper />}>
         <Route path="/" element={<PublicRoutes />}>
           <Route path="/login" element={<Login />} />

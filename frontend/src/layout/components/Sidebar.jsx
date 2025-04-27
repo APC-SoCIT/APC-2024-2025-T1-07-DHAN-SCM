@@ -31,7 +31,7 @@ function Sidebar() {
 
   const location = useLocation();
 
-  const allMenu1 = [
+  const allMenu = [
     {
       key: "/dashboard",
       icon: <DashboardOutlined />,
@@ -43,79 +43,6 @@ function Sidebar() {
       label: <Link to="/products">Products</Link>,
     },
     {
-      key: "/inventory",
-      icon: <DatabaseOutlined />,
-      label: <Link to="/inventory">Inventory</Link>,
-    },
-    {
-      key: "/purchaseOrders",
-      icon: <ShoppingCartOutlined />,
-      label: <Link to="/purchaseOrders">Purchase Orders</Link>,
-    },
-    {
-      key: "/orders",
-      icon: <ShoppingOutlined />,
-      label: <Link to="/orders">Orders</Link>,
-    },
-    // {
-    //   key: "/reports",
-    //   icon: <PieChartOutlined />,
-    //   label: <Link to="/reports">Reports</Link>,
-    // },
-    {
-      key: "/users",
-      icon: <UserOutlined />,
-      label: <Link to="/users">Users</Link>,
-    },
-    {
-      key: "/productGroups",
-      icon: <GroupOutlined />,
-      label: <Link to="/productGroups">Product Groups</Link>,
-      group: "Others",
-    },
-    {
-      key: "/suppliers",
-      icon: <InboxOutlined />,
-      label: <Link to="/suppliers">Suppliers</Link>,
-      group: "Others",
-    },
-    {
-      key: "/companies",
-      icon: <TeamOutlined />,
-      label: <Link to="/companies">Companies</Link>,
-      group: "Others",
-    },
-    {
-      key: "/locations",
-      icon: <PushpinOutlined />,
-      label: <Link to="/locations">Locations</Link>,
-      group: "Others",
-    },
-    {
-      key: "/warehouses",
-      icon: <BankOutlined />,
-      label: <Link to="/warehouses">Warehouses</Link>,
-      group: "Others",
-    },
-    {
-      key: "/ecommerce",
-      icon: <UnorderedListOutlined />,
-      label: <Link to="/ecommerce">Ecommerce</Link>,
-    },
-    {
-      key: "/customerOrders",
-      icon: <ShoppingOutlined />,
-      label: <Link to="/customerOrders">My Orders</Link>,
-    },
-  ];
-
-  const allMenu = [
-    {
-      key: "/products",
-      icon: <UnorderedListOutlined />,
-      label: <Link to="/products">Products</Link>,
-    },
-    {
       key: "/purchaseOrders",
       icon: <ShoppingCartOutlined />,
       label: <Link to="/purchaseOrders">Purchase Orders</Link>,
@@ -132,9 +59,9 @@ function Sidebar() {
       group: "Others",
     },
     {
-      key: "/companies",
+      key: "/customers",
       icon: <TeamOutlined />,
-      label: <Link to="/companies">Companies</Link>,
+      label: <Link to="/customers">Customers</Link>,
       group: "Others",
     },
     {
@@ -176,6 +103,11 @@ function Sidebar() {
       icon: <UnorderedListOutlined />,
       label: <Link to="/ecommerce">Ecommerce</Link>,
     },
+    {
+      key: "/customerOrders",
+      icon: <ShoppingOutlined />,
+      label: <Link to="/customerOrders">My Orders</Link>,
+    },
   ];
 
   const userRoleMenu = {
@@ -189,7 +121,7 @@ function Sidebar() {
       "/reports",
       "/productGroups",
       "/suppliers",
-      "/companies",
+      "/customers",
       "/users",
       "/locations",
       "/warehouses",
@@ -197,11 +129,11 @@ function Sidebar() {
       "/tags",
       "/ecommerce",
     ],
-    Customer: ["/ecommerce", "/customerOrders"],
-    Sales: ["/dashboard", "/orders"],
-    Procurement: ["/dashboard", "/purchaseOrders"],
-    "Inventory staff": ["/dashboard", "/inventory"],
-    "Logistic manager": ["/dashboard", "/orders"],
+    Customer: ["/dashboard", "/ecommerce", "/customerOrders"],
+    "Sales Manager": ["/dashboard", "/orders"],
+    "Warehouse Staff": ["/dashboard", "/purchaseOrders", "/orders"],
+    "Logistic Manager": ["/dashboard", "/orders"],
+    Finance: ["/dashboard", "/orders"],
   };
 
   const getMenuForRoles = (menu, userRoleMenu, roles) => {

@@ -151,7 +151,7 @@ function Orders() {
         const statusName = record.status.name;
 
         if (statusName === "Pending") {
-          if (roles.includes("Sales") || roles.includes("Admin")) {
+          if (roles.includes("Sales Manager") || roles.includes("Admin")) {
             menuItems.push({ type: "divider" });
             menuItems.push({ key: 12, label: "Cancelled", danger: true });
             menuItems.unshift({ key: 2, label: "Approve" });
@@ -165,13 +165,13 @@ function Orders() {
         }
 
         if (statusName === "Ready to Deliver") {
-          if (roles.includes("Logistics") || roles.includes("Admin")) {
+          if (roles.includes("Logistic Manager") || roles.includes("Admin")) {
             menuItems.unshift({ key: 35, label: "In-Transit" });
           }
         }
 
         if (statusName === "In-Transit") {
-          if (roles.includes("Logistics") || roles.includes("Admin")) {
+          if (roles.includes("Logistic Manager") || roles.includes("Admin")) {
             menuItems.unshift({ key: 11, label: "Delivered" });
           }
         }

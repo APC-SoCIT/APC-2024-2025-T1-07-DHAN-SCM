@@ -39,19 +39,20 @@ function Dashboard() {
     const fetchData = async () => {
       try {
         setIsContentLoading(true);
-        const { data: productReports } = await http.get("/api/report/products");
-        const { data: orderReports } = await http.get("/api/report/orders");
-        const { data: amountPerUser } = await http.get(
-          "/api/report/getTotalAmountPerUser"
-        );
-        const { data: categoryReport } = await http.get(
-          "/api/report/getProductTotalsByCategory"
-        );
 
-        setProductReports(productReports);
-        setOrderReports(orderReports);
-        setAmountPerUser(amountPerUser);
-        setCategoryReport(categoryReport);
+        // const { data: productReports } = await http.get("/api/report/products");
+        // const { data: orderReports } = await http.get("/api/report/orders");
+        // const { data: amountPerUser } = await http.get(
+        //   "/api/report/getTotalAmountPerUser"
+        // );
+        // const { data: categoryReport } = await http.get(
+        //   "/api/report/getProductTotalsByCategory"
+        // );
+
+        // setProductReports(productReports);
+        // setOrderReports(orderReports);
+        // setAmountPerUser(amountPerUser);
+        // setCategoryReport(categoryReport);
       } catch (error) {
         setError(error);
       } finally {
@@ -70,9 +71,9 @@ function Dashboard() {
     return <Skeleton />;
   }
 
-  if (!productReports) {
-    return "";
-  }
+  // if (!productReports) {
+  //   return "";
+  // }
 
   let bgImg =
     "https://images.pexels.com/photos/5014950/pexels-photo-5014950.jpeg?cs=srgb&dl=pexels-chris-f-5014950.jpg&fm=jpg";
@@ -119,7 +120,7 @@ function Dashboard() {
               </Title>
             </Card>
           </div>
-          <h1>Orders</h1>
+          {/* <h1>Orders</h1>
           <Row gutter={[16, 16]}>
             <Col span={8}>
               <Card style={cardStyle}>
@@ -208,17 +209,17 @@ function Dashboard() {
                 />
               </Card>
             </Col>
-          </Row>
+          </Row> */}
         </Col>
         <Col span={12}>
-          <h1>Sales by Company</h1>
+          {/* <h1>Sales by Company</h1>
           <div style={{ height: 400, padding: 50 }}>
             <Barchart data={amountPerUser} />
           </div>
           <h1>Product by Category</h1>
           <div style={{ height: 400, marginTop: 100 }}>
             <Piechart data={categoryReport} />
-          </div>
+          </div> */}
         </Col>
       </Row>
     </div>
