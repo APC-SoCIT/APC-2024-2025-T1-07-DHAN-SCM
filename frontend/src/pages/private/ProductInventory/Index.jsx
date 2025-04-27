@@ -14,16 +14,7 @@ import {
   Tabs,
   Statistic,
 } from "antd";
-import {
-  MoreOutlined,
-  ArrowDownOutlined,
-  ExclamationOutlined,
-  EnvironmentOutlined,
-  EnvironmentTwoTone,
-  ExclamationCircleOutlined,
-  WarningOutlined,
-  IdcardOutlined,
-} from "@ant-design/icons";
+import { EnvironmentOutlined, IdcardOutlined } from "@ant-design/icons";
 
 import ErrorContent from "../../../components/common/ErrorContent";
 
@@ -213,11 +204,7 @@ function ProductInventory() {
         </Row>
       </Card>
       <Card>
-        <Tabs
-          //onChange={onChange}
-          type="card"
-          items={tabItems}
-        />
+        <Tabs type="card" items={tabItems} />
       </Card>
     </Spin>
   );

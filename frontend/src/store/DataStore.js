@@ -19,7 +19,7 @@ const useDataStore = create((set) => ({
     15: "Partially Paid",
     16: "Ready to Deliver",
     17: "Refunded",
-    18: "In Transit",
+    18: "In-Transit",
     19: "In Stock",
     20: "Out of Stock",
     21: "Under Maintenance",

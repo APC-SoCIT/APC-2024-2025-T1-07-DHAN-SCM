@@ -20,13 +20,7 @@ import Barcode from "react-barcode";
 const { Title, Text } = Typography;
 
 const ViewAllocation = ({ order, orderItem }) => {
-  const tableColumn = [
-    {
-      title: "Barcode",
-      render: (_, record) => {
-        return record.incoming_stock.barcode;
-      },
-    },
+  const tableColumn1 = [
     {
       title: "Lot Number",
       render: (_, record) => {
@@ -41,6 +35,9 @@ const ViewAllocation = ({ order, orderItem }) => {
         );
       },
     },
+  ];
+
+  const tableColumn2 = [
     {
       title: "Serial Number",
       render: (_, record) => {
@@ -49,11 +46,20 @@ const ViewAllocation = ({ order, orderItem }) => {
     },
   ];
 
-  if (!orderItem.product.is_machine) {
-    tableColumn.pop();
-  }
+  let tableColumn = [
+    {
+      title: "Barcode",
+      render: (_, record) => {
+        return record.incoming_stock.barcode;
+      },
+    },
+  ];
 
-  console.log({ order, orderItem });
+  if (orderItem.product.is_machine) {
+    tableColumn = [...tableColumn, ...tableColumn2];
+  } else {
+    tableColumn = [...tableColumn, ...tableColumn1];
+  }
 
   let tableData = orderItem.outgoing_stocks;
   if (order.status.name === "Approved") {

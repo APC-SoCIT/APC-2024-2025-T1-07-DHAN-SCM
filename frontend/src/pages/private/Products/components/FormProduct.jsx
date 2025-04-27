@@ -6,11 +6,9 @@ import {
   Button,
   Select,
   Divider,
-  Alert,
   Upload,
   Checkbox,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
 
 const FormProduct = ({ formData, supportingData, onSubmit }) => {
   const [formProductInstance] = Form.useForm();
@@ -37,14 +35,6 @@ const FormProduct = ({ formData, supportingData, onSubmit }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData]);
-
-  const handleFormValuesChange = (changedValues) => {
-    // const fieldName = Object.keys(changedValues)[0];
-    // const fieldValue = changedValues[fieldName];
-    // if (fieldName === "inventory_movement") {
-    //   setInventoryMovement(fieldValue);
-    // }
-  };
 
   const handleFormFinish = (values) => {
     // Convert `undefined` to `null`
@@ -103,7 +93,6 @@ const FormProduct = ({ formData, supportingData, onSubmit }) => {
         profit_margin: 0,
         is_machine: false,
       }}
-      onValuesChange={handleFormValuesChange}
       onFinish={handleFormFinish}
     >
       <Form.Item

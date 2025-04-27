@@ -1,37 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  Spin,
-  Row,
-  Col,
-  Button,
-  Drawer,
-  Table,
-  Dropdown,
-  Tag,
-  Typography,
-  Image,
-  Space,
-  Popover,
-  Card,
-  Segmented,
-  Skeleton,
-  Statistic,
-} from "antd";
-import {
-  MoreOutlined,
-  ArrowDownOutlined,
-  EnvironmentOutlined,
-  WarningOutlined,
-  PlusCircleOutlined,
-  MinusCircleOutlined,
-} from "@ant-design/icons";
+import { Row, Col, Table, Card, Skeleton, Statistic } from "antd";
+import { PlusCircleOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 
 import ErrorContent from "../../../../../components/common/ErrorContent";
 
 import http from "../../../../../services/httpService";
-import { getColumnSearchProps } from "../../../../../helpers/TableFilterProps";
-import { formatWithComma } from "../../../../../helpers/numbers";
 
 function ProductLogs({ product }) {
   const [productLogs, setProductLogs] = useState([]);

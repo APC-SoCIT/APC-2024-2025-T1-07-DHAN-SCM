@@ -17,7 +17,7 @@ function OrderTracking({ order }) {
           if (
             statusName === "Approved" ||
             statusName === "Ready to Deliver" ||
-            statusName === "In Transit"
+            statusName === "In-Transit"
           ) {
             color = "green";
           } else if (statusName === "Delivered") {

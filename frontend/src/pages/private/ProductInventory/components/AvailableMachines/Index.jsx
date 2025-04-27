@@ -1,41 +1,16 @@
 import { useEffect, useState } from "react";
-import {
-  Spin,
-  Row,
-  Col,
-  Button,
-  Drawer,
-  Table,
-  Dropdown,
-  Tag,
-  Typography,
-  Image,
-  Space,
-  Popover,
-  Card,
-  Segmented,
-  Tabs,
-} from "antd";
-import {
-  MoreOutlined,
-  ArrowDownOutlined,
-  EnvironmentOutlined,
-  WarningOutlined,
-} from "@ant-design/icons";
-import dayjs from "dayjs";
+import { Spin, Button, Drawer, Table, Dropdown, Card, Tabs } from "antd";
+import { MoreOutlined } from "@ant-design/icons";
 import Barcode from "react-barcode";
 
 import ErrorContent from "../../../../../components/common/ErrorContent";
 
 import http from "../../../../../services/httpService";
 import { getColumnSearchProps } from "../../../../../helpers/TableFilterProps";
-import { formatWithComma } from "../../../../../helpers/numbers";
 
 import Calibrations from "./components/Calibrations/Index";
 import Maintenances from "./components/Maintenance/Index";
 import FormGroupedItem from "./components/FormGroupedItems";
-
-const { Text } = Typography;
 
 function AvailableMachines({ product, onChange }) {
   const [groupedItems, setGroupItems] = useState([]);

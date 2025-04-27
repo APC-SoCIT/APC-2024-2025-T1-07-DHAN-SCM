@@ -137,6 +137,11 @@ function OrdersView() {
       width: 100,
       render: (text) => formatWithComma(text),
     },
+    {
+      title: "Action",
+      render: (text) => <Button>View Allocated</Button>,
+      width: 150,
+    },
   ];
 
   const { megaion_order_number, order_items, total_amount, status, company } =
@@ -147,7 +152,7 @@ function OrdersView() {
   if (
     statusName === "Approved" ||
     statusName === "Ready to Deliver" ||
-    statusName === "In Transit"
+    statusName === "In-Transit"
   ) {
     color = "green";
   } else if (statusName === "Delivered") {
@@ -180,11 +185,11 @@ function OrdersView() {
   if (statusName === "Ready to Deliver") {
     if (roles.includes("Logistics") || roles.includes("Admin")) {
       actionKey = 35;
-      actionText = "In Transit";
+      actionText = "In-Transit";
     }
   }
 
-  if (statusName === "In Transit") {
+  if (statusName === "In-Transit") {
     if (roles.includes("Logistics") || roles.includes("Admin")) {
       actionKey = 11;
       actionText = "Delivered";
@@ -283,14 +288,16 @@ function OrdersView() {
           </Row>
 
           <div style={{ textAlign: "right" }}>
-            <Button
-              size="large"
-              danger
-              onClick={() => handleAction(12, "Cancel")}
-              style={{ marginRight: 8 }}
-            >
-              Cancel
-            </Button>
+            {showCancelButton && (
+              <Button
+                size="large"
+                danger
+                onClick={() => handleAction(12, "Cancel")}
+                style={{ marginRight: 8 }}
+              >
+                Cancel
+              </Button>
+            )}
             {actionKey !== "" && (
               <Button
                 size="large"

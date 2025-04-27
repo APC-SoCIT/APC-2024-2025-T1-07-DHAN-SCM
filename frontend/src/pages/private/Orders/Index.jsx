@@ -128,7 +128,7 @@ function Orders() {
         if (
           statusName === "Approved" ||
           statusName === "Ready to Deliver" ||
-          statusName === "In Transit"
+          statusName === "In-Transit"
         ) {
           color = "green";
         } else if (statusName === "Delivered") {
@@ -166,11 +166,11 @@ function Orders() {
 
         if (statusName === "Ready to Deliver") {
           if (roles.includes("Logistics") || roles.includes("Admin")) {
-            menuItems.unshift({ key: 35, label: "In Transit" });
+            menuItems.unshift({ key: 35, label: "In-Transit" });
           }
         }
 
-        if (statusName === "In Transit") {
+        if (statusName === "In-Transit") {
           if (roles.includes("Logistics") || roles.includes("Admin")) {
             menuItems.unshift({ key: 11, label: "Delivered" });
           }
@@ -218,7 +218,7 @@ function Orders() {
   const readyToDeliverOs = orders.filter(
     (o) => o.status.name === "Ready to Deliver"
   );
-  const intransitOs = orders.filter((o) => o.status.name === "In Transit");
+  const intransitOs = orders.filter((o) => o.status.name === "In-Transit");
   const deliveredOs = orders.filter((o) => o.status.name === "Delivered");
   const cancelledOs = orders.filter((o) => o.status.name === "Cancelled");
 
@@ -273,7 +273,7 @@ function Orders() {
       key: "4",
       label: (
         <>
-          In Transit{" "}
+          In-Transit{" "}
           {intransitOs.length > 0 && (
             <Badge count={intransitOs.length} color="green" />
           )}
@@ -320,8 +320,8 @@ function Orders() {
                       value: "Ready to Deliver",
                     },
                     {
-                      text: "In Transit",
-                      value: "In Transit",
+                      text: "In-Transit",
+                      value: "In-Transit",
                     },
                     {
                       text: "Delivered",

@@ -142,7 +142,7 @@ function Dashboard() {
             <Col span={8}>
               <Card style={cardStyle}>
                 <Statistic
-                  title="In Transit"
+                  title="In-Transit"
                   value={orderReports.in_transit_count}
                   prefix={<ShoppingCartOutlined />}
                 />

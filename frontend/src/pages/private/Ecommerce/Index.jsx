@@ -11,7 +11,6 @@ import {
   Empty,
   Tag,
   Divider,
-  Typography,
   Result,
 } from "antd";
 import {
@@ -27,8 +26,6 @@ import http from "../../../services/httpService";
 import { formatWithComma } from "../../../helpers/numbers";
 
 import useUserStore from "../../../store/UserStore";
-
-const { Paragraph } = Typography;
 
 function ProductCard({ product, addToCart }) {
   let actions = [];

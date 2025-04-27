@@ -1,39 +1,14 @@
 import { useEffect, useState } from "react";
-import {
-  Spin,
-  Row,
-  Col,
-  Button,
-  Drawer,
-  Table,
-  Dropdown,
-  Tag,
-  Typography,
-  Image,
-  Space,
-  Popover,
-  Card,
-  Segmented,
-} from "antd";
-import {
-  MoreOutlined,
-  ArrowDownOutlined,
-  EnvironmentOutlined,
-  WarningOutlined,
-} from "@ant-design/icons";
-import dayjs from "dayjs";
+import { Spin, Button, Drawer, Table, Dropdown, Card } from "antd";
+import { MoreOutlined } from "@ant-design/icons";
 
 import ErrorContent from "../../../../../components/common/ErrorContent";
 
 import http from "../../../../../services/httpService";
-import { getColumnSearchProps } from "../../../../../helpers/TableFilterProps";
-import { formatWithComma } from "../../../../../helpers/numbers";
 
 import Barcode from "react-barcode";
 
 import FormGroupedItem from "./components/FormGroupedItems";
-
-const { Text } = Typography;
 
 function AvailableConsumables({ product, status, onChange }) {
   const [groupedItems, setGroupItems] = useState([]);
