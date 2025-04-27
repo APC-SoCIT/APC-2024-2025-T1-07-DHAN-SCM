@@ -10,9 +10,8 @@ class Role extends Model
 
     public function roleUsers()
     {
-        return $this->hasMany(UserRole::class);
+        return $this->hasMany(RoleUser::class); // ✅ Correct model reference
     }
-
     // Relationship with User model through UserRole
     public function users()
     {

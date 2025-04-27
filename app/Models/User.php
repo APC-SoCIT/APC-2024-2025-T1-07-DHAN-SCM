@@ -49,7 +49,7 @@ class User extends Authenticatable
     }
     public function roleUsers()
     {
-        return $this->hasMany(UserRole::class);
+        return $this->hasMany(RoleUser::class); // ✅ Correct model reference
     }
 
     // Relationship with Role model through UserRole

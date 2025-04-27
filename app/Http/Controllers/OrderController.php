@@ -19,6 +19,8 @@ class OrderController extends Controller
         // Get the authenticated user
         $user = auth()->user();
     
+        // Fetch user's role using the relationship
+        $role = $user->roleUsers()->with('role')->first()?->role->name ?? null;
         // Start the query
         $query = Order::with([
             'company',
@@ -32,7 +34,7 @@ class OrderController extends Controller
         ]);
     
         // If the user's role is "Customer," filter by their created orders
-        if ($user->role === 'Customer') {
+        if ($role === 'Customer') {
             $query->where('created_by', $user->id);
         }
     

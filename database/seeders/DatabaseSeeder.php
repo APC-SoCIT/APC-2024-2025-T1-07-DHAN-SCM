@@ -113,16 +113,25 @@ class DatabaseSeeder extends Seeder
 
         User::create([
             'id' => 6,
-            'username' => 'customer.user',
+            'username' => 'customer1.user',
             'password' => Hash::make('123'),
-            'email' => 'customer.user@gmail.com',
-            'full_name' => 'customer.user',
+            'email' => 'customer1.user@gmail.com',
+            'full_name' => 'customer1.user',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        User::create([
+            'id' => 7,
+            'username' => 'customer2.user',
+            'password' => Hash::make('123'),
+            'email' => 'customer2.user@gmail.com',
+            'full_name' => 'customer2.user',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
         User::create([
-            'id' => 7,
+            'id' => 8,
             'username' => 'finance.user',
             'password' => Hash::make('123'),
             'email' => 'finance.user@gmail.com',
@@ -152,7 +161,8 @@ class DatabaseSeeder extends Seeder
             ['user_id' => 4, 'role_id' => 6, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
             ['user_id' => 5, 'role_id' => 8, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
             ['user_id' => 6, 'role_id' => 9, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['user_id' => 7, 'role_id' => 10, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['user_id' => 7, 'role_id' => 9, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['user_id' => 8, 'role_id' => 10, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
             // Add more role-user relationships as needed
         ]);
         
@@ -202,12 +212,17 @@ class DatabaseSeeder extends Seeder
             
 
          // Seed companies
-         Company::create(['id' => 1, 'name' => 'Company 1', 'contact_info' => 'Contact info for company 1', 'website_url' => 'https://company1.com', 'industry' => 'Industry 1', 'address' => '123 Company St.', 'city' => 'City 1', 'country' => 'Country 1', 'zip_code' => '12345', 'phone_number' => '123-456-7890', 'email_address' => 'contact@company1.com', 'primary_contact_name' => 'John Smith', 'primary_contact_phone' => '123-456-7890', 'primary_contact_email' => 'john.smith@company1.com', 'additional_info' => '{}', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()]);
-            Company::create(['id' => 2, 'name' => 'Company 2', 'contact_info' => 'Contact info for company 2', 'website_url' => 'https://company2.com', 'industry' => 'Industry 2', 'address' => '456 Company Ave.', 'city' => 'City 2', 'country' => 'Country 2', 'zip_code' => '67890', 'phone_number' => '987-654-3210', 'email_address' => 'contact@company2.com', 'primary_contact_name' => 'Jane Doe', 'primary_contact_phone' => '987-654-3210', 'primary_contact_email' => 'jane.doe@company2.com', 'additional_info' => '{}', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()]);
+         Company::create(['id' => 1, 'name' => 'Makati medical hospital', 'contact_info' => 'Makati', 'website_url' => 'https://company1.com', 'industry' => 'Industry 1', 'address' => '123 Company St.', 'city' => 'City 1', 'country' => 'Country 1', 'zip_code' => '12345', 'phone_number' => '123-456-7890', 'email_address' => 'contact@company1.com', 'primary_contact_name' => 'John Smith', 'primary_contact_phone' => '123-456-7890', 'primary_contact_email' => 'john.smith@company1.com', 'additional_info' => '{}', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()]);
+            Company::create(['id' => 2, 'name' => 'Calamba medical hospital', 'contact_info' => 'Calamba laguna', 'website_url' => 'https://company2.com', 'industry' => 'Industry 2', 'address' => '456 Company Ave.', 'city' => 'City 2', 'country' => 'Country 2', 'zip_code' => '67890', 'phone_number' => '987-654-3210', 'email_address' => 'contact@company2.com', 'primary_contact_name' => 'Jane Doe', 'primary_contact_phone' => '987-654-3210', 'primary_contact_email' => 'jane.doe@company2.com', 'additional_info' => '{}', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()]);
     
                 CompanyUser::create([
                     'company_id' => 1,
-                    'user_id' =>1,
+                    'user_id' =>6,
+                ]);
+                
+                CompanyUser::create([
+                    'company_id' => 2,
+                    'user_id' =>7,
                 ]);
                 
           // Seed warehouses
