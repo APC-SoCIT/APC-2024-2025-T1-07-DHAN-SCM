@@ -77,12 +77,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::patch('orders/{id}/status', [OrderController::class, 'updateStatus']);
 
+ 
 
 
 
 
 });
 
+
+Route::get('forServicing', [MaintenanceRecordController::class, 'forServicing']);
 
 
 Route::get('availableIncomingStocks/{productId?}', [IncomingStocksController::class, 'getAvailableIncomingStocks']);

@@ -2,12 +2,57 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\DemoUnit;
 use Illuminate\Http\Request;
 use App\Models\IncomingStock;
+use App\Models\OutgoingStock;
 use App\Models\MaintenanceRecord;
+use Illuminate\Support\Facades\DB;
 
 class MaintenanceRecordController extends Controller
 {
+
+
+    public function forServicing()
+    {
+        return response()->json(
+            collect(DB::select("
+                SELECT 
+                    F.name AS company_name,
+                    B.name AS product_name,
+                    ii.serial_number,
+                    A.order_item_id,
+                    A.demo_unit_id,
+                    A.type,
+                    A.incoming_stock_id,
+                    ii.barcode,
+                    COALESCE(D.megaion_order_number, E.demo_number) AS reference_number,
+                    G.next_maintenance_date,
+                    COALESCE(D.created_at, E.created_at) AS created_at
+                FROM outgoing_stocks A
+                INNER JOIN products B ON B.id = A.product_id
+                INNER JOIN incoming_stocks ii ON ii.id = A.incoming_stock_id
+                LEFT JOIN order_items C ON C.id = A.order_item_id
+                LEFT JOIN orders D ON D.id = C.order_id
+                LEFT JOIN demo_units E ON E.id = A.demo_unit_id
+                LEFT JOIN companies F ON F.id = COALESCE(D.company_id, E.company_id)
+                LEFT JOIN maintenance_records G ON G.incoming_stock_id = A.incoming_stock_id
+                WHERE B.is_machine = 1
+                ORDER BY COALESCE(D.created_at, E.created_at) DESC
+            "))
+            ->map(function ($item) {
+                $today = now();
+                $nextMaintenanceDate = $item->next_maintenance_date ? \Carbon\Carbon::parse($item->next_maintenance_date) : null;
+                
+                return array_merge((array) $item, [
+                    'for_maintenance' => $nextMaintenanceDate === null || $nextMaintenanceDate->diffInDays($today) <= 30
+                ]);
+            })
+        );
+    } 
     // Retrieve all maintenance records with related entities
     public function index()
     {

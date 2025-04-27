@@ -25,7 +25,7 @@ class OrderController extends Controller
             'orderItems.orderTemporaryAllocations.incomingStock', // Include temporary stock allocations
             'orderItems.outgoingStocks.incomingStock', // Include outgoing stock details
             'orderStatuses.status' // Include order statuses with status details
-        ])->get();
+        ])->orderBy('megaion_order_number', 'desc')->get();
     }
 
     public function show($id)
