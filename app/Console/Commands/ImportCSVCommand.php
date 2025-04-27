@@ -75,6 +75,7 @@ class ImportCSVCommand extends Command
                 'name' => $name,
                 'model' => $model,
             ], [
+                'description' => $name,
                 'minimum_quantity' => $record['minimum_qty'],
                 'profit_margin' => $record['profit_margin % (optional)'] ?? 0,
                 'supplier_price' => $record['supplier_price'],
