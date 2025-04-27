@@ -9,7 +9,7 @@ class RoleController extends Controller
 {
     public function index()
     {
-        return Role::all();
+        return Role::orderBy('name', 'asc')->get();
     }
 
     public function store(Request $request)

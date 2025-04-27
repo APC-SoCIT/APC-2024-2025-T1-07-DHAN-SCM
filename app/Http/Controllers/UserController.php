@@ -19,7 +19,7 @@ class UserController extends Controller
             'username' => 'required|string|unique:users,username',
             'full_name' => 'required|string',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:1',
             'roles' => 'nullable|array', // Ensure roles is an array if provided
             'roles.*' => 'exists:roles,id', // Validate each role ID exists
         ]);
@@ -81,7 +81,7 @@ class UserController extends Controller
             'username' => 'sometimes|required|string|unique:users,username,' . $id,
             'full_name' => 'sometimes|required|string',
             'email' => 'sometimes|required|email|unique:users,email,' . $id,
-            'password' => 'sometimes|required|string|min:6',
+            'password' => 'sometimes|required|string|min:1',
             'roles' => 'nullable|array', // Ensure roles is an array if provided
             'roles.*' => 'exists:roles,id', // Validate each role ID exists
         ]);

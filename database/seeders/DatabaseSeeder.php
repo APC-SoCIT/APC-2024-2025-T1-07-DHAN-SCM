@@ -100,6 +100,9 @@ class DatabaseSeeder extends Seeder
             ['id' => 5, 'name' => 'Supplier', 'description' => 'External supplier with restricted access', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
             ['id' => 6, 'name' => 'Warehouse Staff', 'description' => 'Handles warehouse operations and inventory movement', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
             ['id' => 7, 'name' => 'User', 'description' => 'General user with limited access', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 8, 'name' => 'Logistic Manager', 'description' => 'Logistic Manager', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 9, 'name' => 'Customer', 'description' => 'Customer', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 10, 'name' => 'Finance', 'description' => 'Finance', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
         ]);
         
         DB::table('role_users')->insert([
@@ -145,7 +148,7 @@ class DatabaseSeeder extends Seeder
             ['id' => 32, 'name' => 'Completed', 'description' => 'Completed', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 33, 'name' => 'For Recieving', 'description' => 'For Recieving', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 34, 'name' => 'Ready to Deliver', 'description' => 'Ready to Deliver', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 35, 'name' => 'In-transit', 'description' => 'In-transit', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 35, 'name' => 'In-Transit', 'description' => 'In-transit', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['id' => 36, 'name' => 'Draft', 'description' => 'Draft', 'created_by' => 1, 'updated_by' => 1, 'created_at' => now(), 'updated_at' => now()]
         ];
 

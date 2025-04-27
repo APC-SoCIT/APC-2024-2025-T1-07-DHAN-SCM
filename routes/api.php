@@ -97,7 +97,7 @@ Route::get('getAllProducts/{productId?}', [ProductController::class, 'getAllProd
 Route::get('/products/{id}/logs', [ProductController::class, 'productLogs']);
 
 //reporst from here:
-Route::get('report/outOfStocks', [ReportController::class, 'outOfStocks']);
+Route::get('report/outOfStocks', [ReportController::class, 'outOfStocks']); 
 Route::get('report/belowMinimumStocks', [ReportController::class, 'belowMinimumStocks']);
 Route::get('report/getAllDemoUnits', [ReportController::class, 'getAllDemoUnits']);
 Route::get('report/demoUnitOverDueNearExpire', [ReportController::class, 'demoUnitOverDueNearExpire']);
