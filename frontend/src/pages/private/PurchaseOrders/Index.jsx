@@ -184,17 +184,21 @@ function PurchaseOrders() {
       width: 100,
       render: (_, record) => {
         let color = "orange";
-        const statusId = record.status_id;
-        if (statusId === 2 || statusId === 33 || statusId === 31) {
+        const statusName = record.status.name;
+        if (
+          statusName === "Approved" ||
+          statusName === "For Receiving" ||
+          statusName === "Partially Received"
+        ) {
           color = "green";
-        } else if (statusId === 11) {
+        } else if (statusName === "Delivered") {
           color = "blue";
-        } else if (statusId === 14) {
+        } else if (statusName === "Paid") {
           color = "purple";
-        } else if (statusId === 12) {
+        } else if (statusName === "Cancelled") {
           color = "red";
         }
-        return <Tag color={color}>{record.status.name}</Tag>;
+        return <Tag color={color}>{statusName}</Tag>;
       },
     },
     {
@@ -203,44 +207,32 @@ function PurchaseOrders() {
       render: (_, record) => {
         const menuItems = [{ key: "View", label: "View Details" }];
 
-        if (record.status_id === 1) {
+        const statusName = record.status.name;
+
+        if (statusName === "Pending") {
           menuItems.push({ type: "divider" });
-          menuItems.push({ key: 12, label: statuses[12], danger: true });
-          menuItems.unshift({ key: 2, label: statuses[2] });
+          menuItems.push({ key: 12, label: "Cancelled", danger: true });
+          menuItems.unshift({ key: 2, label: "Approved" });
         }
 
-        if (record.status_id === 2) {
+        if (statusName === "Approved") {
           menuItems.push({ type: "divider" });
-          menuItems.push({ key: 12, label: statuses[12], danger: true });
-          menuItems.unshift({ key: 33, label: statuses[33] });
+          menuItems.push({ key: 12, label: "Cancelled", danger: true });
+          menuItems.unshift({ key: 33, label: "For Receiving" });
         }
 
-        if (record.status_id === 33 || record.status_id === 31) {
+        if (
+          statusName === "For Receiving" ||
+          statusName === "Partially Received"
+        ) {
           menuItems.unshift({ key: "Receive", label: "Receive" });
         }
 
-        if (record.status_id === 11) {
-          menuItems.unshift({ key: 14, label: statuses[14] });
+        if (statusName === "Delivered") {
+          menuItems.unshift({ key: 14, label: "Paid" });
         }
 
-        // if (record.status_id === 6) {
-        //   menuItems.unshift({ key: 7, label: statuses[7] });
-        //   menuItems.pop();
-        //   menuItems.pop();
-        // }
-
-        // if (record.status_id === 7) {
-        //   menuItems.unshift({ key: 8, label: statuses[8] });
-        //   menuItems.pop();
-        //   menuItems.pop();
-        // }
-
-        // if (record.status_id === 7 || record.status_id === 8) {
-        //   menuItems.pop();
-        //   menuItems.pop();
-        // }
-
-        const handleMenuClick = ({ key }) => {
+        const handleMenuClick = ({ key, label }) => {
           if (key === "View") {
             navigate(`/purchaseOrders/${record.id}`);
           }
@@ -274,14 +266,24 @@ function PurchaseOrders() {
     },
   ];
 
-  const pendingPOs = purchaseOrders.filter((po) => po.status_id === 1);
-  const approvedPOs = purchaseOrders.filter((po) => po.status_id === 2);
-  const forReceivingPOs = purchaseOrders.filter((po) => po.status_id === 33);
-  const partiallyReceivedPOs = purchaseOrders.filter(
-    (po) => po.status_id === 31
+  const pendingPOs = purchaseOrders.filter(
+    (po) => po.status.name === "Pending"
   );
-  const deliveredPOs = purchaseOrders.filter((po) => po.status_id === 11);
-  const cancelledPos = purchaseOrders.filter((po) => po.status_id === 12);
+  const approvedPOs = purchaseOrders.filter(
+    (po) => po.status.name === "Approved"
+  );
+  const forReceivingPOs = purchaseOrders.filter(
+    (po) => po.status.name === "For Receiving"
+  );
+  const partiallyReceivedPOs = purchaseOrders.filter(
+    (po) => po.status.name === "Partially Received"
+  );
+  const deliveredPOs = purchaseOrders.filter(
+    (po) => po.status.name === "Delivered"
+  );
+  const cancelledPos = purchaseOrders.filter(
+    (po) => po.status.name === "Cancelled"
+  );
 
   const tabItems = [
     {

@@ -124,15 +124,20 @@ function PurchaseOrdersView() {
     created_at,
   } = purchaseOrder;
 
-  let statusColor = "orange";
-  if (status_id === 2 || status_id === 33 || status_id === 31) {
-    statusColor = "green";
-  } else if (status_id === 11) {
-    statusColor = "blue";
-  } else if (status_id === 14) {
-    statusColor = "purple";
-  } else if (status_id === 12) {
-    statusColor = "red";
+  let color = "orange";
+  const statusName = status.name;
+  if (
+    statusName === "Approved" ||
+    statusName === "For Receiving" ||
+    statusName === "Partially Received"
+  ) {
+    color = "green";
+  } else if (statusName === "Delivered") {
+    color = "blue";
+  } else if (statusName === "Paid") {
+    color = "purple";
+  } else if (statusName === "Cancelled") {
+    color = "red";
   }
 
   const handlePrint = () => {
@@ -176,8 +181,8 @@ function PurchaseOrdersView() {
             </Text>
           </Col>
           <Col>
-            <Tag style={{ fontSize: 16 }} color={statusColor}>
-              {status.name}
+            <Tag style={{ fontSize: 16 }} color={color}>
+              {statusName}
             </Tag>
           </Col>
         </Row>

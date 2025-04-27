@@ -20,6 +20,7 @@ import PurchaseOrdersCreate from "./pages/private/PurchaseOrdersCreate/Index.jsx
 import PurchaseOrdersView from "./pages/private/PurchaseOrdersView/Index.jsx";
 import PurchaseOrdersReceive from "./pages/private/PurchaseOrdersReceive/Index.jsx";
 import Orders from "./pages/private/Orders/Index.jsx";
+import OrdersView from "./pages/private/OrdersView/Index.jsx";
 import DemoUnits from "./pages/private/DemoUnits/Index.jsx";
 
 import ProductGroups from "./pages/private/ProductGroups/Index.jsx";
@@ -36,9 +37,8 @@ import Inventory from "./pages/private/Inventory/Index.jsx";
 
 import Ecommerce from "./pages/private/Ecommerce/Index";
 
-import ViewOrder from "./pages/private/Orders/ViewOrder/Index.jsx";
-import CustomerOrder from "./pages/private/CustomerOrder/Index.jsx";
-import ViewCustomerOrder from "./pages/private/CustomerOrder/ViewOrder/Index.jsx";
+// import CustomerOrder from "./pages/private/CustomerOrder/Index.jsx";
+// import ViewCustomerOrder from "./pages/private/CustomerOrder/OrdersView/Index.jsx";
 
 function App() {
   const routes = [
@@ -83,17 +83,17 @@ function App() {
     },
     {
       title: "Orders",
-      subTitle: "create purchamanage order here",
+      subTitle: "orders management",
       path: "/orders",
       element: <Orders />,
     },
-    // {
-    //   title: "View Order",
-    //   subTitle: "view order full details",
-    //   path: "/orders/:orderId",
-    //   element: <ViewOrder />,
-    //   isWithBackButton: true,
-    // },
+    {
+      title: "View Order",
+      subTitle: "view order full details",
+      path: "/orders/:orderId",
+      element: <OrdersView />,
+      isWithBackButton: true,
+    },
     // {
     //   title: "My Orders",
     //   subTitle: "view your orders here",

@@ -66,8 +66,7 @@ function Orders() {
   const handleUpdateOrder = async (order, newStatusId) => {
     try {
       setIsContentLoading(true);
-      await http.post(`/api/orderStatuses`, {
-        order_id: order.id,
+      await http.patch(`/api/orders/${order.id}/status`, {
         status_id: Number(newStatusId),
       });
       await getOrders();
@@ -84,16 +83,15 @@ function Orders() {
       dataIndex: "megaion_order_number",
       ...getColumnSearchProps("megaion_order_number"),
       render: (_, record) => {
-        return <div>{record.megaion_order_number}</div>;
+        return (
+          <Link to={`/orders/${record.id}`}>{record.megaion_order_number}</Link>
+        );
       },
       width: 200,
     },
     {
       title: "Company",
-      dataIndex: "total_items",
-      render: (_, record) =>
-        // record?.user?.company_members[0]?.company.name || "-",
-        "Company name here",
+      render: (_, record) => record.company.name,
     },
     // {
     //   title: "",
@@ -125,66 +123,79 @@ function Orders() {
       width: 100,
 
       render: (_, record) => {
-        // const status_id = record.latest_status.status.id;
-
         let color = "orange";
-        // if (status_id === 11 || status_id === 12) {
-        //   color = "purple";
-        // } else if (status_id === 8) {
-        //   color = "red";
-        // }
-        return <Tag color={color}>Pending</Tag>;
+        const statusName = record.status.name;
+        if (
+          statusName === "Approved" ||
+          statusName === "Ready to Deliver" ||
+          statusName === "In Transit"
+        ) {
+          color = "green";
+        } else if (statusName === "Delivered") {
+          color = "blue";
+        } else if (statusName === "Paid") {
+          color = "purple";
+        } else if (statusName === "Cancelled") {
+          color = "red";
+        }
+
+        return <Tag color={color}>{statusName}</Tag>;
       },
     },
     {
       title: "Action",
       width: 50,
       render: (_, record) => {
-        const menuItems = [
-          { key: "View", label: "View Details" },
-          // {
-          //   type: "divider",
-          // },
-          // { key: 8, label: statuses[8], danger: true },
-        ];
+        const menuItems = [{ key: "View", label: "View Details" }];
 
-        //const status_id = record.latest_status.status.id;
+        const statusName = record.status.name;
 
-        // if (status_id === 10) {
-        //   if (roles.includes("Logistic manager") || roles.includes("Admin")) {
-        //     menuItems.unshift({ key: 11, label: statuses[11] });
-        //   }
-        //   menuItems.pop();
-        //   menuItems.pop();
-        // }
+        if (statusName === "Pending") {
+          if (roles.includes("Sales") || roles.includes("Admin")) {
+            menuItems.push({ type: "divider" });
+            menuItems.push({ key: 12, label: "Cancelled", danger: true });
+            menuItems.unshift({ key: 2, label: "Approve" });
+          }
+        }
 
-        // if (status_id === 11) {
-        //   if (roles.includes("Logistic manager")) {
-        //     menuItems.unshift({ key: 12, label: statuses[12] });
-        //   }
-        //   menuItems.pop();
-        //   menuItems.pop();
-        // }
+        if (statusName === "Approved") {
+          if (roles.includes("Warehouse Staff") || roles.includes("Admin")) {
+            menuItems.unshift({ key: 16, label: "Ready to Deliver" });
+          }
+        }
 
-        // if (status_id === 12) {
-        //   menuItems.pop();
-        //   menuItems.pop();
-        // }
+        if (statusName === "Ready to Deliver") {
+          if (roles.includes("Logistics") || roles.includes("Admin")) {
+            menuItems.unshift({ key: 18, label: "In Transit" });
+          }
+        }
+
+        if (statusName === "In Transit") {
+          if (roles.includes("Logistics") || roles.includes("Admin")) {
+            menuItems.unshift({ key: 11, label: "Delivered" });
+          }
+        }
+
+        if (statusName === "Delivered") {
+          if (roles.includes("Finance") || roles.includes("Admin")) {
+            menuItems.unshift({ key: 14, label: "Paid" });
+          }
+        }
 
         const handleMenuClick = ({ key }) => {
-          // if (key === "View") {
-          //   navigate(`/orders/${record.id}`);
-          // } else {
-          //   modal.confirm({
-          //     title: `${statuses[key]} Purchase Order`,
-          //     content: `Are you sure you want to ${statuses[
-          //       key
-          //     ].toLowerCase()} this purchase order?`,
-          //     onOk: async () => {
-          //       handleUpdateOrder(record, key);
-          //     },
-          //   });
-          // }
+          if (key === "View") {
+            navigate(`/orders/${record.id}`);
+          } else {
+            modal.confirm({
+              title: `${statuses[key]} Order`,
+              content: `Are you sure you want to ${statuses[
+                key
+              ].toLowerCase()} this order?`,
+              onOk: async () => {
+                handleUpdateOrder(record, key);
+              },
+            });
+          }
         };
 
         return (
@@ -202,11 +213,14 @@ function Orders() {
     },
   ];
 
-  const pendingOs = orders.filter((o) => o.status_id === 1);
-  // const processingOs = orders.filter((o) => o.latest_status.status.id === 10);
-  // const inTransitOs = orders.filter((o) => o.latest_status.status.id === 11);
-  // const deliveredOs = orders.filter((o) => o.latest_status.status.id === 12);
-  // const cancelledOs = orders.filter((o) => o.latest_status.status.id === 8);
+  const pendingOs = orders.filter((o) => o.status.name === "Pending");
+  const approvedOs = orders.filter((o) => o.status.name === "Approved");
+  const readyToDeliverOs = orders.filter(
+    (o) => o.status.name === "Ready to Deliver"
+  );
+  const intransitOs = orders.filter((o) => o.status.name === "In Transit");
+  const deliveredOs = orders.filter((o) => o.status.name === "Delivered");
+  const cancelledOs = orders.filter((o) => o.status.name === "Cancelled");
 
   const tabItems = [
     {
@@ -223,89 +237,110 @@ function Orders() {
         <Table columns={tableColumns} dataSource={pendingOs} rowKey="id" />
       ),
     },
-    // {
-    //   key: "2",
-    //   label: (
-    //     <>
-    //       Processing{" "}
-    //       {processingOs.length > 0 && (
-    //         <Badge count={processingOs.length} color="gold" />
-    //       )}
-    //     </>
-    //   ),
-    //   children: (
-    //     <Table columns={tableColumns} dataSource={processingOs} rowKey="id" />
-    //   ),
-    // },
-    // {
-    //   key: "3",
-    //   label: (
-    //     <>
-    //       In Transit{" "}
-    //       {inTransitOs.length > 0 && (
-    //         <Badge count={inTransitOs.length} color="gold" />
-    //       )}
-    //     </>
-    //   ),
-    //   children: (
-    //     <Table columns={tableColumns} dataSource={inTransitOs} rowKey="id" />
-    //   ),
-    // },
-    // {
-    //   key: "4",
-    //   label: "Delivered",
-    //   children: (
-    //     <Table columns={tableColumns} dataSource={deliveredOs} rowKey="id" />
-    //   ),
-    // },
-    // {
-    //   key: "5",
-    //   label: "Cancelled",
-    //   children: (
-    //     <Table columns={tableColumns} dataSource={cancelledOs} rowKey="id" />
-    //   ),
-    // },
-    // {
-    //   key: "6",
-    //   label: "All Orders",
-    //   children: (
-    //     <Table
-    //       columns={tableColumns.map((cols) =>
-    //         cols.dataIndex === "status_id"
-    //           ? {
-    //               ...cols,
-    //               filters: [
-    //                 {
-    //                   text: "On Hold",
-    //                   value: 9,
-    //                 },
-    //                 {
-    //                   text: "Processing",
-    //                   value: 10,
-    //                 },
-    //                 {
-    //                   text: "In Transit",
-    //                   value: 11,
-    //                 },
-    //                 {
-    //                   text: "Delivered",
-    //                   value: 12,
-    //                 },
-    //                 {
-    //                   text: "Cancelled",
-    //                   value: 8,
-    //                 },
-    //               ],
-    //               onFilter: (value, record) =>
-    //                 record.latest_status.status.id === value,
-    //             }
-    //           : cols
-    //       )}
-    //       dataSource={orders}
-    //       rowKey="id"
-    //     />
-    //   ),
-    // },
+    {
+      key: "2",
+      label: (
+        <>
+          Approved{" "}
+          {approvedOs.length > 0 && (
+            <Badge count={approvedOs.length} color="green" />
+          )}
+        </>
+      ),
+      children: (
+        <Table columns={tableColumns} dataSource={approvedOs} rowKey="id" />
+      ),
+    },
+    {
+      key: "3",
+      label: (
+        <>
+          Ready to Deliver{" "}
+          {readyToDeliverOs.length > 0 && (
+            <Badge count={readyToDeliverOs.length} color="green" />
+          )}
+        </>
+      ),
+      children: (
+        <Table
+          columns={tableColumns}
+          dataSource={readyToDeliverOs}
+          rowKey="id"
+        />
+      ),
+    },
+    {
+      key: "4",
+      label: (
+        <>
+          In Transit{" "}
+          {intransitOs.length > 0 && (
+            <Badge count={intransitOs.length} color="green" />
+          )}
+        </>
+      ),
+      children: (
+        <Table columns={tableColumns} dataSource={intransitOs} rowKey="id" />
+      ),
+    },
+    {
+      key: "5",
+      label: "Delivered",
+      children: (
+        <Table columns={tableColumns} dataSource={deliveredOs} rowKey="id" />
+      ),
+    },
+    {
+      key: "6",
+      label: "Cancelled",
+      children: (
+        <Table columns={tableColumns} dataSource={cancelledOs} rowKey="id" />
+      ),
+    },
+    {
+      key: "7",
+      label: "All Orders",
+      children: (
+        <Table
+          columns={tableColumns.map((cols) =>
+            cols.dataIndex === "status_id"
+              ? {
+                  ...cols,
+                  filters: [
+                    {
+                      text: "Pending",
+                      value: "Pending",
+                    },
+                    {
+                      text: "Approved",
+                      value: "Approved",
+                    },
+                    {
+                      text: "Ready to Deliver",
+                      value: "Ready to Deliver",
+                    },
+                    {
+                      text: "In Transit",
+                      value: "In Transit",
+                    },
+                    {
+                      text: "Delivered",
+                      value: "Delivered",
+                    },
+                    {
+                      text: "Cancelled",
+                      value: "Cancelled",
+                    },
+                  ],
+                  onFilter: (value, record) => record.status.name === value,
+                }
+              : cols
+          )}
+          dataSource={orders}
+          rowKey="id"
+        />
+      ),
+    },
   ];
 
   return (

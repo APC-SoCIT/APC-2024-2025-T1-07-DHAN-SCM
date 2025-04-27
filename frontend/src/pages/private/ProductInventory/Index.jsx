@@ -30,6 +30,7 @@ import http from "../../../services/httpService";
 
 import AvailableConsumables from "./components/AvailableConsumables/Index";
 import AvailableMachines from "./components/AvailableMachines/Index";
+import ProductLogs from "./components/ProductLogs/Index";
 
 const { Title, Text } = Typography;
 
@@ -148,8 +149,8 @@ function ProductInventory() {
   let tabItems = [
     {
       key: 6,
-      label: "Release",
-      children: "Release",
+      label: "Product Logs",
+      children: <ProductLogs product={product} />,
     },
   ];
 
