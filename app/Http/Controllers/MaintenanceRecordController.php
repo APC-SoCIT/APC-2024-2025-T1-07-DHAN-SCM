@@ -59,9 +59,9 @@ class MaintenanceRecordController extends Controller
                 $today = now();
                 $nextMaintenanceDate = $item->next_maintenance_date ? \Carbon\Carbon::parse($item->next_maintenance_date) : null;
                 $calibrationDate = $item->calibration_date ? \Carbon\Carbon::parse($item->calibration_date) : null;
-                
+                $forMaintenance =  (Carbon::today())->diffInDays( Carbon::parse($nextMaintenanceDate)) < 30;
                 return array_merge((array) $item, [
-                    'for_maintenance' => $nextMaintenanceDate = null || $nextMaintenanceDate->diffInDays($today) <= 30,
+                  'for_maintenance' => $forMaintenance,
                     'for_calibration' => $calibrationDate != null ? false : true
                 ]);
             })
