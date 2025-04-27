@@ -16,7 +16,11 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return Order::with([
+        // Get the authenticated user
+        $user = auth()->user();
+    
+        // Start the query
+        $query = Order::with([
             'company',
             'status',
             'creator',
@@ -25,7 +29,14 @@ class OrderController extends Controller
             'orderItems.orderTemporaryAllocations.incomingStock', // Include temporary stock allocations
             'orderItems.outgoingStocks.incomingStock', // Include outgoing stock details
             'orderStatuses.status' // Include order statuses with status details
-        ])->orderBy('megaion_order_number', 'desc')->get();
+        ]);
+    
+        // If the user's role is "Customer," filter by their created orders
+        if ($user->role === 'Customer') {
+            $query->where('created_by', $user->id);
+        }
+    
+        return response()->json($query->orderBy('megaion_order_number', 'desc')->get());
     }
 
     public function show($id)
