@@ -17,8 +17,8 @@ import http from "../../../services/httpService";
 
 import "./style.css";
 
-import Piechart from "./Chart/Piechart";
-import Barchart from "./Chart/Barchart";
+// import Piechart from "./Chart/Piechart";
+// import Barchart from "./Chart/Barchart";
 
 import useUserStore from "../../../store/UserStore";
 
@@ -30,18 +30,42 @@ function Dashboard() {
   const [amountPerUser, setAmountPerUser] = useState([]);
   const [categoryReport, setCategoryReport] = useState([]);
 
+  const [data, setData] = useState({
+    outOfStocks: 0,
+    belowMinimumStocks: 0,
+    demoUnit: 0,
+    demoUnitOverDueNearExpire: 0,
+  });
+
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const { name } = useUserStore();
+  const { name, roles } = useUserStore();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsContentLoading(true);
 
-        // const { data: productReports } = await http.get("/api/report/products");
-        // const { data: orderReports } = await http.get("/api/report/orders");
+        const { data: outOfStocks } = await http.get("/api/report/outOfStocks");
+        const { data: belowMinimumStocks } = await http.get(
+          "/api/report/belowMinimumStocks"
+        );
+        const { data: getAllDemoUnits } = await http.get(
+          "/api/report/getAllDemoUnits"
+        );
+        const { data: demoUnitOverDueNearExpire } = await http.get(
+          "/api/report/demoUnitOverDueNearExpire"
+        );
+
+        setData({
+          outOfStocks: outOfStocks.below_minimum_count,
+          belowMinimumStocks: belowMinimumStocks.demo_unit_count,
+          demoUnit: getAllDemoUnits.demo_unit_count,
+          demoUnitOverDueNearExpire:
+            demoUnitOverDueNearExpire.out_of_stock_count,
+        });
+
         // const { data: amountPerUser } = await http.get(
         //   "/api/report/getTotalAmountPerUser"
         // );
@@ -120,55 +144,8 @@ function Dashboard() {
               </Title>
             </Card>
           </div>
-          {/* <h1>Orders</h1>
-          <Row gutter={[16, 16]}>
-            <Col span={8}>
-              <Card style={cardStyle}>
-                <Statistic
-                  title="On Hold"
-                  value={orderReports.on_hold_count}
-                  prefix={<ExclamationCircleOutlined />}
-                />
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card style={cardStyle}>
-                <Statistic
-                  title="Processing"
-                  value={orderReports.processing_count}
-                  prefix={<SyncOutlined />}
-                />
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card style={cardStyle}>
-                <Statistic
-                  title="In-Transit"
-                  value={orderReports.in_transit_count}
-                  prefix={<ShoppingCartOutlined />}
-                />
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card style={cardStyle}>
-                <Statistic
-                  title="Delivered"
-                  value={orderReports.delivered_count}
-                  prefix={<CheckCircleOutlined />}
-                />
-              </Card>
-            </Col>
-            <Col span={8}>
-              <Card style={cardStyle}>
-                <Statistic
-                  title="Cancelled"
-                  value={orderReports.cancelled_count}
-                  prefix={<CloseCircleOutlined />}
-                />
-              </Card>
-            </Col>
-          </Row>
-          <h1>Products</h1>
+
+          {/*<h1>Products</h1>
           <Row gutter={[16, 16]}>
             <Col span={8}>
               <Card style={cardStyle}>
@@ -220,6 +197,46 @@ function Dashboard() {
           <div style={{ height: 400, marginTop: 100 }}>
             <Piechart data={categoryReport} />
           </div> */}
+          {!roles.includes("Customer") && (
+            <Row gutter={[16, 16]} style={{ marginTop: 80 }}>
+              <Col span={24}>
+                <Card style={cardStyle}>
+                  <Statistic
+                    title="Out of Stocks"
+                    value={data.outOfStocks}
+                    prefix={<ExclamationCircleOutlined />}
+                  />
+                </Card>
+              </Col>
+              <Col span={24}>
+                <Card style={cardStyle}>
+                  <Statistic
+                    title="Processing"
+                    value={data.belowMinimumStocks}
+                    prefix={<SyncOutlined />}
+                  />
+                </Card>
+              </Col>
+              <Col span={24}>
+                <Card style={cardStyle}>
+                  <Statistic
+                    title="In-Transit"
+                    value={data.demoUnit}
+                    prefix={<ShoppingCartOutlined />}
+                  />
+                </Card>
+              </Col>
+              <Col span={24}>
+                <Card style={cardStyle}>
+                  <Statistic
+                    title="Delivered"
+                    value={data.demoUnitOverDueNearExpire}
+                    prefix={<CheckCircleOutlined />}
+                  />
+                </Card>
+              </Col>
+            </Row>
+          )}
         </Col>
       </Row>
     </div>

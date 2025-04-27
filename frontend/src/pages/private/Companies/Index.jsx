@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { Spin, Row, Col, Button, Drawer, Table, Dropdown, Modal } from "antd";
+import {
+  Spin,
+  Row,
+  Col,
+  Button,
+  Drawer,
+  Table,
+  Dropdown,
+  Modal,
+  Tag,
+} from "antd";
 import { MoreOutlined } from "@ant-design/icons";
 
 import ErrorContent from "../../../components/common/ErrorContent";
@@ -110,6 +120,11 @@ function Companies() {
       title: "Name",
       dataIndex: "name",
       ...getColumnSearchProps("name"),
+    },
+    {
+      title: "Users",
+      render: (_, record) =>
+        record.users.map((user) => <Tag key={user.id}>{user.full_name}</Tag>),
     },
     {
       title: "Action",

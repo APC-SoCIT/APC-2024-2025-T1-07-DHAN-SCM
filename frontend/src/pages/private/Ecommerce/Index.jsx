@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   Col,
@@ -12,6 +13,7 @@ import {
   Tag,
   Divider,
   Result,
+  Select,
 } from "antd";
 import {
   ShoppingCartOutlined,
@@ -110,26 +112,32 @@ function ProductListing() {
   const [placeOrderLoading, setPlaceOrderLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(false);
 
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
   const [companyOrderNumber, setCompanyOrderNumber] = useState("");
+  const [orderId, setOrderId] = useState("");
 
   const [isOrderSuccess, setIsOrderSuccess] = useState(false);
   const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
 
   const { id: companyId } = useUserStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLocations = async () => {
       try {
         setIsContentLoading(true);
         const { data } = await http.get("/api/getAllProducts");
-        setProducts(
-          data.map((product) => ({
-            ...product,
-            default_selling_price: parseFloat(product.default_selling_price),
-          }))
-        );
+
+        const products = data.map((product) => ({
+          ...product,
+          default_selling_price: parseFloat(product.default_selling_price),
+        }));
+
+        setProducts(products);
+        setFilteredProducts(products);
       } catch (error) {
-        setError(error.message);
+        setErrorMsg(error.message);
       } finally {
         setIsContentLoading(false);
       }
@@ -180,13 +188,30 @@ function ProductListing() {
     );
   };
 
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleFilterChange = (value) => {
+    if (value === "All") {
+      setFilteredProducts(products);
+    } else if (value === "Consumables") {
+      const filteredProducts = products.filter(
+        (product) => !product.is_machine
+      );
+      setFilteredProducts(filteredProducts);
+    } else if (value === "Machines") {
+      const filteredProducts = products.filter((product) => product.is_machine);
+      setFilteredProducts(filteredProducts);
+    }
+  };
 
-  const totalPrice = cart.reduce(
-    (total, item) => total + item.default_selling_price * item.quantity,
-    0
+  const selectAfter = (
+    <Select
+      defaultValue="All"
+      onChange={handleFilterChange}
+      style={{ width: 150 }}
+    >
+      <Option value="All">All</Option>
+      <Option value="Consumables">Consumables</Option>
+      <Option value="Machines">Machines</Option>
+    </Select>
   );
 
   const handlePlaceOrder = async () => {
@@ -208,7 +233,7 @@ function ProductListing() {
         };
       });
       const order = {
-        company_id: companyId,
+        // company_id: companyId,
         company_order_number: companyOrderNumber,
         order_date: "2025-04-05",
         total_amount: totalPrice,
@@ -216,6 +241,7 @@ function ProductListing() {
         status_id: 1,
       };
       const { data } = await http.post("/api/orders", order);
+      setOrderId(data.id);
       setPurchaseOrderNumber(data.megaion_order_number);
       setIsOrderSuccess(true);
     } catch (error) {
@@ -224,6 +250,15 @@ function ProductListing() {
       setPlaceOrderLoading(false);
     }
   };
+
+  const displayProducts = filteredProducts.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPrice = cart.reduce(
+    (total, item) => total + item.default_selling_price * item.quantity,
+    0
+  );
 
   if (isOrderSuccess) {
     return (
@@ -235,13 +270,9 @@ function ProductListing() {
           <Button
             type="primary"
             key="console"
-            onClick={() =>
-              alert(
-                "for customer user only .. redirect to /customerOrders route"
-              )
-            }
+            onClick={() => navigate(`/customerOrders/${orderId}`)}
           >
-            Go to My Orders
+            View my Orders
           </Button>,
         ]}
       />
@@ -258,12 +289,13 @@ function ProductListing() {
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ marginBottom: 20 }}
             size="large"
+            addonAfter={selectAfter}
           />
           {products.length === 0 ? (
             <Empty />
           ) : (
             <Row gutter={[16, 16]}>
-              {filteredProducts.map((product) => (
+              {displayProducts.map((product) => (
                 <Col key={product.id} xs={24} sm={12} md={8} lg={8}>
                   <ProductCard product={product} addToCart={addToCart} />
                 </Col>

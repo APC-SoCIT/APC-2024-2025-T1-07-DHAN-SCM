@@ -124,7 +124,7 @@ function Sidebar() {
       "/customers",
       "/users",
       "/locations",
-      "/warehouses",
+      // "/warehouses",
       "/productUnits",
       "/tags",
       "/ecommerce",
