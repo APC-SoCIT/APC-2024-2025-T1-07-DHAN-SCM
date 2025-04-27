@@ -199,11 +199,11 @@ function Servicing() {
     <Spin spinning={isContentLoading2} tip="loading...">
       <Card style={{ marginBottom: 16 }}>
         <span>
-          <strong>For Calibration</strong>: {0}
+          <strong>For Calibration</strong>: {forCalibrationCount}
         </span>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <span>
-          <strong>For Maintenance</strong>: {0}
+          <strong>For Maintenance</strong>: {forMaintenanceCount}
         </span>
       </Card>
       {/* <Row style={{ marginBottom: 16 }} justify="space-between">

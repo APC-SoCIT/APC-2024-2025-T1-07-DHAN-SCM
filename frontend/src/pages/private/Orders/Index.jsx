@@ -94,7 +94,6 @@ function Orders() {
       dataIndex: "company_order_number",
       ...getColumnSearchProps("company_order_number"),
       width: 200,
-      render: (text) => formatWithComma(text),
     },
     {
       title: "Company",

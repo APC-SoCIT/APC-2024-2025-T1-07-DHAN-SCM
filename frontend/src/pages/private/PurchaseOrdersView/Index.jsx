@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Row,
   Col,
@@ -13,6 +13,7 @@ import {
   Image,
   Divider,
   Modal,
+  App,
 } from "antd";
 import dayjs from "dayjs";
 
@@ -23,6 +24,8 @@ import http from "../../../services/httpService";
 import { formatWithComma } from "../../../helpers/numbers";
 
 import megaionImg from "../../../assets/images/megaion.png";
+
+import useUserStore from "../../../store/UserStore";
 
 const { Title, Text } = Typography;
 
@@ -36,17 +39,23 @@ function PurchaseOrdersView() {
   const [isViewReceiveOpen, setIsViewReceiveOpen] = useState(false);
 
   const { purchaseOrderId } = useParams();
+  const { roles } = useUserStore();
+  const { modal } = App.useApp();
+  const navigate = useNavigate();
+
+  const getPurchaseOrder = async () => {
+    const { data: purchaseOrder } = await http.get(
+      `/api/purchaseOrders/${purchaseOrderId}`
+    );
+
+    setPurcaseOrder(purchaseOrder.purchase_order);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsContentLoading(true);
-
-        const { data: purchaseOrder } = await http.get(
-          `/api/purchaseOrders/${purchaseOrderId}`
-        );
-
-        setPurcaseOrder(purchaseOrder.purchase_order);
+        await getPurchaseOrder();
       } catch (error) {
         setErrorMsg(error.message);
       } finally {
@@ -140,8 +149,62 @@ function PurchaseOrdersView() {
     color = "red";
   }
 
+  let actionText = "";
+  let actionKey = "";
+  let showCancelButton = false;
+
+  if (statusName === "Pending") {
+    if (roles.includes("Admin")) {
+      showCancelButton = true;
+      actionKey = 2;
+      actionText = "Approve";
+    }
+  }
+
+  if (statusName === "Approved") {
+    if (roles.includes("Admin")) {
+      actionKey = 33;
+      actionText = "For Receiving";
+    }
+  }
+
+  if (statusName === "Delivered") {
+    if (roles.includes("Admin")) {
+      actionKey = 14;
+      actionText = "Paid";
+    }
+  }
+
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleUpdatePurchaseOrder = async (purchaseOrder, newStatusId) => {
+    try {
+      setIsContentLoading(true);
+      await http.put(`/api/purchaseOrders/${purchaseOrder.id}/status`, {
+        status_id: Number(newStatusId),
+      });
+      if (newStatusId === 33) {
+        navigate(`/purchaseOrders/receive/${purchaseOrder.id}`);
+      } else {
+        await getPurchaseOrder();
+      }
+    } catch (errorMsg) {
+      setErrorMsg(errorMsg);
+    } finally {
+      setIsContentLoading(false);
+    }
+  };
+
+  const handleAction = async (key, text) => {
+    modal.confirm({
+      title: `${text} Purchase Order`,
+      content: `Are you sure you want to ${text.toLowerCase()} this purchase order?`,
+      onOk: async () => {
+        handleUpdatePurchaseOrder(purchaseOrder, key);
+      },
+    });
   };
 
   return (
@@ -229,6 +292,28 @@ function PurchaseOrdersView() {
             />
           </Col>
         </Row>
+      </div>
+
+      <div style={{ textAlign: "right" }}>
+        {showCancelButton && (
+          <Button
+            size="large"
+            danger
+            onClick={() => handleAction(12, "Cancel")}
+            style={{ marginRight: 8 }}
+          >
+            Cancel
+          </Button>
+        )}
+        {actionKey !== "" && (
+          <Button
+            size="large"
+            type="primary"
+            onClick={() => handleAction(actionKey, actionText)}
+          >
+            {actionText}
+          </Button>
+        )}
       </div>
 
       <Modal

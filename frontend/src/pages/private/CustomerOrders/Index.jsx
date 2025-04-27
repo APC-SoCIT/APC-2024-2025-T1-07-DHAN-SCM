@@ -66,7 +66,6 @@ function CustomerOrders() {
       dataIndex: "company_order_number",
       ...getColumnSearchProps("company_order_number"),
       width: 150,
-      render: (text) => formatWithComma(text),
     },
     {
       title: "Order date",
