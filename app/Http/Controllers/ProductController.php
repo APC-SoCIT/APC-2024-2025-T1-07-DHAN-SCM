@@ -41,11 +41,11 @@ class ProductController extends Controller
 
             $logs->push([
                 'name' => $product->name,
-                'type' => $type,
                 'quantity' => $stocks->count(),
-                'source' => 'IncomingStock',
+                'Adjustment' => 'Increase (+)',
                 'timestamp' => $stocks->max('created_at')->toDateTimeString(),
                 'reference_number' => $poNumber,
+                'type' => $type,
             ]);
         }
 
@@ -60,11 +60,11 @@ class ProductController extends Controller
 
             $logs->push([
                 'name' => $product->name,
-                'type' => $stocks->first()->type ?? 'Ordered',
                 'quantity' => $stocks->count(),
-                'source' => 'OutgoingStock',
+                'Adjustment' => 'Decrease (-)',
                 'timestamp' => $stocks->max('created_at')->toDateTimeString(),
                 'reference_number' => $demoNumber ?? $orderNumber ?? 'N/A',
+                'type' => $stocks->first()->type ?? 'Ordered',
             ]);
         }
 
