@@ -68,71 +68,6 @@ function PurchaseOrders() {
         status_id: Number(newStatusId),
       });
 
-      // if (Number(newStatusId) === 6) {
-      //   const { data } = await http.get(
-      //     `/api/purchaseOrders/${purchaseOrder.id}`
-      //   );
-
-      //   const { purchase_order_items: purchaseOrderItems } = data;
-
-      //   const consumableItems = purchaseOrderItems.filter(
-      //     ({ product }) => product.product_category_id == 1
-      //   );
-      //   const equipmentItems = purchaseOrderItems
-      //     .filter(({ product }) => product.product_category_id == 2)
-      //     .flatMap((equipment) =>
-      //       Array.from({ length: equipment.quantity }, () => {
-      //         return {
-      //           ...equipment,
-      //           quantity: 1,
-      //         };
-      //       })
-      //     );
-
-      //   const forInsertProductItemConsumables = consumableItems.map(
-      //     (consumableItem) => {
-      //       return {
-      //         product_id: consumableItem.product_id,
-      //         purchase_order_id: purchaseOrder.id,
-      //         batch_number: null,
-      //         expiry_date: null,
-      //         other_details: null,
-      //         barcode: null,
-      //         location_id: 1,
-      //         warehouse_id: 1,
-      //         status_id: 3,
-      //       };
-      //     }
-      //   );
-
-      //   const forInsertProductItemEquipments = equipmentItems.map(
-      //     (equipmentItem) => {
-      //       return {
-      //         product_id: equipmentItem.product_id,
-      //         purchase_order_id: purchaseOrder.id,
-      //         serial_number: null,
-      //         model_number: null,
-      //         maintenance_interval_in_month: 0,
-      //         other_details: null,
-      //         barcode: null,
-      //         location_id: 1,
-      //         warehouse_id: 1,
-      //         status_id: 3,
-      //       };
-      //     }
-      //   );
-
-      //   await http.post(
-      //     "/api/productItemConsumablesNew",
-      //     forInsertProductItemConsumables
-      //   );
-
-      //   await http.post(
-      //     "/api/productItemEquipmentsNew",
-      //     forInsertProductItemEquipments
-      //   );
-      // }
-
       await getPurchaseOrders();
     } catch (errorMsg) {
       setErrorMsg(errorMsg);
@@ -154,7 +89,6 @@ function PurchaseOrders() {
             <div>
               <Text strong>{ponumber}</Text>
             </div>
-
             <div>{supplier.name}</div>
             <div>
               {supplier.contact_info && (

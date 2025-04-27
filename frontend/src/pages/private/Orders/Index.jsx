@@ -160,13 +160,13 @@ function Orders() {
 
         if (statusName === "Approved") {
           if (roles.includes("Warehouse Staff") || roles.includes("Admin")) {
-            menuItems.unshift({ key: 16, label: "Ready to Deliver" });
+            menuItems.unshift({ key: 34, label: "Ready to Deliver" });
           }
         }
 
         if (statusName === "Ready to Deliver") {
           if (roles.includes("Logistics") || roles.includes("Admin")) {
-            menuItems.unshift({ key: 18, label: "In Transit" });
+            menuItems.unshift({ key: 35, label: "In Transit" });
           }
         }
 

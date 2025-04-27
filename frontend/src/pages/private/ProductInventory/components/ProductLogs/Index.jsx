@@ -15,12 +15,15 @@ import {
   Card,
   Segmented,
   Skeleton,
+  Statistic,
 } from "antd";
 import {
   MoreOutlined,
   ArrowDownOutlined,
   EnvironmentOutlined,
   WarningOutlined,
+  PlusCircleOutlined,
+  MinusCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 
@@ -68,7 +71,13 @@ function ProductLogs({ product }) {
     {
       title: "Adjustment",
       dataIndex: "Adjustment",
-      render: (text) => text || "N/A",
+      render: (text) => {
+        if (text === "Decrease (-)") {
+          return <span style={{ color: "#cf1322" }}>{text}</span>;
+        } else {
+          return <span style={{ color: "#3f8600" }}>{text}</span>;
+        }
+      },
     },
     {
       title: "Type",
@@ -89,12 +98,48 @@ function ProductLogs({ product }) {
     },
   ];
 
+  let totalIncrease = productLogs
+    .filter((log) => log.Adjustment === "Increase (+)")
+    .reduce((acc, item) => {
+      acc += item.quantity;
+      return acc;
+    }, 0);
+  let totalDecrease = productLogs
+    .filter((log) => log.Adjustment === "Decrease (-)")
+    .reduce((acc, item) => {
+      acc += item.quantity;
+      return acc;
+    }, 0);
+
   return (
     <>
+      <Row style={{ marginBottom: 16 }} gutter={16}>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Increase"
+              value={totalIncrease}
+              valueStyle={{ color: "#3f8600" }}
+              prefix={<PlusCircleOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card>
+            <Statistic
+              title="Decrease"
+              value={totalDecrease}
+              valueStyle={{ color: "#cf1322" }}
+              prefix={<MinusCircleOutlined />}
+            />
+          </Card>
+        </Col>
+      </Row>
       <Table
         rowKey="timestamp"
         columns={tableColumns}
         dataSource={productLogs}
+        pagination={false}
       />
     </>
   );

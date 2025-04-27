@@ -10,7 +10,7 @@ import http from "../../../../../../../services/httpService";
 
 import { getColumnSearchProps } from "../../../../../../../helpers/TableFilterProps";
 
-function Maintenances({ serialNumber, onChange }) {
+function Maintenances({ productItemId }) {
   const [maintenances, setMaintenances] = useState([]);
   const [selectedMaintenance, setSelectedMaintenance] = useState(null);
 
@@ -20,10 +20,12 @@ function Maintenances({ serialNumber, onChange }) {
     useState(false);
 
   const [isContentLoading, setIsContentLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(null);
+  const [error, setError] = useState(null);
 
   const getMaintenances = async () => {
-    const { data } = await http.get(`/api/maintenanceRecords/${serialNumber}`);
+    const { data } = await http.get(
+      `/api/productRecordMaintenance/search/${productItemId}`
+    );
     setMaintenances(data);
   };
 
@@ -33,7 +35,7 @@ function Maintenances({ serialNumber, onChange }) {
         setIsContentLoading(true);
         await getMaintenances();
       } catch (error) {
-        setErrorMsg(error.message || "Something went wrong!");
+        setError(error);
       } finally {
         setIsContentLoading(false);
       }
@@ -42,8 +44,8 @@ function Maintenances({ serialNumber, onChange }) {
     fetchMaintenances();
   }, []);
 
-  if (errorMsg) {
-    return <ErrorContent errorMessage={errorMsg} />;
+  if (error) {
+    return <ErrorContent />;
   }
 
   const toggleFormCreateMaintenanceOpen = () => {
@@ -58,14 +60,15 @@ function Maintenances({ serialNumber, onChange }) {
     try {
       toggleFormCreateMaintenanceOpen();
       setIsContentLoading(true);
-      await http.post("/api/maintenanceRecords", {
+      await http.post("/api/productRecordMaintenance", {
         ...formData,
-        serial_number: serialNumber,
+        product_item_equipment_id: productItemId,
+        maintenance_by_id: 1,
+        status_id: 1,
       });
       await getMaintenances();
-      onChange();
     } catch (error) {
-      setErrorMsg(error.message || "Something went wrong!");
+      setError(error);
     } finally {
       setIsContentLoading(false);
     }
@@ -75,14 +78,13 @@ function Maintenances({ serialNumber, onChange }) {
     try {
       toggleFormUpdateMaintenanceOpen();
       setIsContentLoading(true);
-      await http.put(`/api/maintenanceRecords/${selectedMaintenance.id}`, {
-        ...formData,
-        serial_number: serialNumber,
-      });
+      await http.put(
+        `/api/productRecordMaintenance/${selectedMaintenance.id}`,
+        formData
+      );
       await getMaintenances();
-      onChange();
     } catch (error) {
-      setErrorMsg(error.message || "Something went wrong!");
+      setError(error);
     } finally {
       setIsContentLoading(false);
     }
@@ -91,11 +93,10 @@ function Maintenances({ serialNumber, onChange }) {
   const handleDeleteMaintenance = async (maintenance) => {
     try {
       setIsContentLoading(true);
-      await http.delete(`/api/maintenanceRecords/${maintenance.id}`);
+      await http.delete(`/api/productRecordMaintenance/${maintenance.id}`);
       await getMaintenances();
-      onChange();
     } catch (error) {
-      setErrorMsg(error.message || "Something went wrong!");
+      setError(error);
     } finally {
       setIsContentLoading(false);
     }
@@ -103,33 +104,19 @@ function Maintenances({ serialNumber, onChange }) {
 
   const tableColumns = [
     {
-      title: "Maintenance Date",
-      dataIndex: "maintenance_date",
+      title: "Date Added",
+      dataIndex: "date_added",
     },
 
     {
-      title: "Description",
-      dataIndex: "description",
-    },
-    {
-      title: "Performed By",
-      dataIndex: "performed_by",
-    },
-    {
-      title: "Next Maintenance Date",
-      dataIndex: "next_maintenance_date",
+      title: "Notes",
+      dataIndex: "notes",
     },
     {
       title: "Action",
       width: 50,
       render: (_, record) => {
-        const menuItems = [
-          { key: "Update", label: "Update" },
-          {
-            type: "divider",
-          },
-          { key: "Delete", label: "Delete", danger: true },
-        ];
+        const menuItems = [{ key: "Update", label: "Update" }];
 
         const handleMenuClick = ({ key }) => {
           if (key === "Update") {

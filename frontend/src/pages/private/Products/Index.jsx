@@ -53,7 +53,6 @@ function Products() {
 
   const getProducts = async () => {
     const { data } = await http.get("/api/getAllProducts");
-    console.log(data);
     setProducts(data);
   };
 
@@ -135,8 +134,6 @@ function Products() {
     }
   };
 
-  console.log({ tags });
-
   const tableColumns = [
     {
       title: "",
@@ -158,11 +155,7 @@ function Products() {
       ...getColumnSearchPropsProduct("name", "Product Name or SKU"),
       render: (_, record) => {
         return (
-          <Link
-            to={`/products/${record.id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link to={`/products/${record.id}`}>
             <div>
               {record.name} &mdash; {record.model}{" "}
             </div>
