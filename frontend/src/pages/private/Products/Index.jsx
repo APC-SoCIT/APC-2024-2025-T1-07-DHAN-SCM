@@ -152,7 +152,7 @@ function Products() {
     {
       title: "Name",
       dataIndex: "name",
-      ...getColumnSearchPropsProduct("name", "Product Name or SKU"),
+      ...getColumnSearchPropsProduct("name", "Name, SKU or Barcode"),
       render: (_, record) => {
         return (
           <Link to={`/products/${record.id}`}>

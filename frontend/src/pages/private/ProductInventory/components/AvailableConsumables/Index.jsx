@@ -10,6 +10,8 @@ import Barcode from "react-barcode";
 
 import FormGroupedItem from "./components/FormGroupedItems";
 
+import { getColumnSearchProps } from "../../../../../helpers/TableFilterProps";
+
 function AvailableConsumables({ product, status, onChange }) {
   const [groupedItems, setGroupItems] = useState([]);
   const [selectedGroupItem, setSelectedGroupItem] = useState(null);
@@ -157,6 +159,7 @@ function AvailableConsumables({ product, status, onChange }) {
                 {
                   title: "Barcode",
                   dataIndex: "barcode",
+                  ...getColumnSearchProps("barcode"),
                   render: (text) => (
                     <div id={text}>
                       <Barcode

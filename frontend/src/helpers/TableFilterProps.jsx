@@ -118,7 +118,14 @@ const getColumnSearchPropsProduct = (dataIndex, placeholder) => {
       <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
     ),
     onFilter: (value, record) => {
-      const recordValue = `${record[dataIndex]} ${record.sku || ""}`;
+      const barcodes = record.incoming_stocks.reduce((acc, item) => {
+        acc += item.barcodes.join(", ");
+        return acc;
+      }, "");
+      console.log(barcodes);
+      const recordValue = `${record[dataIndex]} ${
+        record.sku || ""
+      } ${barcodes}`;
       return recordValue
         ? recordValue.toString().toLowerCase().includes(value.toLowerCase())
         : "";
