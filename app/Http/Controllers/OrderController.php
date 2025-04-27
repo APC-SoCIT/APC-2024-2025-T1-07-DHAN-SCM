@@ -30,7 +30,16 @@ class OrderController extends Controller
 
     public function show($id)
     {
-        return Order::with(['company', 'status', 'creator', 'updater', 'orderItems.product'])->findOrFail($id);
+        return Order::with([
+            'company',
+            'status',
+            'creator',
+            'updater',
+            'orderItems.product',
+            'orderItems.orderTemporaryAllocations.incomingStock', // Include temporary stock allocations
+            'orderItems.outgoingStocks.incomingStock', // Include outgoing stock details
+            'orderStatuses.status' // Include order statuses with status details
+        ])->findOrFail($id);
     }
 
 
