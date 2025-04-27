@@ -52,7 +52,7 @@ class MaintenanceRecordController extends Controller
                 ]);
             })
         );
-    }
+    } 
     // Retrieve all maintenance records with related entities
     public function index()
     {
