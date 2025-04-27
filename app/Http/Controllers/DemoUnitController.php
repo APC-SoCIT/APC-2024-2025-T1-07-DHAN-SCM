@@ -29,7 +29,7 @@ class DemoUnitController extends Controller
 
                 return array_merge($demoUnit->toArray(), [
                     'product' => optional($demoUnit->incomingStock->product)->toArray(),
-                    'is_overdue' => $demoEndDate !== null && $demoEndDate->isPast()
+                    'is_overdue' => $demoEndDate != null && $demoEndDate->isPast()
                 ]);
             })
         );
