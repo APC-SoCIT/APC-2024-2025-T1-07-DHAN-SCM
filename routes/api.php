@@ -103,6 +103,7 @@ Route::get('report/outOfStocks', [ReportController::class, 'outOfStocks']);
 Route::get('report/belowMinimumStocks', [ReportController::class, 'belowMinimumStocks']);
 Route::get('report/getAllDemoUnits', [ReportController::class, 'getAllDemoUnits']);
 Route::get('report/demoUnitOverDueNearExpire', [ReportController::class, 'demoUnitOverDueNearExpire']);
+Route::get('report/getThisMonthRevenue', [ReportController::class, 'getThisMonthRevenue']);
 
 
 //LIST

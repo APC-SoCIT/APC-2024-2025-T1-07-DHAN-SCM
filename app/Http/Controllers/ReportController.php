@@ -193,17 +193,28 @@ class ReportController extends Controller
     {
         $transactions = DB::select("
             SELECT 
-                a.order_date AS order_date,
+                a.created_at AS created_at,
                 COALESCE(b.name, 'Unknown Customer') AS customer,
                 a.total_amount AS total_amount,
                 a.megaion_order_number AS megaion_order_number,
                 COALESCE((SELECT name FROM statuses WHERE id = a.status_id), 'Unknown Status') AS status
             FROM orders a
             LEFT JOIN companies b ON a.company_id = b.id
-            ORDER BY a.order_date DESC
+            ORDER BY a.created_at DESC
         ");
-
+    
         return response()->json(['transactions' => $transactions]);
+    }
+
+    public function getThisMonthRevenue()
+    {
+        $totalRevenue = DB::table('orders')
+            ->where('status_id', 14) // Ensure this is the correct status ID for "delivered"
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('total_amount');
+
+        return response()->json(['total_revenue' => $totalRevenue]);
     }
                     
 
