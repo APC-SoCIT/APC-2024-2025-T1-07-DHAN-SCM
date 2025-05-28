@@ -160,6 +160,34 @@ class ReportController extends Controller
     }
 
 
+    public function getTopSellingProducts()
+    {
+        $products = DB::select("
+            SELECT 
+                a.id AS product_id, 
+                a.name,
+                a.model,
+                SUM(b.quantity) AS total_quantity_sold,
+                COALESCE(
+                    (SELECT SUM(s.quantity) 
+                    FROM incoming_stocks s
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM outgoing_stocks o WHERE o.incoming_stock_id = s.id
+                    ) 
+                    AND (s.expiration_date IS NULL OR s.expiration_date > CURRENT_DATE)
+                    AND s.product_id = a.id
+                    ), 
+                    0
+                ) AS available_quantity,
+                (a.supplier_price + a.profit_margin) AS selling_price
+            FROM products a
+            INNER JOIN order_items b ON a.id = b.product_id
+            GROUP BY a.id, a.name, a.model, a.supplier_price, a.profit_margin
+            ORDER BY total_quantity_sold DESC
+        ");
+
+        return response()->json(['products' => $products]);
+    }
                 
 
 }
