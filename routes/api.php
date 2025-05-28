@@ -107,6 +107,7 @@ Route::get('report/demoUnitOverDueNearExpire', [ReportController::class, 'demoUn
 
 //LIST
 Route::get('report/getTopSellingProducts', [ReportController::class, 'getTopSellingProducts']);
+Route::get('report/getRecentTransactions', [ReportController::class, 'getRecentTransactions']);
 
 
 
