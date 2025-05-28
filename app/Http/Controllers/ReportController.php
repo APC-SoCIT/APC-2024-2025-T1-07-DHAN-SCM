@@ -216,6 +216,13 @@ class ReportController extends Controller
 
         return response()->json(['total_revenue' => $totalRevenue]);
     }
+
+    public function getTotalCustomer()
+    {
+        $totalCustomers = DB::select("SELECT COUNT(*) AS total_customers FROM companies");
+
+        return response()->json(['total_customers' => $totalCustomers[0]->total_customers]);
+    }
                     
 
 }
