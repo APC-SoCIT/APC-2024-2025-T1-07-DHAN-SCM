@@ -223,6 +223,24 @@ class ReportController extends Controller
 
         return response()->json(['total_customers' => $totalCustomers[0]->total_customers]);
     }
+
+        public function getMonthlyRevenue()
+    {
+        $monthlyRevenue = [];
+
+        for ($month = 1; $month <= 12; $month++) {
+            $totalRevenue = DB::table('orders')
+                ->where('status_id', 14) // Ensure this is the correct status ID for "delivered"
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', now()->year)
+                ->sum('total_amount');
+
+            $monthName = date("F", mktime(0, 0, 0, $month, 1)); // Convert month number to name
+            $monthlyRevenue[$monthName] = $totalRevenue;
+        }
+
+        return response()->json(['monthly_revenue' => $monthlyRevenue]);
+    }
                     
 
 }

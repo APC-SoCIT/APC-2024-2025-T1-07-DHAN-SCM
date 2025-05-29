@@ -111,6 +111,7 @@ Route::get('report/getTopSellingProducts', [ReportController::class, 'getTopSell
 Route::get('report/getRecentTransactions', [ReportController::class, 'getRecentTransactions']);
 
 
-
+//BAR
+Route::get('report/getMonthlyRevenue', [ReportController::class, 'getMonthlyRevenue']);
 
 
