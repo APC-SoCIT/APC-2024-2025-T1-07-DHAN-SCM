@@ -241,6 +241,18 @@ class ReportController extends Controller
 
         return response()->json(['monthly_revenue' => $monthlyRevenue]);
     }
+    
+
+    public function getMaintenanceCountForThisMonth()
+    {
+        $count = DB::table('maintenance_records')
+            ->whereMonth('next_maintenance_date', now()->month)
+            ->whereYear('next_maintenance_date', now()->year)
+            ->where('next_maintenance_date', '>=', now()->toDateString()) // Ensures date is not in the past
+            ->count();
+
+        return response()->json(['maintenance_count' => $count]);
+    }
                     
 
 }
