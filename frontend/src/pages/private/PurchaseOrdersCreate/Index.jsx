@@ -118,6 +118,9 @@ function PurchaseOrdersCreate() {
         const supplierId = searchParams.get("supplierId");
         const productId = searchParams.get("productId");
 
+        setSuppliers(suppliers);
+        setProducts(products);
+
         if (supplierId && productId) {
           const supplier = suppliers.find(({ id }) => id == supplierId);
 
@@ -130,13 +133,56 @@ function PurchaseOrdersCreate() {
 
             if (product) {
               setSelectedSupplier(supplier);
-              handleAddPOItem(product);
+
+              const { id, name, model, product_unit, supplier_price, tags } =
+                product;
+
+              const validTags = tags.filter((tag) => /\[.*\]/.test(tag.name));
+
+              let newPOItems = [];
+
+              newPOItems = [
+                ...poItems,
+                {
+                  product_id: id,
+                  name,
+                  model,
+                  unit: product_unit.name,
+                  quantity: 1,
+                  unit_price: parseFloat(supplier_price),
+                  amount: parseFloat(supplier_price),
+                  tags: validTags,
+                },
+              ];
+
+              let tagIds = [];
+              newPOItems.forEach((item) => {
+                tagIds = [...tagIds, ...item.tags.map((tag) => tag.id)];
+              });
+
+              tagIds = [...new Set(tagIds)];
+
+              const poSimilarItems = products
+                .filter((product) =>
+                  product.tags.some((tag) => tagIds.includes(tag.id))
+                )
+                .filter(
+                  (product) =>
+                    !newPOItems.some((item) => item.product_id === product.id)
+                );
+
+              const poSubtotal = newPOItems.reduce((acc, item) => {
+                acc += item.amount;
+                return acc;
+              }, 0);
+
+              setPOItems(newPOItems);
+              setPOSimilarItems(poSimilarItems);
+              setPOSubtotal(poSubtotal);
+              setPOTotal(poSubtotal);
             }
           }
         }
-
-        setSuppliers(suppliers);
-        setProducts(products);
       } catch (error) {
         setErrorMsg(error.message);
       } finally {

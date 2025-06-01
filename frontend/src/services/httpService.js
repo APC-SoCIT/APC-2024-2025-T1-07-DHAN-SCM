@@ -2,7 +2,7 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: "http://192.168.18.201:8000",
-  baseURL: "https://58b6-149-30-139-51.ngrok-free.app",
+  baseURL: "http://localhost:8000",
   withCredentials: false,
 });
 
