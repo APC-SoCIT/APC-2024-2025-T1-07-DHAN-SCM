@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('outgoing_stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('demo_unit_id')->nullable()->constrained('demo_units');
-            $table->foreignId('order_item_id')->nullable()->constrained('purchase_order_items');
+            $table->foreignId('order_item_id')->nullable()->constrained('order_items');
             $table->foreignId('incoming_stock_id')->constrained('incoming_stocks');
             $table->foreignId('product_id')->constrained('products');
             $table->string('type');

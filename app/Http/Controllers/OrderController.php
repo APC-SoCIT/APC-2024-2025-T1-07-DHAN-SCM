@@ -59,6 +59,7 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
+        
         $request->validate([
             'company_order_number' => 'nullable|string',
             'order_date' => 'required|date',
@@ -134,6 +135,7 @@ class OrderController extends Controller
     }
     public function updateStatus(Request $request, $id)
     {
+  
         $order = Order::findOrFail($id);
     
         $request->validate([
@@ -151,6 +153,8 @@ class OrderController extends Controller
                 'status_id' => $request->status_id,
                 'updated_by' => auth()->id(),
             ]);
+
+           
     
             // Log the status change in order_statuses table with status name in comments
             OrderStatus::create([
@@ -161,13 +165,14 @@ class OrderController extends Controller
                 'created_by' => auth()->id(),
                 'updated_by' => auth()->id(),
             ]);
+           
     
             // If status is "Approved", allocate stock using FIFO (excluding expired & used items)
             if (strtolower($statusName) === 'approved') {
                 foreach ($order->orderItems as $item) {
                     $availableStocks = $this->getAvailableIncomingStocks($item->product_id, $item->quantity);
-    
                     foreach ($availableStocks as $incomingStock) {
+
                         OrderTemporaryAllocation::create([
                             'order_item_id' => $item->id,
                             'incoming_stock_id' => $incomingStock->id,
@@ -183,8 +188,8 @@ class OrderController extends Controller
             if (strtolower($statusName) === 'ready to deliver') {
                 foreach ($order->orderItems as $item) {
                     $temporaryAllocations = OrderTemporaryAllocation::where('order_item_id', $item->id)->get();
-    
                     foreach ($temporaryAllocations as $allocation) {
+
                         OutgoingStock::create([
                             'order_item_id' => $allocation->order_item_id,
                             'incoming_stock_id' => $allocation->incoming_stock_id,

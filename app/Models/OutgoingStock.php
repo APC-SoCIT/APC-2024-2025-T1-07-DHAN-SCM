@@ -29,7 +29,7 @@ class OutgoingStock extends Model
 
     public function orderItem(): BelongsTo
     {
-        return $this->belongsTo(PurchaseOrderItem::class, 'order_item_id');
+        return $this->belongsTo(OrderItem::class, 'order_item_id');
     }
 
     public function incomingStock(): BelongsTo
