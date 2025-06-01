@@ -37,11 +37,19 @@ class ReportController extends Controller
         // Get the 'showDetails' parameter from the request (defaults to false)
         $showDetails = filter_var($request->query('showDetails', false), FILTER_VALIDATE_BOOLEAN);
     
-        // Filter out-of-stock products
-        $outOfStockProducts = Product::with('incomingStocks.outgoingStocks')->get()->filter(function ($product) {
-            $availableQuantity = $product->incomingStocks->sum('quantity') - $product->incomingStocks->flatMap->outgoingStocks->count();
-            return $availableQuantity <= 0;
-        });
+        // Filter out-of-stock products (excluding expired products)
+        $outOfStockProducts = Product::with(['incomingStocks.outgoingStocks'])
+            ->get()
+            ->filter(function ($product) {
+                // Exclude expired stocks before calculating available quantity
+                $validStocks = $product->incomingStocks->filter(function ($stock) {
+                    return $stock->expiration_date === null || $stock->expiration_date > now();
+                });
+    
+                $availableQuantity = $validStocks->sum('quantity') - $validStocks->flatMap->outgoingStocks->sum('quantity');
+    
+                return $availableQuantity <= 0;
+            });
     
         // If 'showDetails' is true, return full details, otherwise return only the count
         if ($showDetails) {
@@ -68,11 +76,19 @@ class ReportController extends Controller
         // Get the 'showDetails' parameter from the request (defaults to false)
         $showDetails = filter_var($request->query('showDetails', false), FILTER_VALIDATE_BOOLEAN);
     
-        // Filter products that have stock but are below minimum
-        $belowMinimumProducts = Product::with('incomingStocks.outgoingStocks')->get()->filter(function ($product) {
-            $availableQuantity = $product->incomingStocks->sum('quantity') - $product->incomingStocks->flatMap->outgoingStocks->count();
-            return $availableQuantity > 0 && $availableQuantity < $product->minimum_quantity; // Filter below minimum
-        });
+        // Filter products that have stock but are below minimum (excluding expired stock)
+        $belowMinimumProducts = Product::with(['incomingStocks.outgoingStocks'])
+            ->get()
+            ->filter(function ($product) {
+                // Exclude expired stocks before calculating available quantity
+                $validStocks = $product->incomingStocks->filter(function ($stock) {
+                    return $stock->expiration_date === null || $stock->expiration_date > now();
+                });
+    
+                $availableQuantity = $validStocks->sum('quantity') - $validStocks->flatMap->outgoingStocks->sum('quantity');
+    
+                return $availableQuantity > 0 && $availableQuantity < $product->minimum_quantity;
+            });
     
         // If 'showDetails' is true, return full details, otherwise return only the count
         if ($showDetails) {
@@ -81,10 +97,10 @@ class ReportController extends Controller
                     'product_id' => $product->id,
                     'name' => $product->name,
                     'sku' => $product->sku,
-                    'available_quantity' => $product->incomingStocks->sum('quantity') - $product->incomingStocks->flatMap->outgoingStocks->count(),
+                    'available_quantity' => $product->incomingStocks->sum('quantity') - $product->incomingStocks->flatMap->outgoingStocks->sum('quantity'),
                     'minimum_quantity' => $product->minimum_quantity,
                     'outgoing_count' => $product->incomingStocks->flatMap->outgoingStocks->count(),
-                    'is_below_minimum' => true, // Flagging below minimum stock items
+                    'is_below_minimum' => true,
                 ];
             });
     
