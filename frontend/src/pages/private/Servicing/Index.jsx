@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Table, Skeleton, Card, Tabs, Row, Col, Statistic, Spin } from "antd";
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import duration from "dayjs/plugin/duration";
 
 import ErrorContent from "../../../components/common/ErrorContent";
 
@@ -10,6 +12,9 @@ import { getColumnSearchProps } from "../../../helpers/TableFilterProps";
 
 import Maintenances from "../ProductInventory/components/AvailableMachines/components/Maintenance/Index";
 import Calibrations from "../ProductInventory/components/AvailableMachines/components/Calibrations/Index";
+import WarrantyClaims from "../ProductInventory/components/AvailableMachines/components/WarrantyClaims/Index";
+
+dayjs.extend(duration);
 
 function Servicing() {
   const [machines, setMachines] = useState([]);
@@ -235,6 +240,11 @@ function Servicing() {
         rowKey="serial_number"
         expandable={{
           expandedRowRender: (record) => {
+            const releaseDate = dayjs(record.created_at); // Replace with your actual release date
+            const expiryDate = releaseDate.add(1, "year");
+
+            const diff = dayjs.duration(expiryDate.diff(dayjs()));
+
             const tabItems = [
               {
                 key: "2",
@@ -253,6 +263,23 @@ function Servicing() {
                   <Maintenances
                     serialNumber={record.serial_number}
                     onChange={onChange}
+                  />
+                ),
+              },
+              {
+                key: "4",
+                label: (
+                  <>
+                    Waranty Claims (
+                    {`Expires in ${diff.months()} months and ${diff.days()} days`}
+                    )
+                  </>
+                ),
+                children: (
+                  <WarrantyClaims
+                    serialNumber={record.serial_number}
+                    onChange={onChange}
+                    enable={diff.days() !== 0}
                   />
                 ),
               },
