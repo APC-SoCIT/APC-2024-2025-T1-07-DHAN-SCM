@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\DemoUnit;
 use Illuminate\Http\Request;
 use App\Models\IncomingStock;
+use App\Models\OutgoingStock;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -36,80 +37,47 @@ class ReportController extends Controller
 
     public function outOfStocks(Request $request)
     {
-        // Get the 'showDetails' parameter from the request (defaults to false)
-        $showDetails = filter_var($request->query('showDetails', false), FILTER_VALIDATE_BOOLEAN);
-    
-        // Filter out-of-stock products (excluding expired products)
-        $outOfStockProducts = Product::with(['incomingStocks.outgoingStocks'])
-            ->get()
-            ->filter(function ($product) {
-                // Exclude expired stocks before calculating available quantity
-                $validStocks = $product->incomingStocks->filter(function ($stock) {
-                    return $stock->expiration_date === null || $stock->expiration_date > now();
-                });
-    
-                $availableQuantity = $validStocks->sum('quantity') - $validStocks->flatMap->outgoingStocks->sum('quantity');
-    
-                return $availableQuantity <= 0;
-            });
-    
-        // If 'showDetails' is true, return full details, otherwise return only the count
-        if ($showDetails) {
-            $outOfStockProducts = $outOfStockProducts->map(function ($product) {
-                return [
-                    'product_id' => $product->id,
-                    'name' => $product->name,
-                    'sku' => $product->sku,
-                    'available_quantity' => 0,
-                    'minimum_quantity' => $product->minimum_quantity,
-                    'outgoing_count' => $product->incomingStocks->flatMap->outgoingStocks->count(),
-                    'is_out_of_stock' => true,
-                ];
-            });
-    
-            return response()->json(['out_of_stock_products' => $outOfStockProducts]);
-        }
-    
-        return response()->json(['out_of_stock_count' => $outOfStockProducts->count()]);
+        $query = Product::with([
+            'incomingStocks'
+        ]);
+
+        $products = $query->get()
+            ->map(function ($product) {
+                $availableQuantity = $product->incomingStocks
+                    ->reject(fn($stock) => OutgoingStock::where('incoming_stock_id', $stock->id)->exists())
+                    ->filter(fn($stock) => is_null($stock->expiration_date) || !Carbon::parse($stock->expiration_date)->isPast())
+                    ->sum('quantity');
+
+                return ['available_quantity' => $availableQuantity];
+            })
+            ->filter(fn($product) => $product['available_quantity'] == 0)
+            ->count(); // Count the products where available_quantity is 0
+
+        return response()->json(['out_of_stock_count' => $products]);
     }
 
-    public function belowMinimumStocks(Request $request)
+   public function belowMinimumStocks(Request $request)
     {
         // Get the 'showDetails' parameter from the request (defaults to false)
         $showDetails = filter_var($request->query('showDetails', false), FILTER_VALIDATE_BOOLEAN);
-    
-        // Filter products that have stock but are below minimum (excluding expired stock)
-        $belowMinimumProducts = Product::with(['incomingStocks.outgoingStocks'])
-            ->get()
-            ->filter(function ($product) {
-                // Exclude expired stocks before calculating available quantity
-                $validStocks = $product->incomingStocks->filter(function ($stock) {
-                    return $stock->expiration_date === null || $stock->expiration_date > now();
-                });
-    
-                $availableQuantity = $validStocks->sum('quantity') - $validStocks->flatMap->outgoingStocks->sum('quantity');
-    
-                return $availableQuantity > 0 && $availableQuantity < $product->minimum_quantity;
-            });
-    
-        // If 'showDetails' is true, return full details, otherwise return only the count
-        if ($showDetails) {
-            $belowMinimumProducts = $belowMinimumProducts->map(function ($product) {
-                return [
-                    'product_id' => $product->id,
-                    'name' => $product->name,
-                    'sku' => $product->sku,
-                    'available_quantity' => $product->incomingStocks->sum('quantity') - $product->incomingStocks->flatMap->outgoingStocks->sum('quantity'),
-                    'minimum_quantity' => $product->minimum_quantity,
-                    'outgoing_count' => $product->incomingStocks->flatMap->outgoingStocks->count(),
-                    'is_below_minimum' => true,
-                ];
-            });
-    
-            return response()->json(['below_minimum_products' => $belowMinimumProducts]);
-        }
-    
-        return response()->json(['below_minimum_count' => $belowMinimumProducts->count()]);
+
+        $belowMinimumProducts = Product::with(['incomingStocks.outgoingStocks'])->get()
+            ->map(function ($product) {
+                $validStocks = $product->incomingStocks
+                    ->reject(fn($stock) => OutgoingStock::where('incoming_stock_id', $stock->id)->exists()) // Exclude stocks already in OutgoingStock
+                    ->filter(fn($stock) => is_null($stock->expiration_date) || !Carbon::parse($stock->expiration_date)->isPast()); // Ignore expired stocks
+
+                $availableQuantity = $validStocks->sum('quantity');
+
+                return array_merge($product->toArray(), [
+                    'available_quantity' => $availableQuantity,
+                    'below_minimum' => $availableQuantity > 0 && $availableQuantity < $product->minimum_quantity
+                ]);
+            })
+            ->filter(fn($product) => $product['below_minimum']) // Filter only below-minimum stocks
+            ->count(); // Get count
+
+        return response()->json(['below_minimum_count' => $belowMinimumProducts]);
     }
 
   
