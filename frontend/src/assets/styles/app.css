@@ -25,3 +25,7 @@
 .cursor-pointer {
   cursor: pointer;
 }
+
+.stat-font-white .ant-statistic-content-value-int {
+  color: #fff !important;
+}

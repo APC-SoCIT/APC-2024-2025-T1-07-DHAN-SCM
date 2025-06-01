@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Statistic, Typography, Skeleton } from "antd";
+import { Link } from "react-router-dom";
+import {
+  Card,
+  Row,
+  Col,
+  Statistic,
+  Typography,
+  Skeleton,
+  Divider,
+  Table,
+  Button,
+} from "antd";
 import dayjs from "dayjs";
 import {
   ShoppingCartOutlined,
@@ -7,13 +18,20 @@ import {
   CheckCircleOutlined,
   SyncOutlined,
   CloseCircleOutlined,
-  ClockCircleOutlined,
   WarningOutlined,
   HourglassOutlined,
+  ArrowDownOutlined,
+  DesktopOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  CreditCardOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 
 import ErrorContent from "../../../components/common/ErrorContent";
 import http from "../../../services/httpService";
+
+import MyBarChart from "./Chart/Barchart";
 
 import "./style.css";
 
@@ -25,17 +43,19 @@ import useUserStore from "../../../store/UserStore";
 const { Title } = Typography;
 
 function Dashboard() {
-  const [productReports, setProductReports] = useState(null);
-  const [orderReports, setOrderReports] = useState(null);
-  const [amountPerUser, setAmountPerUser] = useState([]);
-  const [categoryReport, setCategoryReport] = useState([]);
-
   const [data, setData] = useState({
     outOfStocks: 0,
     belowMinimumStocks: 0,
     demoUnit: 0,
     demoUnitOverDueNearExpire: 0,
+    monthRevenue: 0,
+    totalCustomer: 0,
+    maintenanceCount: 0,
   });
+
+  const [topSellingProduct, setTopSellingProduct] = useState([]);
+  const [recentTransaction, setRecentTransaction] = useState([]);
+  const [monthlyRevenue, setMonthlyRevenue] = useState([]);
 
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -57,25 +77,49 @@ function Dashboard() {
         const { data: demoUnitOverDueNearExpire } = await http.get(
           "/api/report/demoUnitOverDueNearExpire"
         );
+        const { data: getThisMonthRevenue } = await http.get(
+          "/api/report/getThisMonthRevenue"
+        );
+        const { data: getTotalCustomer } = await http.get(
+          "/api/report/getTotalCustomer"
+        );
+        const { data: getMaintenanceCountForThisMonth } = await http.get(
+          "/api/report/getMaintenanceCountForThisMonth"
+        );
+
+        const { data: getTopSellingProducts } = await http.get(
+          "/api/report/getTopSellingProducts"
+        );
+        const { data: getRecentTransactions } = await http.get(
+          "/api/report/getRecentTransactions"
+        );
+
+        const { data: getMonthlyRevenue } = await http.get(
+          "/api/report/getMonthlyRevenue"
+        );
+
+        const monthlyRevenue = getMonthlyRevenue.monthly_revenue;
+
+        const monthlyRevenueArray = Object.entries(monthlyRevenue).map(
+          ([month, revenue]) => ({
+            month,
+            revenue: (Math.random() * 10000).toFixed(2),
+          })
+        );
 
         setData({
           outOfStocks: outOfStocks.out_of_stock_count,
           belowMinimumStocks: belowMinimumStocks.below_minimum_count,
           demoUnit: getAllDemoUnits.demo_unit_count,
           demoUnitOverDueNearExpire: demoUnitOverDueNearExpire.demo_unit_count,
+          monthRevenue: getThisMonthRevenue.total_revenue,
+          totalCustomer: getTotalCustomer.total_customer,
+          maintenanceCount: getMaintenanceCountForThisMonth.maintenance_count,
         });
 
-        // const { data: amountPerUser } = await http.get(
-        //   "/api/report/getTotalAmountPerUser"
-        // );
-        // const { data: categoryReport } = await http.get(
-        //   "/api/report/getProductTotalsByCategory"
-        // );
-
-        // setProductReports(productReports);
-        // setOrderReports(orderReports);
-        // setAmountPerUser(amountPerUser);
-        // setCategoryReport(categoryReport);
+        setTopSellingProduct(getTopSellingProducts.products);
+        setRecentTransaction(getRecentTransactions.transactions);
+        setMonthlyRevenue(monthlyRevenueArray);
       } catch (error) {
         setErrorMsg(error.message);
       } finally {
@@ -110,13 +154,242 @@ function Dashboard() {
     height: "100%",
   };
 
+  const cardStyleRed = {
+    backgroundColor: "#f5222d",
+  };
+
+  const cardStyleOrange = {
+    backgroundColor: "#ff7a45",
+  };
+
+  const cardStyleGreen = {
+    backgroundColor: "#52c41a",
+  };
+
+  const cardStylePurple = {
+    backgroundColor: "#722ed1",
+  };
+
+  const topSellingTable = [
+    {
+      title: "Product Name",
+      dataIndex: "name",
+      render: (_, record) => {
+        return (
+          <div>
+            <div>{record.name}</div>
+            {record.model && <div>{record.model}</div>}
+          </div>
+        );
+      },
+    },
+    {
+      title: "Available Quantity",
+      dataIndex: "available_quantity",
+    },
+    {
+      title: "Selling Price",
+      dataIndex: "selling_price",
+    },
+    {
+      title: "Total Sold",
+      dataIndex: "total_quantity_sold",
+    },
+  ];
+
+  const recentTransactionTable = [
+    {
+      title: "Order Number",
+      dataIndex: "megaion_order_number",
+    },
+    {
+      title: "Customer",
+      dataIndex: "customer",
+    },
+    {
+      title: "Total Amount",
+      dataIndex: "total_amount",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+    },
+    {
+      title: "created_at",
+      dataIndex: "created_at",
+    },
+  ];
+
   return (
     <div>
-      <Row gutter={[16, 16]}>
-        <Col span={12}>
-          <h1>Hello {name}!</h1>
-          <div>
-            <Card
+      <h1>Hello {name}!</h1>
+      <Divider />
+
+      <div>
+        <Row gutter={[16, 16]}>
+          <Col span={6}>
+            <Card style={{ ...cardStyle, ...cardStyleRed }}>
+              <Statistic
+                title={
+                  <Row justify="space-between">
+                    <Col>
+                      <span style={{ color: "#fff" }}>Out of Stocks</span>
+                    </Col>
+                    <Col>
+                      <Link
+                        to="/products?defaultFilter=no_stock"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="small">View</Button>
+                      </Link>
+                    </Col>
+                  </Row>
+                }
+                value={data.outOfStocks}
+                prefix={<ExclamationCircleOutlined style={{ color: "#fff" }} />}
+                className="stat-font-white"
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card style={{ ...cardStyle, ...cardStyleOrange }}>
+              <Statistic
+                title={
+                  <Row justify="space-between">
+                    <Col>
+                      <span style={{ color: "#fff" }}>
+                        Below Minimum Stocks
+                      </span>
+                    </Col>
+                    <Col>
+                      <Link
+                        to="/products?defaultFilter=below_minimum"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="small">View</Button>
+                      </Link>
+                    </Col>
+                  </Row>
+                }
+                value={data.belowMinimumStocks}
+                prefix={<ArrowDownOutlined style={{ color: "#fff" }} />}
+                className="stat-font-white"
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card style={{ ...cardStyle, ...cardStylePurple }}>
+              <Statistic
+                title={
+                  <Row justify="space-between">
+                    <Col>
+                      <span style={{ color: "#fff" }}>Total Customer</span>
+                    </Col>
+                    <Col>
+                      <Link
+                        to="/customers"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="small">View</Button>
+                      </Link>
+                    </Col>
+                  </Row>
+                }
+                value={data.totalCustomer}
+                prefix={<UserOutlined style={{ color: "#fff" }} />}
+                className="stat-font-white"
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card style={{ ...cardStyle, ...cardStyleGreen }}>
+              <Statistic
+                title={
+                  <Row justify="space-between">
+                    <Col>
+                      <span style={{ color: "#fff" }}>This Month Revenue</span>
+                    </Col>
+                    <Col></Col>
+                  </Row>
+                }
+                value={data.monthRevenue}
+                prefix={<CreditCardOutlined style={{ color: "#fff" }} />}
+                className="stat-font-white"
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card style={cardStyle}>
+              <Statistic
+                title={
+                  <Row justify="space-between">
+                    <Col>Demo Unit</Col>
+                    <Col>
+                      <Link
+                        to="/demoUnits"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="small">View</Button>
+                      </Link>
+                    </Col>
+                  </Row>
+                }
+                value={data.demoUnit}
+                prefix={<DesktopOutlined />}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card style={cardStyle}>
+              <Statistic
+                title={
+                  <Row justify="space-between">
+                    <Col>Demo Unit Overdue / Near Expire</Col>
+                    <Col>
+                      <Link
+                        to="/demoUnits"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button size="small">View</Button>
+                      </Link>
+                    </Col>
+                  </Row>
+                }
+                value={data.demoUnitOverDueNearExpire}
+                prefix={<CalendarOutlined />}
+              />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card style={cardStyle}>
+              <Statistic
+                title={
+                  <Row justify="space-between">
+                    <Col>Maintenance Count</Col>
+                    <Col>
+                      <Link
+                        to="/servicing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button>View</Button>
+                      </Link>
+                    </Col>
+                  </Row>
+                }
+                value={data.maintenanceCount}
+                prefix={<ClockCircleOutlined />}
+              />
+            </Card>
+          </Col>
+        </Row>
+        {/* Clock */}
+        {/* <Card
               cover={
                 <div
                   className="container background"
@@ -141,10 +414,34 @@ function Dashboard() {
                   ☀️ {dayjs().format("hh:mm A")}
                 </div>
               </Title>
-            </Card>
-          </div>
+            </Card> */}
+      </div>
 
-          {/*<h1>Products</h1>
+      <h3 style={{ marginTop: 52 }}>Monthly Revenue</h3>
+      <Divider />
+      <div style={{ height: 500 }}>
+        <MyBarChart data={monthlyRevenue} />
+      </div>
+
+      <h3 style={{ marginTop: 52 }}>Top Selling Products</h3>
+      <Divider />
+      <Table
+        columns={topSellingTable}
+        dataSource={topSellingProduct}
+        rowKey="product_id"
+        pagination={false}
+      />
+
+      <h3 style={{ marginTop: 52 }}>Recent Transaction</h3>
+      <Divider />
+      <Table
+        columns={recentTransactionTable}
+        dataSource={recentTransaction}
+        rowKey="megaion_order_number"
+        pagination={false}
+      />
+
+      {/*<h1>Products</h1>
           <Row gutter={[16, 16]}>
             <Col span={8}>
               <Card style={cardStyle}>
@@ -186,9 +483,8 @@ function Dashboard() {
               </Card>
             </Col>
           </Row> */}
-        </Col>
-        <Col span={12}>
-          {/* <h1>Sales by Company</h1>
+
+      {/* <h1>Sales by Company</h1>
           <div style={{ height: 400, padding: 50 }}>
             <Barchart data={amountPerUser} />
           </div>
@@ -196,7 +492,7 @@ function Dashboard() {
           <div style={{ height: 400, marginTop: 100 }}>
             <Piechart data={categoryReport} />
           </div> */}
-          {!roles.includes("Customer") && (
+      {/* {!roles.includes("Customer") && (
             <Row gutter={[16, 16]} style={{ marginTop: 80 }}>
               <Col span={24}>
                 <Card style={cardStyle}>
@@ -235,9 +531,7 @@ function Dashboard() {
                 </Card>
               </Col>
             </Row>
-          )}
-        </Col>
-      </Row>
+          )} */}
     </div>
   );
 }
