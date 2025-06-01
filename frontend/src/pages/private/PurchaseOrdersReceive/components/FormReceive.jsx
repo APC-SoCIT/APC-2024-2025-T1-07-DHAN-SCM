@@ -21,12 +21,21 @@ const FormReceive = ({ supportingData, onSubmit }) => {
 
   const [formPOItemInstance] = Form.useForm();
   const inputRef = useRef(null); // Create a ref for the InputNumber component
+  const serialRefs = useRef([]);
 
   const handleFormValuesChange = (changedValues) => {
     const fieldName = Object.keys(changedValues)[0];
     const fieldValue = changedValues[fieldName];
     if (fieldName === "delivered_quantity") {
       setMachineSerialsCount(fieldValue);
+    }
+    for (let i = 0; i < machineSerialsCount; i++) {
+      formPOItemInstance.setFields([
+        {
+          name: `serial_number_${i + 1}`,
+          errors: [],
+        },
+      ]);
     }
   };
 
@@ -38,6 +47,44 @@ const FormReceive = ({ supportingData, onSubmit }) => {
       }
     }
 
+    // onSubmit({
+    //   ...values,
+    //   delivery_date: dayjs(values.delivery_date).format("YYYY-MM-DD"),
+    //   expiration_date: values.expiration_date
+    //     ? dayjs(values.expiration_date).format("YYYY-MM-DD")
+    //     : null,
+    // });
+  };
+
+  // Helper to focus next empty or next serial input, or submit if all filled and unique
+  const handleSerialEnter = (index) => {
+    const values = formPOItemInstance.getFieldsValue();
+    // Find the next empty serial input
+    for (let i = 0; i < machineSerialsCount; i++) {
+      if (!values[`serial_number_${i + 1}`]) {
+        serialRefs.current[i]?.focus();
+        return;
+      }
+    }
+    // If all filled, check for duplicates
+    const serials = Array.from({ length: machineSerialsCount }).map((_, i) =>
+      values[`serial_number_${i + 1}`]?.trim()
+    );
+    const hasDuplicates = new Set(serials).size !== serials.length;
+    if (hasDuplicates) {
+      // Show error for duplicates
+      for (let i = 0; i < machineSerialsCount; i++) {
+        formPOItemInstance.setFields([
+          {
+            name: `serial_number_${i + 1}`,
+            errors: ["Serial numbers must be unique."],
+          },
+        ]);
+      }
+      serialRefs.current[0]?.focus();
+      return;
+    }
+    // If all filled and unique, submit the form
     onSubmit({
       ...values,
       delivery_date: dayjs(values.delivery_date).format("YYYY-MM-DD"),
@@ -98,6 +145,7 @@ const FormReceive = ({ supportingData, onSubmit }) => {
         size="large"
         initialValues={{
           delivered_quantity: 1,
+          delivery_date: dayjs(),
         }}
       >
         <Form.Item
@@ -129,29 +177,33 @@ const FormReceive = ({ supportingData, onSubmit }) => {
               key={`serial_number_${index}`}
               label={`Serial ${index + 1}`}
               name={`serial_number_${index + 1}`}
-              rules={[
-                { required: true, message: `Serial ${index + 1} is required.` },
-                {
-                  validator: (_, value) => {
-                    const allValues = formPOItemInstance.getFieldsValue();
-                    const serialNumbers = Object.keys(allValues)
-                      .filter((key) => key.startsWith("serial_number_"))
-                      .map((key) => allValues[key]);
-
-                    if (
-                      serialNumbers.filter((serial) => serial === value)
-                        .length > 1
-                    ) {
-                      return Promise.reject(
-                        new Error("Serial numbers must be unique.")
-                      );
-                    }
-                    return Promise.resolve();
-                  },
-                },
-              ]}
+              rules={
+                [
+                  // { required: true, message: `Serial ${index + 1} is required.` },
+                  // {
+                  //   validator: (_, value) => {
+                  //     const allValues = formPOItemInstance.getFieldsValue();
+                  //     const serialNumbers = Object.keys(allValues)
+                  //       .filter((key) => key.startsWith("serial_number_"))
+                  //       .map((key) => allValues[key]);
+                  //     if (
+                  //       serialNumbers.filter((serial) => serial === value)
+                  //         .length > 1
+                  //     ) {
+                  //       return Promise.reject(
+                  //         new Error("Serial numbers must be unique.")
+                  //       );
+                  //     }
+                  //     return Promise.resolve();
+                  //   },
+                  // },
+                ]
+              }
             >
-              <Input />
+              <Input
+                ref={(el) => (serialRefs.current[index] = el)}
+                onPressEnter={() => handleSerialEnter(index)}
+              />
             </Form.Item>
           ))
         ) : (
