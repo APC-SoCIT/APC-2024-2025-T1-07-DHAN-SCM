@@ -19,6 +19,7 @@ use App\Http\Controllers\ProductUnitController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\OutgoingStockController;
 use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\WarrantyClaimController;
 use App\Http\Controllers\IncomingStocksController;
 use App\Http\Controllers\CalibrationRecordController;
 use App\Http\Controllers\MaintenanceRecordController;
@@ -78,6 +79,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('orders/{id}/status', [OrderController::class, 'updateStatus']);
 
  
+
+    Route::apiResource('warrantyClaims', WarrantyClaimController::class);
 
 
 
