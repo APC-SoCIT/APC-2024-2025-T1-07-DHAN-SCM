@@ -24,6 +24,7 @@ import http from "../../../services/httpService";
 import { formatWithComma } from "../../../helpers/numbers";
 
 import megaionImg from "../../../assets/images/megaion.png";
+import dummySigImg from "../../../assets/images/dummysig.png";
 
 import useUserStore from "../../../store/UserStore";
 
@@ -224,17 +225,79 @@ function PurchaseOrdersView() {
       </Row>
 
       <div id="printArea">
-        <div style={{ marginBottom: 16 }}>
-          <Image src={megaionImg} preview={false} height={50} width={150} />
+        <Image src={megaionImg} preview={false} height={50} width={150} />
+
+        <div style={{ textAlign: "right" }}>
+          <Title level={3} style={{ marginBottom: 0 }}>
+            Purchase Order
+          </Title>
+        </div>
+
+        {/* vendor */}
+        <div>
+          {supplier && (
+            <div>
+              <Row>
+                <Col span={10}>
+                  <Title level={4} style={{ marginBottom: 0 }}>
+                    Vendor
+                  </Title>
+                  <Divider style={{ margin: "0 12px" }} />
+                </Col>
+                <Col span={14}>
+                  <div style={{ textAlign: "right" }}>
+                    <Title level={5} style={{ marginBottom: 0 }}>
+                      <u>
+                        Date Ordered:{" "}
+                        {dayjs(created_at).format("MMMM DD, YYYY")}
+                      </u>
+                    </Title>
+                  </div>
+                </Col>
+              </Row>
+
+              <Title level={5} style={{ margin: 0 }}>
+                Supplier: {supplier.name}
+              </Title>
+              <div>
+                <Text type="secondary">{supplier.contact_info}</Text>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div style={{ textAlign: "right" }}>
+          <Title level={5} style={{ marginBottom: 0 }}>
+            <u>Purchase Order Number: #{ponumber}</u>
+          </Title>
+        </div>
+
+        {/* ship to */}
+        <div>
+          <Row>
+            <Col span={10}>
+              <Title level={4} style={{ marginBottom: 0 }}>
+                Ship To
+              </Title>
+              <Divider style={{ margin: "0 12px" }} />
+            </Col>
+            <Col span={14}></Col>
+          </Row>
+
           <div>
-            Pablo Roman cor. Tropical Ave., BF International, Las Piñas City
-            1740 Philippines
+            <Title level={5} style={{ margin: 0 }}>
+              Megaion Corporation
+            </Title>
           </div>
+          <div>Pablo Roman cor. Tropical Ave.,</div>
+          <div>BF International, Las Piñas City 1740 Philippines</div>
           <div>+63947 891 8181, +632 8801 9109</div>
           <div>hello@megaion.net</div>
         </div>
+
         <Divider />
-        <Row type="flex" justify="space-between" style={{ marginBottom: 16 }}>
+
+        {/* <Row type="flex" justify="space-between" style={{ marginBottom: 16 }}>
           <Col>
             <Title level={5} style={{ margin: 0 }}>
               Purchase Order Number: #{ponumber}
@@ -248,23 +311,15 @@ function PurchaseOrdersView() {
               {statusName}
             </Tag>
           </Col>
-        </Row>
-        {supplier && (
-          <div style={{ marginBottom: 16 }}>
-            <Title level={5} style={{ marginBottom: 0 }}>
-              Supplier: {supplier.name}
-            </Title>
-            <div>
-              <Text type="secondary">{supplier.contact_info}</Text>
-            </div>
-          </div>
-        )}
+        </Row> */}
+
         <Table
           columns={tableColumns}
           dataSource={items}
           rowKey="product_id"
           rowClassName="cursor-pointer"
           pagination={false}
+          size="small"
           onRow={(record) => ({
             onClick: () => {
               setSelectedPOItem(record);
@@ -272,7 +327,11 @@ function PurchaseOrdersView() {
             },
           })}
         />
-        <Row type="flex" justify="space-between" style={{ marginTop: 16 }}>
+        <Row
+          type="flex"
+          justify="space-between"
+          style={{ marginTop: 16, marginBottom: 16 }}
+        >
           <Col></Col>
           <Col>
             <Descriptions
@@ -292,6 +351,62 @@ function PurchaseOrdersView() {
             />
           </Col>
         </Row>
+
+        {/* <Row gutter={32}>
+          <Col span={6}>
+            <div style={{ width: 250, textAlign: "center" }}>
+              <div>APPROVED BY</div>
+              <div style={{ borderTop: "1px solid #000" }}></div>
+              <div>Caisa Subia</div>
+              <div>President - Megaion Corporation</div>
+            </div>
+          </Col>
+          <Col span={6}>
+            <div style={{ width: 250, marginLeft: 100, textAlign: "center" }}>
+              <div>SIGNATURE</div>
+              <div style={{ borderTop: "1px solid #000" }}></div>
+            </div>
+          </Col>
+          <Col span={6}>
+            <div style={{ width: 250, marginLeft: 100, textAlign: "center" }}>
+              <div>DATE</div>
+              <div style={{ borderTop: "1px solid #000" }}></div>
+            </div>
+          </Col>
+        </Row> */}
+        <table>
+          <tbody>
+            <tr>
+              <td style={{ width: 250, verticalAlign: "top" }}>
+                <div style={{ textAlign: "center" }}>
+                  <div>APPROVED BY</div>
+                  <div style={{ borderTop: "1px solid #000" }}></div>
+                  <div>Caisa Subia</div>
+                  <div>President - Megaion Corporation</div>
+                </div>
+              </td>
+              <td style={{ width: 250, paddingLeft: 16, verticalAlign: "top" }}>
+                <div style={{ textAlign: "center" }}>
+                  <div>SIGNATURE</div>
+                  <div style={{ borderTop: "1px solid #000" }}></div>
+                  <div>
+                    <img
+                      src={dummySigImg}
+                      style={{ height: 70, width: 150, marginTop: 12 }}
+                    />
+                  </div>
+                </div>
+              </td>
+              <td style={{ width: 250, paddingLeft: 16, verticalAlign: "top" }}>
+                <div style={{ textAlign: "center" }}>
+                  <div>DATE</div>
+                  <div style={{ borderTop: "1px solid #000" }}></div>
+                  <div>{dayjs().format("MMMM DD, YYYY")}</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div style={{ textAlign: "right" }}>

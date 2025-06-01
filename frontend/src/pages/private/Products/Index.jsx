@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import {
   Spin,
   Row,
@@ -20,6 +20,7 @@ import {
 import {
   MoreOutlined,
   ArrowDownOutlined,
+  ArrowUpOutlined,
   EnvironmentOutlined,
   WarningOutlined,
   IdcardOutlined,
@@ -50,6 +51,15 @@ function Products() {
 
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
+
+  const [tableFilteredValue, setTableFilterValue] = useState({
+    name: undefined,
+    tags: undefined,
+    available_quantity: undefined,
+  });
+
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const getProducts = async () => {
     const { data } = await http.get("/api/getAllProducts");
@@ -82,6 +92,33 @@ function Products() {
 
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    // Example: get the value of defaultFilter from the URL
+    const defaultFilter = searchParams.get("defaultFilter");
+    if (defaultFilter) {
+      if (defaultFilter === "no_stock") {
+        setTableFilterValue({
+          name: null,
+          tags: null,
+          available_quantity: ["No Stock"],
+        });
+      } else if (defaultFilter === "below_minimum") {
+        setTableFilterValue({
+          name: null,
+          tags: null,
+          available_quantity: ["Below Minimum"],
+        });
+      } else if (defaultFilter === "above_minimum") {
+        setTableFilterValue({
+          name: null,
+          tags: null,
+          available_quantity: ["Above Minimum"],
+        });
+      }
+    }
+    // ...existing fetch logic...
+  }, [searchParams]);
 
   if (errorMsg) {
     return <ErrorContent errorMessage={errorMsg} />;
@@ -153,6 +190,7 @@ function Products() {
       title: "Name",
       dataIndex: "name",
       ...getColumnSearchPropsProduct("name", "Name, SKU or Barcode"),
+      filteredValue: tableFilteredValue.name,
       render: (_, record) => {
         return (
           <Link to={`/products/${record.id}`}>
@@ -176,6 +214,7 @@ function Products() {
     },
     {
       title: "Tags",
+      dataIndex: "tags",
       render: (_, record) => {
         return record.tags.length !== 0 ? (
           <Space>
@@ -191,6 +230,7 @@ function Products() {
         text: tag.name,
         value: tag.name,
       })),
+      filteredValue: tableFilteredValue.tags,
       onFilter: (value, record) =>
         record.tags
           .map((tag) => tag.name)
@@ -205,31 +245,29 @@ function Products() {
       width: 150,
       render: (text, record) => {
         const { quantity_level, minimum_quantity } = record;
-        if (
-          quantity_level === "Below Minimum" ||
-          quantity_level === "No Stock"
-        ) {
-          return (
-            <Popover
-              content={<>Minimum Quantity: {minimum_quantity}</>}
-              title={quantity_level}
-            >
-              <span style={{ color: "#f50" }}>
-                {quantity_level === "Below Minimum" ? (
-                  <strong>
-                    <ArrowDownOutlined />
-                  </strong>
-                ) : (
-                  <strong>
-                    <WarningOutlined />
-                  </strong>
-                )}
-              </span>{" "}
-              {text}
-            </Popover>
-          );
+
+        let icon = null;
+        let iconColor = "";
+        if (quantity_level === "No Stock") {
+          icon = <WarningOutlined />;
+          iconColor = "#eb2f96";
+        } else if (quantity_level === "Below Minimum") {
+          icon = <ArrowDownOutlined />;
+          iconColor = "#f50";
+        } else if (quantity_level === "Above Minimum") {
+          icon = <ArrowUpOutlined />;
+          iconColor = "#87d068";
         }
-        return <span>{text}</span>;
+
+        return (
+          <Popover
+            content={<>Minimum Quantity: {minimum_quantity}</>}
+            title={quantity_level}
+          >
+            <span style={{ color: iconColor }}>{icon}</span>
+            {text}
+          </Popover>
+        );
       },
       filters: [
         {
@@ -245,6 +283,7 @@ function Products() {
           value: "Above Minimum",
         },
       ],
+      filteredValue: tableFilteredValue.available_quantity,
       onFilter: (value, record) => record.quantity_level === value,
     },
     {
@@ -255,7 +294,8 @@ function Products() {
           content={
             <>
               <div>
-                Supplier Price: &#8369;{formatWithComma(record.supplier_price)}
+                Supplier Price: &#8369;
+                {formatWithComma(record.supplier_price)}
               </div>
               <div>Profit Margin: {record.profit_margin}</div>
             </>
@@ -274,12 +314,12 @@ function Products() {
         const menuItems = [
           { key: "View", label: "View" },
           { key: "Update", label: "Update" },
+          { key: "Create Purchase Order", label: "Create Purchase Order" },
           // {
           //   type: "divider",
           // },
           // { key: "Delete", label: "Delete", danger: true },
         ];
-
         const handleMenuClick = ({ key, domEvent }) => {
           domEvent.stopPropagation();
           if (key === "View") {
@@ -299,9 +339,12 @@ function Products() {
                 handleDeleteProduct(record);
               },
             });
+          } else if (key === "Create Purchase Order") {
+            navigate(
+              `/purchaseOrders/create?supplierId=${record.supplier_id}&productId=${record.id}`
+            );
           }
         };
-
         return (
           <Dropdown
             menu={{ items: menuItems, onClick: handleMenuClick }}
@@ -556,6 +599,10 @@ function Products() {
                 </Card>
               );
             },
+          }}
+          onChange={(_, filters) => {
+            console.log(filters);
+            setTableFilterValue(filters);
           }}
           // onRow={(record) => ({
           //   onClick: (e) => {

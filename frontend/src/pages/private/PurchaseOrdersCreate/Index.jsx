@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Spin,
   Row,
@@ -39,32 +39,10 @@ function PurchaseOrdersCreate() {
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   // const { productUnits } = useDataStore();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsContentLoading(true);
-        const { data: suppliers } = await http.get("/api/suppliers");
-        const { data: products } = await http.get("/api/getAllProducts");
-
-        setSuppliers(suppliers);
-        setProducts(products);
-      } catch (error) {
-        setErrorMsg(error.message);
-      } finally {
-        setIsContentLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (errorMsg) {
-    return <ErrorContent errorMessage={errorMsg} />;
-  }
 
   const handleAddPOItem = (selectedProduct) => {
     const { id, name, model, product_unit, supplier_price } = selectedProduct;
@@ -91,6 +69,50 @@ function PurchaseOrdersCreate() {
     setPOSubtotal(poSubtotal);
     setPOTotal(poSubtotal);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsContentLoading(true);
+        const { data: suppliers } = await http.get("/api/suppliers");
+        const { data: products } = await http.get("/api/getAllProducts");
+
+        //check if with default data
+        const supplierId = searchParams.get("supplierId");
+        const productId = searchParams.get("productId");
+
+        if (supplierId && productId) {
+          const supplier = suppliers.find(({ id }) => id == supplierId);
+
+          if (supplier) {
+            const filteredProducts = products.filter(
+              ({ supplier_id }) => supplier_id == supplier.id
+            );
+
+            const product = filteredProducts.find(({ id }) => id == productId);
+
+            if (product) {
+              setSelectedSupplier(supplier);
+              handleAddPOItem(product);
+            }
+          }
+        }
+
+        setSuppliers(suppliers);
+        setProducts(products);
+      } catch (error) {
+        setErrorMsg(error.message);
+      } finally {
+        setIsContentLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [searchParams]);
+
+  if (errorMsg) {
+    return <ErrorContent errorMessage={errorMsg} />;
+  }
 
   const handleUpdatePOItem = (poItemProductId, quantity) => {
     const newPOItems = poItems.map((poItem) => {
@@ -270,6 +292,7 @@ function PurchaseOrdersCreate() {
                   value: supplier.id,
                   label: supplier.name,
                 }))}
+                value={selectedSupplier?.id}
                 onChange={(supplierId) => {
                   const supplier = suppliers.find(
                     ({ id }) => id === supplierId

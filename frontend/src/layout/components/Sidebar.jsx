@@ -134,7 +134,7 @@ function Sidebar() {
       // "/warehouses",
       "/productUnits",
       "/tags",
-      // "/ecommerce",
+      "/ecommerce",
     ],
     Customer: ["/dashboard", "/ecommerce", "/customerOrders"],
     "Sales Manager": ["/dashboard", "/orders"],
