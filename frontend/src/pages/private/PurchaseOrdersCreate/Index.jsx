@@ -12,6 +12,8 @@ import {
   InputNumber,
   Card,
   Tooltip,
+  Image,
+  Modal,
 } from "antd";
 import { DoubleRightOutlined, CloseOutlined } from "@ant-design/icons";
 
@@ -27,6 +29,7 @@ const { Text } = Typography;
 
 function PurchaseOrdersCreate() {
   const [poItems, setPOItems] = useState([]);
+  const [poSimilarItems, setPOSimilarItems] = useState([]);
 
   const [poSubtotal, setPOSubtotal] = useState(0);
   const [poTotal, setPOTotal] = useState(0);
@@ -44,21 +47,54 @@ function PurchaseOrdersCreate() {
 
   // const { productUnits } = useDataStore();
 
-  const handleAddPOItem = (selectedProduct) => {
-    const { id, name, model, product_unit, supplier_price } = selectedProduct;
+  const handleAddPOItem = (selectedProduct, emptyPo) => {
+    const { id, name, model, product_unit, supplier_price, tags } =
+      selectedProduct;
 
-    const newPOItems = [
-      ...poItems,
-      {
-        product_id: id,
-        name,
-        model,
-        unit: product_unit.name,
-        quantity: 1,
-        unit_price: parseFloat(supplier_price),
-        amount: parseFloat(supplier_price),
-      },
-    ];
+    const validTags = tags.filter((tag) => /\[.*\]/.test(tag.name));
+
+    let newPOItems = [];
+    if (emptyPo) {
+      newPOItems = [
+        {
+          product_id: id,
+          name,
+          model,
+          unit: product_unit.name,
+          quantity: 1,
+          unit_price: parseFloat(supplier_price),
+          amount: parseFloat(supplier_price),
+          tags: validTags,
+        },
+      ];
+    } else {
+      newPOItems = [
+        ...poItems,
+        {
+          product_id: id,
+          name,
+          model,
+          unit: product_unit.name,
+          quantity: 1,
+          unit_price: parseFloat(supplier_price),
+          amount: parseFloat(supplier_price),
+          tags: validTags,
+        },
+      ];
+    }
+
+    let tagIds = [];
+    newPOItems.forEach((item) => {
+      tagIds = [...tagIds, ...item.tags.map((tag) => tag.id)];
+    });
+
+    tagIds = [...new Set(tagIds)];
+
+    const poSimilarItems = products
+      .filter((product) => product.tags.some((tag) => tagIds.includes(tag.id)))
+      .filter(
+        (product) => !newPOItems.some((item) => item.product_id === product.id)
+      );
 
     const poSubtotal = newPOItems.reduce((acc, item) => {
       acc += item.amount;
@@ -66,6 +102,7 @@ function PurchaseOrdersCreate() {
     }, 0);
 
     setPOItems(newPOItems);
+    setPOSimilarItems(poSimilarItems);
     setPOSubtotal(poSubtotal);
     setPOTotal(poSubtotal);
   };
@@ -142,14 +179,48 @@ function PurchaseOrdersCreate() {
       ({ product_id }) => product_id !== poItem.product_id
     );
 
+    let tagIds = [];
+    newPOItems.forEach((item) => {
+      tagIds = [...tagIds, ...item.tags.map((tag) => tag.id)];
+    });
+
+    tagIds = [...new Set(tagIds)];
+
+    const poSimilarItems = products
+      .filter((product) => product.tags.some((tag) => tagIds.includes(tag.id)))
+      .filter(
+        (product) => !newPOItems.some((item) => item.product_id === product.id)
+      );
+
     const poSubtotal = newPOItems.reduce((acc, item) => {
       acc += item.amount;
       return acc;
     }, 0);
 
     setPOItems(newPOItems);
+    setPOSimilarItems(poSimilarItems);
     setPOSubtotal(poSubtotal);
     setPOTotal(poSubtotal);
+  };
+
+  const handleAddPOSimilarItem = (selectedProduct) => {
+    if (selectedSupplier.id === selectedProduct.supplier_id) {
+      handleAddPOItem(selectedProduct);
+    } else {
+      Modal.confirm({
+        title: "Change Supplier",
+        content:
+          "This will change the supplier. Are you sure you want to swap the product?",
+        onOk: async () => {
+          setPOItems([]);
+          setPOSimilarItems([]);
+          setPOSubtotal(0);
+          setPOTotal(0);
+          setSelectedSupplier(selectedProduct.supplier);
+          handleAddPOItem(selectedProduct, true);
+        },
+      });
+    }
   };
 
   const handlePOSubmit = async () => {
@@ -158,7 +229,10 @@ function PurchaseOrdersCreate() {
       total_items: poItems.length,
       total_amount: poTotal,
       // subtotal_amount: poSubtotal,
-      items: poItems,
+      items: poItems.map((poItems) => {
+        delete poItems.tags;
+        return poItems;
+      }),
     };
 
     try {
@@ -173,6 +247,20 @@ function PurchaseOrdersCreate() {
   };
 
   const table1Columns = [
+    {
+      title: "",
+      dataIndex: "image_url",
+      render: (text) => {
+        return (
+          <Image
+            height={50}
+            width={50}
+            src={text || "https://placehold.co/50x50"}
+          />
+        );
+      },
+      width: 100,
+    },
     {
       title: "Supplier Products",
       ...getColumnSearchPropsProduct("name", "Product Name or SKU"),
@@ -212,6 +300,20 @@ function PurchaseOrdersCreate() {
   );
 
   const table2Columns = [
+    {
+      title: "",
+      dataIndex: "image_url",
+      render: (text) => {
+        return (
+          <Image
+            height={50}
+            width={50}
+            src={text || "https://placehold.co/50x50"}
+          />
+        );
+      },
+      width: 100,
+    },
     {
       title: "Name",
       dataIndex: "name",
@@ -278,6 +380,69 @@ function PurchaseOrdersCreate() {
     },
   ];
 
+  const table3Columns = [
+    {
+      title: "",
+      dataIndex: "image_url",
+      render: (text) => {
+        return (
+          <Image
+            height={50}
+            width={50}
+            src={text || "https://placehold.co/50x50"}
+          />
+        );
+      },
+      width: 100,
+    },
+    {
+      title: "Products",
+      ...getColumnSearchPropsProduct("name", "Product Name or SKU"),
+      render: (_, record) => {
+        return (
+          <>
+            <div>{record.name}</div>
+            <div>
+              <Text type="secondary">{record.model}</Text>
+            </div>
+          </>
+        );
+      },
+    },
+    { title: "Supplier", render: (_, record) => record.supplier.name },
+    {
+      title: "Supplier Price",
+      dataIndex: "supplier_price",
+      render: (text) => {
+        return (
+          <>
+            &#8369;
+            {formatWithComma(text)}
+          </>
+        );
+      },
+      width: 150,
+    },
+    {
+      title: "",
+      render: (_, record) => {
+        return (
+          <Tooltip title="Add to PO item">
+            <Button
+              icon={<DoubleRightOutlined />}
+              type="primary"
+              onClick={() => handleAddPOSimilarItem(record)}
+              // disabled={poItems.find(
+              //   ({ product_id }) => product_id === record.id
+              // )}
+            />
+          </Tooltip>
+        );
+      },
+      width: 50,
+    },
+  ];
+
   return (
     <>
       <Spin spinning={isContentLoading} tip="loading ...">
@@ -298,6 +463,7 @@ function PurchaseOrdersCreate() {
                     ({ id }) => id === supplierId
                   );
                   setPOItems([]);
+                  setPOSimilarItems([]);
                   setPOSubtotal(0);
                   setPOTotal(0);
                   setSelectedSupplier(supplier);
@@ -351,6 +517,15 @@ function PurchaseOrdersCreate() {
                 </Col>
               </Row>
             </Card>
+            {poSimilarItems.length !== 0 && (
+              <Card title="Similar Products" style={{ marginTop: 16 }}>
+                <Table
+                  columns={table3Columns}
+                  dataSource={poSimilarItems}
+                  rowKey="id"
+                />
+              </Card>
+            )}
           </Col>
         </Row>
       </Spin>

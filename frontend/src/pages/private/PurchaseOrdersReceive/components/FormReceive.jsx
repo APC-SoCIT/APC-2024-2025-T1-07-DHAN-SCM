@@ -39,21 +39,52 @@ const FormReceive = ({ supportingData, onSubmit }) => {
     }
   };
 
-  const handleFormFinish = (values) => {
-    // Convert `undefined` to `null`
-    for (let key in values) {
-      if (values[key] === undefined) {
-        values[key] = null;
+  const handleFormFinish = () => {
+    const values = formPOItemInstance.getFieldsValue();
+    // Check for empty serials
+    const serials = Array.from({ length: machineSerialsCount }).map((_, i) =>
+      values[`serial_number_${i + 1}`]?.trim()
+    );
+    let hasEmpty = false;
+    serials.forEach((serial, i) => {
+      if (!serial) {
+        formPOItemInstance.setFields([
+          {
+            name: `serial_number_${i + 1}`,
+            errors: ["Serial number is required."],
+          },
+        ]);
+        if (!hasEmpty) {
+          serialRefs.current[i]?.focus();
+          hasEmpty = true;
+        }
       }
+    });
+    if (hasEmpty) return;
+
+    // Check for duplicates
+    const hasDuplicates = new Set(serials).size !== serials.length;
+    if (hasDuplicates) {
+      for (let i = 0; i < machineSerialsCount; i++) {
+        formPOItemInstance.setFields([
+          {
+            name: `serial_number_${i + 1}`,
+            errors: ["Serial numbers must be unique."],
+          },
+        ]);
+      }
+      serialRefs.current[0]?.focus();
+      return;
     }
 
-    // onSubmit({
-    //   ...values,
-    //   delivery_date: dayjs(values.delivery_date).format("YYYY-MM-DD"),
-    //   expiration_date: values.expiration_date
-    //     ? dayjs(values.expiration_date).format("YYYY-MM-DD")
-    //     : null,
-    // });
+    // All valid, submit
+    onSubmit({
+      ...values,
+      delivery_date: dayjs(values.delivery_date).format("YYYY-MM-DD"),
+      expiration_date: values.expiration_date
+        ? dayjs(values.expiration_date).format("YYYY-MM-DD")
+        : null,
+    });
   };
 
   // Helper to focus next empty or next serial input, or submit if all filled and unique
@@ -227,7 +258,7 @@ const FormReceive = ({ supportingData, onSubmit }) => {
         <Divider />
         <Form.Item noStyle>
           <div style={{ textAlign: "right" }}>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" onClick={handleFormFinish}>
               OK
             </Button>
           </div>
