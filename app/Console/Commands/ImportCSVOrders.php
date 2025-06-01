@@ -106,7 +106,6 @@ class ImportCSVOrders extends Command
                 // ✅ Create Order & Override Timestamps
                 $order = Order::create([
                     'company_id' => $company->id,
-                    'user_id' => $user->id,
                     'company_order_number' => $record['company_order_number'] ?? null,
                     'order_date' => $orderDate,
                     'total_amount' => $totalPrice,
