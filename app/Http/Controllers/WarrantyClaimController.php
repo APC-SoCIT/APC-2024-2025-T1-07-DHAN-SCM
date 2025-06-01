@@ -69,7 +69,6 @@ class WarrantyClaimController extends Controller
         $warrantyClaim = WarrantyClaim::findOrFail($id);
     
         $request->validate([
-            'incoming_stock_id' => 'required|exists:incoming_stocks,id',
             'claim_date' => 'required|date',
             'description' => 'nullable|string',
             'performed_by' => 'nullable|string',
