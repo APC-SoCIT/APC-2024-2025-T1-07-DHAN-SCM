@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\DemoUnit;
 use Illuminate\Http\Request;
 use App\Models\IncomingStock;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 
 class ReportController extends Controller
@@ -259,16 +261,43 @@ class ReportController extends Controller
     }
     
 
-    public function getMaintenanceCountForThisMonth()
-    {
-        $count = DB::table('maintenance_records')
-            ->whereMonth('next_maintenance_date', now()->month)
-            ->whereYear('next_maintenance_date', now()->year)
-            ->where('next_maintenance_date', '>=', now()->toDateString()) // Ensures date is not in the past
-            ->count();
 
-        return response()->json(['maintenance_count' => $count]);
-    }
+public function forServicingCount()
+{
+    $count = collect(DB::select("
+        SELECT  
+            B.name AS product_name,
+            ii.serial_number,
+            latest_maintenance.next_maintenance_date,
+            latest_calibration.calibration_date
+        FROM outgoing_stocks A
+        INNER JOIN products B ON B.id = A.product_id
+        INNER JOIN incoming_stocks ii ON ii.id = A.incoming_stock_id
+        LEFT JOIN (
+            SELECT incoming_stock_id, next_maintenance_date 
+            FROM maintenance_records 
+            ORDER BY next_maintenance_date DESC
+        ) latest_maintenance ON latest_maintenance.incoming_stock_id = A.incoming_stock_id
+        LEFT JOIN (
+            SELECT incoming_stock_id, calibration_date 
+            FROM calibration_records 
+            ORDER BY calibration_date DESC
+        ) latest_calibration ON latest_calibration.incoming_stock_id = A.incoming_stock_id
+        WHERE B.is_machine = 1
+    "))
+    ->map(function ($item) {
+        $nextMaintenanceDate = $item->next_maintenance_date ? Carbon::parse($item->next_maintenance_date) : null;
+        $forMaintenance = !$nextMaintenanceDate || Carbon::today()->diffInDays($nextMaintenanceDate) < 30;
+
+        return ['for_maintenance' => $forMaintenance];
+    })
+    ->filter(fn($item) => $item['for_maintenance'] === true)
+    ->count();
+
+    return response()->json(['maintenance_count' => $count]);
+}
+
+
                     
 
 }
