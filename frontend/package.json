@@ -1,4 +1,5 @@
 {
+  "homepage": "https://akioagot.github.io/megaion_client_3",
   "name": "megaion_client",
   "private": true,
   "version": "0.0.0",
@@ -7,7 +8,9 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "antd": "^5.24.1",
@@ -28,6 +31,7 @@
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
+    "gh-pages": "^6.3.0",
     "globals": "^15.14.0",
     "vite": "^6.1.0"
   }
