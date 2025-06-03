@@ -39,7 +39,18 @@ const FormReceive = ({ supportingData, onSubmit }) => {
     }
   };
 
-  const handleFormFinish = () => {
+  const handleFormFinishConsumable = (values) => {
+    // All valid, submit
+    onSubmit({
+      ...values,
+      delivery_date: dayjs(values.delivery_date).format("YYYY-MM-DD"),
+      expiration_date: values.expiration_date
+        ? dayjs(values.expiration_date).format("YYYY-MM-DD")
+        : null,
+    });
+  };
+
+  const handleFormFinishMachine = () => {
     const values = formPOItemInstance.getFieldsValue();
     // Check for empty serials
     const serials = Array.from({ length: machineSerialsCount }).map((_, i) =>
@@ -172,7 +183,7 @@ const FormReceive = ({ supportingData, onSubmit }) => {
           required: "This is required.",
         }}
         onValuesChange={handleFormValuesChange}
-        onFinish={handleFormFinish}
+        onFinish={handleFormFinishConsumable}
         size="large"
         initialValues={{
           delivered_quantity: 1,
@@ -256,13 +267,23 @@ const FormReceive = ({ supportingData, onSubmit }) => {
           </>
         )}
         <Divider />
-        <Form.Item noStyle>
-          <div style={{ textAlign: "right" }}>
-            <Button type="primary" onClick={handleFormFinish}>
-              OK
-            </Button>
-          </div>
-        </Form.Item>
+        {poItem.product.is_machine ? (
+          <Form.Item noStyle>
+            <div style={{ textAlign: "right" }}>
+              <Button type="primary" onClick={handleFormFinishMachine}>
+                OK
+              </Button>
+            </div>
+          </Form.Item>
+        ) : (
+          <Form.Item noStyle>
+            <div style={{ textAlign: "right" }}>
+              <Button type="primary" htmlType="submit">
+                OK
+              </Button>
+            </div>
+          </Form.Item>
+        )}
       </Form>
     </>
   );
