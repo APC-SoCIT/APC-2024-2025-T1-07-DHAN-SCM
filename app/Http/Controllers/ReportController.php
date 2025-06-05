@@ -35,7 +35,7 @@ class ReportController extends Controller
 
 
 
-    public function outOfStocks(Request $request)
+    public function outOfStocks2(Request $request)
     {
         $query = Product::with([
             'incomingStocks'
@@ -56,7 +56,29 @@ class ReportController extends Controller
         return response()->json(['out_of_stock_count' => $products]);
     }
 
-   public function belowMinimumStocks(Request $request)
+    public function outOfStocks(Request $request)
+    {
+        // Preload all outgoing incoming_stock_ids to prevent N+1 queries
+        $outgoingStockIds = OutgoingStock::pluck('incoming_stock_id')->toArray();
+
+        $products = Product::with('incomingStocks')->get();
+
+        $outOfStockCount = $products->map(function ($product) use ($outgoingStockIds) {
+            $availableQuantity = $product->incomingStocks
+                ->reject(fn($stock) => in_array($stock->id, $outgoingStockIds))
+                ->filter(fn($stock) => is_null($stock->expiration_date) || !Carbon::parse($stock->expiration_date)->isPast())
+                ->sum('quantity');
+
+            return ['available_quantity' => $availableQuantity];
+        })
+        ->filter(fn($product) => $product['available_quantity'] == 0)
+        ->count();
+
+        return response()->json(['out_of_stock_count' => $outOfStockCount]);
+    }
+
+
+   public function belowMinimumStocks2(Request $request)
     {
         // Get the 'showDetails' parameter from the request (defaults to false)
         $showDetails = filter_var($request->query('showDetails', false), FILTER_VALIDATE_BOOLEAN);
@@ -79,6 +101,35 @@ class ReportController extends Controller
 
         return response()->json(['below_minimum_count' => $belowMinimumProducts]);
     }
+
+    public function belowMinimumStocks(Request $request)
+    {
+        // Optional query param (currently unused but kept for future logic)
+        $showDetails = filter_var($request->query('showDetails', false), FILTER_VALIDATE_BOOLEAN);
+
+        // Preload all outgoing incoming_stock_ids to avoid N+1 queries
+        $outgoingStockIds = OutgoingStock::pluck('incoming_stock_id')->toArray();
+
+        // Only fetch products that have at least one incoming stock
+        $products = Product::with('incomingStocks')->get();
+
+        // Map, filter and count in one pipeline
+        $belowMinimumCount = $products->map(function ($product) use ($outgoingStockIds) {
+            $availableQuantity = $product->incomingStocks
+                ->reject(fn($stock) => in_array($stock->id, $outgoingStockIds))
+                ->filter(fn($stock) => is_null($stock->expiration_date) || !Carbon::parse($stock->expiration_date)->isPast())
+                ->sum('quantity');
+
+            return [
+                'available_quantity' => $availableQuantity,
+                'minimum_quantity' => $product->minimum_quantity,
+            ];
+        })->filter(fn($data) => $data['available_quantity'] > 0 && $data['available_quantity'] < $data['minimum_quantity'])
+        ->count();
+
+        return response()->json(['below_minimum_count' => $belowMinimumCount]);
+    }
+
 
   
 
@@ -230,7 +281,7 @@ class ReportController extends Controller
     
 
 
-public function forServicingCount()
+public function forServicingCount2()
 {
     $count = collect(DB::select("
         SELECT  
@@ -264,6 +315,64 @@ public function forServicingCount()
 
     return response()->json(['maintenance_count' => $count]);
 }
+
+public function forServicingCount()
+{
+    $items = collect(DB::select("
+        SELECT  
+            B.name AS product_name,
+            ii.serial_number,
+            latest_maintenance.next_maintenance_date,
+            latest_calibration.calibration_date
+        FROM outgoing_stocks A
+        INNER JOIN products B ON B.id = A.product_id
+        INNER JOIN incoming_stocks ii ON ii.id = A.incoming_stock_id
+        LEFT JOIN (
+            SELECT t1.*
+            FROM maintenance_records t1
+            INNER JOIN (
+                SELECT incoming_stock_id, MAX(maintenance_date) as max_date
+                FROM maintenance_records
+                WHERE next_maintenance_date IS NOT NULL
+                GROUP BY incoming_stock_id
+            ) t2 ON t1.incoming_stock_id = t2.incoming_stock_id AND t1.maintenance_date = t2.max_date
+        ) latest_maintenance ON latest_maintenance.incoming_stock_id = A.incoming_stock_id
+        LEFT JOIN (
+            SELECT t1.*
+            FROM calibration_records t1
+            INNER JOIN (
+                SELECT incoming_stock_id, MAX(calibration_date) as max_date
+                FROM calibration_records
+                WHERE calibration_date IS NOT NULL
+                GROUP BY incoming_stock_id
+            ) t2 ON t1.incoming_stock_id = t2.incoming_stock_id AND t1.calibration_date = t2.max_date
+        ) latest_calibration ON latest_calibration.incoming_stock_id = A.incoming_stock_id
+        WHERE B.is_machine = 1
+    "))
+    ->map(function ($item) {
+        $today = Carbon::today();
+
+        // Maintenance check
+        $nextMaintenanceDate = $item->next_maintenance_date
+            ? Carbon::parse($item->next_maintenance_date)
+            : null;
+
+        $forMaintenance = false;
+        if ($nextMaintenanceDate) {
+            $daysUntilMaintenance = $today->diffInDays($nextMaintenanceDate, false);
+            $forMaintenance = $daysUntilMaintenance < 30;
+        }
+
+        return [
+            'for_maintenance' => $forMaintenance
+        ];
+    })
+    ->filter(fn($item) => $item['for_maintenance'])
+    ->count();
+
+    return response()->json(['maintenance_count' => $items]);
+}
+
 
 
                     

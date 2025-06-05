@@ -46,29 +46,30 @@ class UserController extends Controller
     }
 
 
-   public function getUserData(Request $request)
+  public function getUserData(Request $request)
     {
-        $user = auth()->user();
-        $roles = $user->roles->pluck('name');// Assuming the Role model has a 'name' attribute
+        $user = auth()->user()->load('roles');  // eager load roles
+        
         return response()->json([
             'user_id' => $user->id,
             'name' => $user->full_name,
             'username' => $user->username,
             'email' => $user->email,
-            'roles' => $roles
+            'roles' => $user->roles->pluck('name'),
         ]);
     }
 
-    public function show($id)
+
+ public function show($id)
     {
-        $user = User::with('roles')->findOrFail($id);
-    
+        $user = User::with('roles')->findOrFail($id);  // eager loads roles in single query
+
         return response()->json([
             'user_id' => $user->id,
             'name' => $user->full_name,
             'username' => $user->username,
             'email' => $user->email,
-            'roles' => $user->roles->pluck('name') // Extract only role names
+            'roles' => $user->roles->pluck('name'),
         ]);
     }
 

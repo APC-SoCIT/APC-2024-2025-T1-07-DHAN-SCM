@@ -16,7 +16,7 @@ class MaintenanceRecordController extends Controller
 {
 
 
-    public function forServicing()
+    public function forServicing2()
     {
         return response()->json(
             collect(DB::select("
@@ -67,6 +67,80 @@ class MaintenanceRecordController extends Controller
             })
         );
     }
+public function forServicing()
+{
+    $results = DB::select("
+        SELECT 
+            F.name AS company_name,
+            B.name AS product_name,
+            ii.serial_number,
+            A.order_item_id,
+            A.demo_unit_id,
+            A.type,
+            A.incoming_stock_id,
+            ii.barcode,
+            COALESCE(D.megaion_order_number, E.demo_number) AS reference_number,
+            latest_maintenance.next_maintenance_date,
+            COALESCE(D.created_at, E.created_at) AS created_at,
+            latest_calibration.calibration_date
+        FROM outgoing_stocks A
+        INNER JOIN products B ON B.id = A.product_id
+        INNER JOIN incoming_stocks ii ON ii.id = A.incoming_stock_id
+        LEFT JOIN order_items C ON C.id = A.order_item_id
+        LEFT JOIN orders D ON D.id = C.order_id
+        LEFT JOIN demo_units E ON E.id = A.demo_unit_id
+        LEFT JOIN companies F ON F.id = COALESCE(D.company_id, E.company_id)
+        LEFT JOIN (
+            SELECT t1.*
+            FROM maintenance_records t1
+            INNER JOIN (
+                SELECT incoming_stock_id, MAX(maintenance_date) as max_date
+                FROM maintenance_records
+                WHERE next_maintenance_date IS NOT NULL
+                GROUP BY incoming_stock_id
+            ) t2 ON t1.incoming_stock_id = t2.incoming_stock_id AND t1.maintenance_date = t2.max_date
+        ) latest_maintenance ON latest_maintenance.incoming_stock_id = A.incoming_stock_id
+        LEFT JOIN (
+            SELECT t1.*
+            FROM calibration_records t1
+            INNER JOIN (
+                SELECT incoming_stock_id, MAX(calibration_date) as max_date
+                FROM calibration_records
+                WHERE calibration_date IS NOT NULL
+                GROUP BY incoming_stock_id
+            ) t2 ON t1.incoming_stock_id = t2.incoming_stock_id AND t1.calibration_date = t2.max_date
+        ) latest_calibration ON latest_calibration.incoming_stock_id = A.incoming_stock_id
+        WHERE B.is_machine = 1 
+        ORDER BY COALESCE(D.created_at, E.created_at) DESC
+    ");
+
+    $items = collect($results)->map(function ($item) {
+        $today = Carbon::today();
+
+        // Parse dates
+        $nextMaintenanceDate = $item->next_maintenance_date ? Carbon::parse($item->next_maintenance_date) : null;
+        $calibrationDate = $item->calibration_date ? Carbon::parse($item->calibration_date) : null;
+
+        // Maintenance logic (same as getAllProducts)
+        $forMaintenance = false;
+        if ($nextMaintenanceDate) {
+            $daysUntilMaintenance = $today->diffInDays($nextMaintenanceDate, false);
+            $forMaintenance = $daysUntilMaintenance < 30;
+        }
+
+        // Calibration logic (same as getAllProducts)
+        $forCalibration = !$calibrationDate;
+
+        return array_merge((array) $item, [
+            'for_maintenance' => $forMaintenance,
+            'for_calibration' => $forCalibration
+        ]);
+    });
+
+    return response()->json($items);
+}
+
+
     // Retrieve all maintenance records with related entities
     public function index()
     {

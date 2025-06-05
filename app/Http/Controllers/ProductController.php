@@ -79,7 +79,7 @@ class ProductController extends Controller
     
         return response()->json($logs->sortByDesc('timestamp')->values()->toArray());
     }
-    public function getAllProducts($productId = null)  
+    public function getAllProducts1($productId = null)  
     {  
         $query = Product::with([  
             'productUnit',  
@@ -225,6 +225,328 @@ class ProductController extends Controller
     
         return response()->json($productId !== null ? $products->first() : $products);
     }
+
+
+    public function getAllProducts2($productId = null)
+    {
+        // Preload all relevant OutgoingStock IDs to avoid N+1 queries
+        $outgoingStockIds = OutgoingStock::pluck('incoming_stock_id')->toArray();
+
+        $query = Product::with([
+            'productUnit',
+            'supplier',
+            'location',
+            'warehouse',
+            'status',
+            'creator',
+            'updater',
+            'tags',
+            'incomingStocks.calibrationRecords',
+            'incomingStocks.maintenanceRecords'
+        ]);
+
+        if ($productId !== null) {
+            $query->where('id', $productId);
+        }
+
+        $products = $query->get()->map(function ($product) use ($outgoingStockIds) {
+            // Filter out outgoing stocks
+            $incomingStocks = $product->incomingStocks->reject(
+                fn($stock) => in_array($stock->id, $outgoingStockIds)
+            );
+
+            $availableQuantity = $incomingStocks
+                ->filter(fn($stock) => is_null($stock->expiration_date) || !Carbon::parse($stock->expiration_date)->isPast())
+                ->sum('quantity');
+
+            $filteredIncomingStocks = $incomingStocks->sortBy(
+                fn($stock) => $stock->expiration_date ?? $stock->created_at
+            );
+
+            $groupedStocks = $filteredIncomingStocks->isNotEmpty()
+                ? $filteredIncomingStocks->groupBy(fn($stock) => implode('|', [
+                    $stock->purchase_order_item_id,
+                    $stock->serial_number ?? 'NULL',
+                    $stock->lot_number ?? 'NULL',
+                    $stock->expiration_date ?? 'NULL',
+                    $stock->product_id
+                ]))->map(function ($stocks) use ($product) {
+                    $firstStock = $stocks->first();
+                    $quantity = $stocks->sum('quantity');
+                    $remainingTimeString = null;
+                    $status = 'In Stock';
+
+                    if (!$product->is_machine) {
+                        $expirationDate = $firstStock->expiration_date ? Carbon::parse($firstStock->expiration_date) : null;
+                        $today = Carbon::today();
+
+                        if (!$expirationDate || !$firstStock->lot_number) {
+                            $status = 'INSTOCK';
+                        } else {
+                            $remainingTime = $today->diff($expirationDate);
+
+                            if ($expirationDate->isPast()) {
+                                $status = 'EXPIRED';
+                                $remainingTimeString = 'Expired ' . $remainingTime->y . ' Years, ' . $remainingTime->m . ' Months, and ' . $remainingTime->d . ' Days Ago';
+                            } elseif ($expirationDate->greaterThan($today->copy()->addMonths(3))) {
+                                $status = 'VIABLE';
+                                $remainingTimeString = 'Expires in ' . $remainingTime->y . ' Years, ' . $remainingTime->m . ' Months, and ' . $remainingTime->d . ' Days';
+                            } else {
+                                $status = 'EXPIRING';
+                                $remainingTimeString = 'Expiring in ' . $remainingTime->m . ' Months and ' . $remainingTime->d . ' Days';
+                            }
+                        }
+                    }
+                    // Calibration & Maintenance records — always initialize
+                    $calibrationRecords = $firstStock->calibrationRecords
+                        ->sortByDesc('calibration_date')
+                        ->map(fn($r) => [
+                            'calibration_date' => $r->calibration_date,
+                            'calibrated_by' => $r->calibrated_by,
+                            'calibration_notes' => $r->calibration_notes,
+                            'calibration_status_id' => $r->calibration_status_id
+                        ])->values();
+
+                    $maintenanceRecords = $firstStock->maintenanceRecords
+                        ->sortByDesc('maintenance_date')
+                        ->map(fn($r) => [
+                            'maintenance_date' => $r->maintenance_date,
+                            'next_maintenance_date' => $r->next_maintenance_date,
+                            'performed_by' => $r->performed_by,
+                            'description' => $r->description
+                        ])->values();
+
+                    // Always define flags, even for non-machines
+                    $forCalibration = false;
+                    $forMaintenance = false;
+
+                    if ($product->is_machine) {
+                        $latestCalibration = $calibrationRecords->first();
+                        $forCalibration = !$latestCalibration;
+
+                        $latestMaintenance = $maintenanceRecords->first();
+                        $nextMaintenanceDate = $latestMaintenance['next_maintenance_date'] ?? null;
+                        $forMaintenance = $nextMaintenanceDate
+                            ? Carbon::today()->diffInDays(Carbon::parse($nextMaintenanceDate)) < 30
+                            : false;
+                    }
+
+                    return [
+                        'purchase_order_item_id' => $firstStock->purchase_order_item_id,
+                        'serial_number' => $firstStock->serial_number,
+                        'lot_number' => $firstStock->lot_number,
+                        'expiration_date' => $firstStock->expiration_date,
+                        'product_id' => $firstStock->product_id,
+                        'quantity' => $quantity,
+                        'status' => $status,
+                        'remaining_time' => $remainingTimeString,
+                        'barcodes' => $stocks->pluck('barcode')->all(),
+                        'calibration_records' => $calibrationRecords->toArray(),
+                        'for_calibration' => (bool) $forCalibration,
+                        'maintenance_records' => $maintenanceRecords->toArray(),
+                        'for_maintenance' => (bool) $forMaintenance
+                    ];
+                })->values()
+                : collect();
+
+            // Totals
+            $totalForCalibration = $product->is_machine
+                ? $groupedStocks->where('for_calibration', true)->count()
+                : 0;
+
+            $totalForMaintenance = $product->is_machine
+                ? $groupedStocks->where('for_maintenance', true)->count()
+                : 0;
+
+            $totalDemoUnits = $product->is_machine
+                ? DemoUnit::whereIn('incoming_stock_id', $product->incomingStocks->pluck('id'))->count()
+                : 0;
+
+            return array_merge($product->toArray(), [
+                'available_quantity' => $availableQuantity,
+                'quantity_level' => $availableQuantity == 0
+                    ? 'No Stock'
+                    : ($availableQuantity < $product->minimum_quantity ? 'Below Minimum' : 'Above Minimum'),
+                'default_selling_price' => number_format(
+                    $product->supplier_price + ($product->supplier_price * ($product->profit_margin / 100)),
+                    2,
+                    '.',
+                    ''
+                ),
+                'incoming_stocks' => $groupedStocks->toArray(),
+                'total_for_calibration' => $totalForCalibration,
+                'total_for_maintenance' => $totalForMaintenance,
+                'total_demo_units' => $totalDemoUnits
+            ]);
+        });
+
+       return response()->json(
+            $productId !== null 
+                ? $products->first() 
+                : $products->sortByDesc('available_quantity')->values()
+        );
+
+    }
+
+    public function getAllProducts($productId = null)
+    {
+        // Load products with eager loading of relations and filtered incomingStocks
+        // Use withCount to avoid N+1 for DemoUnits count
+        
+        $query = Product::with([
+            'productUnit',
+            'supplier',
+            'location',
+            'warehouse',
+            'status',
+            'creator',
+            'updater',
+            'tags',
+            // Load incomingStocks with calibration and maintenance eager loaded
+            'incomingStocks' => function($q) {
+                // Only incomingStocks that are NOT outgoing (join with outgoing_stocks)
+                $q->whereDoesntHave('outgoingStocks')
+                ->with(['calibrationRecords' => function($qr) {
+                    $qr->orderByDesc('calibration_date');
+                }, 'maintenanceRecords' => function($qr) {
+                    $qr->orderByDesc('maintenance_date');
+                }]);
+            },
+        ])->withCount(['demoUnits']); // preload count of demo units per product
+
+        if ($productId !== null) {
+            $query->where('id', $productId);
+        }
+
+        $products = $query->get()->map(function ($product) {
+            // Filter out expired incoming stocks here (avoid parsing date multiple times)
+            $today = Carbon::today();
+
+            $validStocks = $product->incomingStocks->filter(function ($stock) use ($today) {
+                return is_null($stock->expiration_date) || !Carbon::parse($stock->expiration_date)->isPast();
+            });
+
+            $availableQuantity = $validStocks->sum('quantity');
+
+            // Sort stocks by expiration_date or created_at once
+            $filteredIncomingStocks = $validStocks->sortBy(function ($stock) {
+                return $stock->expiration_date ?? $stock->created_at;
+            });
+
+            // Group stocks by combined keys
+            $groupedStocks = $filteredIncomingStocks->groupBy(function ($stock) {
+                return implode('|', [
+                    $stock->purchase_order_item_id,
+                    $stock->serial_number ?? 'NULL',
+                    $stock->lot_number ?? 'NULL',
+                    $stock->expiration_date ?? 'NULL',
+                    $stock->product_id,
+                ]);
+            })->map(function ($stocks) use ($product, $today) {
+                $firstStock = $stocks->first();
+                $quantity = $stocks->sum('quantity');
+                $status = 'In Stock';
+                $remainingTimeString = null;
+
+                if (!$product->is_machine) {
+                    $expirationDate = $firstStock->expiration_date ? Carbon::parse($firstStock->expiration_date) : null;
+                    if (!$expirationDate || !$firstStock->lot_number) {
+                        $status = 'INSTOCK';
+                    } else {
+                        $remainingTime = $today->diff($expirationDate);
+                        if ($expirationDate->isPast()) {
+                            $status = 'EXPIRED';
+                            $remainingTimeString = 'Expired ' . $remainingTime->y . ' Years, ' . $remainingTime->m . ' Months, and ' . $remainingTime->d . ' Days Ago';
+                        } elseif ($expirationDate->greaterThan($today->copy()->addMonths(3))) {
+                            $status = 'VIABLE';
+                            $remainingTimeString = 'Expires in ' . $remainingTime->y . ' Years, ' . $remainingTime->m . ' Months, and ' . $remainingTime->d . ' Days';
+                        } else {
+                            $status = 'EXPIRING';
+                            $remainingTimeString = 'Expiring in ' . $remainingTime->m . ' Months and ' . $remainingTime->d . ' Days';
+                        }
+                    }
+                }
+
+                // Latest calibration and maintenance records already sorted desc
+                $latestCalibration = $firstStock->calibrationRecords->first();
+                $calibrationRecords = $firstStock->calibrationRecords->map(fn($r) => [
+                    'calibration_date' => $r->calibration_date,
+                    'calibrated_by' => $r->calibrated_by,
+                    'calibration_notes' => $r->calibration_notes,
+                    'calibration_status_id' => $r->calibration_status_id,
+                ])->values();
+
+                $latestMaintenance = $firstStock->maintenanceRecords->first();
+                $maintenanceRecords = $firstStock->maintenanceRecords->map(fn($r) => [
+                    'maintenance_date' => $r->maintenance_date,
+                    'next_maintenance_date' => $r->next_maintenance_date,
+                    'performed_by' => $r->performed_by,
+                    'description' => $r->description,
+                ])->values();
+
+                // Flags for calibration & maintenance for machines
+                $forCalibration = $product->is_machine && !$latestCalibration;
+                $forMaintenance = false;
+                if ($product->is_machine && $latestMaintenance) {
+                    $nextMaintenanceDate = $latestMaintenance->next_maintenance_date;
+                    if ($nextMaintenanceDate) {
+                        $forMaintenance = $today->diffInDays(Carbon::parse($nextMaintenanceDate)) < 30;
+                    }
+                }
+
+                return [
+                    'purchase_order_item_id' => $firstStock->purchase_order_item_id,
+                    'serial_number' => $firstStock->serial_number,
+                    'lot_number' => $firstStock->lot_number,
+                    'expiration_date' => $firstStock->expiration_date,
+                    'product_id' => $firstStock->product_id,
+                    'quantity' => $quantity,
+                    'status' => $status,
+                    'remaining_time' => $remainingTimeString,
+                    'barcodes' => $stocks->pluck('barcode')->all(),
+                    'calibration_records' => $calibrationRecords->toArray(),
+                    'for_calibration' => (bool) $forCalibration,
+                    'maintenance_records' => $maintenanceRecords->toArray(),
+                    'for_maintenance' => (bool) $forMaintenance,
+                ];
+            })->values();
+
+            $totalForCalibration = $product->is_machine
+                ? $groupedStocks->where('for_calibration', true)->count()
+                : 0;
+
+            $totalForMaintenance = $product->is_machine
+                ? $groupedStocks->where('for_maintenance', true)->count()
+                : 0;
+
+            // Use preloaded demo_units_count to avoid query inside loop
+            $totalDemoUnits = $product->is_machine ? $product->demo_units_count : 0;
+
+            return array_merge($product->toArray(), [
+                'available_quantity' => $availableQuantity,
+                'quantity_level' => $availableQuantity == 0
+                    ? 'No Stock'
+                    : ($availableQuantity < $product->minimum_quantity ? 'Below Minimum' : 'Above Minimum'),
+                'default_selling_price' => number_format(
+                    $product->supplier_price + ($product->supplier_price * ($product->profit_margin / 100)),
+                    2,
+                    '.',
+                    ''
+                ),
+                'incoming_stocks' => $groupedStocks->toArray(),
+                'total_for_calibration' => $totalForCalibration,
+                'total_for_maintenance' => $totalForMaintenance,
+                'total_demo_units' => $totalDemoUnits,
+            ]);
+        });
+
+        return response()->json(
+            $productId !== null
+                ? $products->first()
+                : $products->sortByDesc('available_quantity')->values()
+        );
+    }
+
 
     /**
      * Display a listing of the products.

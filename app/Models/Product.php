@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\DemoUnit;
 use Illuminate\Support\Str;
+use App\Models\IncomingStock;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
@@ -127,6 +129,18 @@ class Product extends Model
     {
         return $this->incomingStocks()->sum('quantity');
     }
+    public function demoUnits()
+    {
+        return $this->hasManyThrough(
+            DemoUnit::class,
+            IncomingStock::class,
+            'product_id', // Foreign key on incoming_stocks table...
+            'incoming_stock_id', // Foreign key on demo_units table...
+            'id', // Local key on products table...
+            'id'  // Local key on incoming_stocks table...
+        );
+    }
+
 
 
 }
