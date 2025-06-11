@@ -6,6 +6,7 @@ use Log;
 use Storage;
 use Carbon\Carbon;
 use App\Models\Order;
+use App\Models\Status;
 use App\Models\Product;
 use App\Models\DemoUnit;
 use App\Models\ProductType;
@@ -16,6 +17,9 @@ use App\Models\PurchaseOrder;
 use App\Models\SupplierProduct;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use App\Models\PurchaseOrderStatus;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -540,12 +544,24 @@ class ProductController extends Controller
             ]);
         });
 
+        
+
         return response()->json(
             $productId !== null
                 ? $products->first()
                 : $products->sortByDesc('available_quantity')->values()
         );
     }
+
+
+
+
+ private function getStatusId($statusName)
+    {
+        return Status::where('name', $statusName)->first()->id;
+    }
+
+
 
 
     /**

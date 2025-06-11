@@ -84,6 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
+    Route::get('/purchaseOrders/{purchaseOrderId?}', [PurchaseOrderController::class, 'getPurchaseOrderDetails']);
 
 });
 
@@ -93,9 +94,9 @@ Route::get('forServicing', [MaintenanceRecordController::class, 'forServicing'])
 
 Route::get('availableIncomingStocks/{productId?}', [IncomingStocksController::class, 'getAvailableIncomingStocks']);
 
-Route::get('/purchaseOrders/{purchaseOrderId?}', [PurchaseOrderController::class, 'getPurchaseOrderDetails']);
 
 Route::get('getAllProducts/{productId?}', [ProductController::class, 'getAllProducts']);
+
 
 Route::get('/products/{id}/logs', [ProductController::class, 'productLogs']);
 

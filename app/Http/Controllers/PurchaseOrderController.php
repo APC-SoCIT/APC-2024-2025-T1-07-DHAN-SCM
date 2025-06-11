@@ -16,12 +16,15 @@ use App\Models\PurchaseOrderStatus;
 use Illuminate\Support\Facades\Log;
 use App\Models\SupplierProductPrice;
 use Illuminate\Support\Facades\Auth;
+use App\Services\PurchaseOrderService;
 
 class PurchaseOrderController extends Controller
 {
 
     public function getPurchaseOrderDetails($purchaseOrderId = null)
     {
+        $poService = new PurchaseOrderService();
+        $poService->createPOsForBelowMinimumAndZeroStock();
         if ($purchaseOrderId) {
             $purchaseOrder = PurchaseOrder::with([
                 'supplier',
@@ -100,6 +103,8 @@ class PurchaseOrderController extends Controller
     {
         return PurchaseOrder::with(['supplier', 'status', 'creator', 'updater'])->findOrFail($id);
     }
+
+    
 
     public function update(Request $request, $id)
     {
